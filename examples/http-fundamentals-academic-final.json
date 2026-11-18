@@ -1,0 +1,4286 @@
+{
+  "schema": "tubemind/1",
+  "id": "d4ecd58cff6b3889",
+  "version": 1,
+  "meta": {
+    "videoId": "qv5-5hhsKpE",
+    "title": "HTTP Fundamentals in 10 Minutes",
+    "channel": "",
+    "url": "https://www.youtube.com/watch?v=qv5-5hhsKpE",
+    "duration": 635.54,
+    "mode": "academic",
+    "language": "en",
+    "sourceLanguage": "en",
+    "translation": {
+      "lang": "en",
+      "status": "english",
+      "detect_ms": 0.2,
+      "translate_ms": 0,
+      "units": 0,
+      "translated": 0,
+      "coverage": 1.0
+    },
+    "originalTitle": "HTTP Fundamentals in 10 Minutes",
+    "transcriptSource": "youtube-captions",
+    "llm": "nvidia:nvidia/nemotron-3.5-bolt-e4b",
+    "labelled": true,
+    "embeddings": "tfidf-lsa",
+    "createdAt": 1794894621829,
+    "buildSeconds": 2.88,
+    "timings": {
+      "transcript": 1285,
+      "translate": 0,
+      "detect": 0,
+      "segment": 1443,
+      "concepts": 120,
+      "assemble": 28,
+      "summary": 1,
+      "edges": 8,
+      "guard": 0,
+      "total": 2884,
+      "skeleton": 1599
+    },
+    "storyboardSpec": null,
+    "labelStats": {
+      "calls": 2,
+      "prompt_tokens": 2332,
+      "completion_tokens": 576,
+      "llm_ms": 7668,
+      "applied": 38,
+      "candidates": 40
+    }
+  },
+  "root": {
+    "id": "n-d3d24201fe",
+    "text": "HTTP Fundamentals Learning Sketchbook",
+    "type": "root",
+    "layer": 0,
+    "start": 0.0,
+    "end": 635.54,
+    "summary": "HTTP defines how web communication works using rules and messages",
+    "tone": [
+      "controversial"
+    ],
+    "keywords": [
+      "Client Limit",
+      "Somewhat Rare",
+      "Flow Control",
+      "Push",
+      "Query String",
+      "Com Blog",
+      "Push Resources",
+      "Query"
+    ],
+    "notes": "",
+    "links": [],
+    "image": null,
+    "collapsed": false,
+    "children": [
+      {
+        "id": "n-edcc6f5d95",
+        "text": "Protocol Rules",
+        "type": "section",
+        "layer": 1,
+        "start": 0.0,
+        "end": 111.96,
+        "summary": "Teaches what a protocol is in communication",
+        "tone": [
+          "instructional",
+          "controversial"
+        ],
+        "keywords": [
+          "protocol",
+          "rules",
+          "revisit http",
+          "communication",
+          "roles",
+          "foundations"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-604c858bee",
+            "text": "URI identifies resource",
+            "type": "concept",
+            "layer": 2,
+            "start": 109.56,
+            "end": 128.58,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-9a18bdf098",
+                "text": "“welcome back to another video now today we're going to cover HTTP hypertext transfer protocol which is really a Cornerstone of web applications and…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 109.56,
+                "end": 18.78,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "welcome back to another video now today we're going to cover HTTP hypertext transfer protocol which is really a Cornerstone of web applications and in a nutshell enables the exchange of data over the internet today I wanted to"
+              },
+              {
+                "id": "n-4f21ee9865",
+                "text": "“since we last took the time to study it secondly for newcomers to the field this will help you build your foundation so that you can go on and be…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 109.56,
+                "end": 49.62,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "since we last took the time to study it secondly for newcomers to the field this will help you build your foundation so that you can go on and be successful in your future endeavors and finally I've conducted a lot of interviews in the past some for offensive roles like pen"
+              }
+            ],
+            "source": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional",
+            "topic": "URI",
+            "evidence": [
+              {
+                "start": 109.56,
+                "end": 128.58,
+                "text": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional"
+              }
+            ],
+            "explain": "A URI is a uniform resource identifier that identifies the resource being requested in server request messages.",
+            "mechanism": "1. Identify the resource needed. 2. Construct the URI for that resource. 3. Include the URI in the server request message.",
+            "example": "A specific web page address like https://example.com/page1",
+            "exercise": "Write down the URI for your favorite online resource.",
+            "diagram": "Client -> URI -> Server",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-10c3104f43",
+            "text": "HTTP methods perform actions",
+            "type": "concept",
+            "layer": 2,
+            "start": 109.56,
+            "end": 128.58,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-7e0ad85882",
+                "text": "“message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 109.56,
+                "end": 128.58,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional"
+              },
+              {
+                "id": "n-110970232e",
+                "text": "“so really I think this is a video for everyone and with that let's revisit HTTP so first up what is HTTP kind of a weird question and sometimes this…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 109.56,
+                "end": 81.6,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "so really I think this is a video for everyone and with that let's revisit HTTP so first up what is HTTP kind of a weird question and sometimes this can catch people out what it is but how do you actually articulate it well"
+              }
+            ],
+            "source": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional",
+            "topic": "HTTP methods",
+            "evidence": [
+              {
+                "start": 109.56,
+                "end": 128.58,
+                "text": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional"
+              }
+            ],
+            "explain": "HTTP methods include actions such as get, post, put, and delete in server request messages.",
+            "mechanism": "1. Decide the desired action (e.g., retrieve, create, update). 2. Select the corresponding HTTP method (e.g., GET, POST). 3. Include the chosen method in the server request message.",
+            "example": "Using a GET method to retrieve a resource",
+            "exercise": "Match the action 'update' to its correct HTTP method.",
+            "diagram": "Action -> Method (GET/POST/PUT/DELETE)",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-be1c911d3f",
+            "text": "HTTP Request and Response",
+            "type": "concept",
+            "layer": 2,
+            "start": 93.48,
+            "end": 111.96,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": true,
+            "children": [
+              {
+                "id": "n-1ff9f171b3",
+                "text": "Def: A URI identifies the resource being requested",
+                "type": "detail",
+                "layer": 3,
+                "start": 109.56,
+                "end": 128.58,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional",
+                "more": true,
+                "tag": "Def",
+                "faith": 0.59
+              },
+              {
+                "id": "n-6e70855f63",
+                "text": "Tip: As languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures…",
+                "type": "detail",
+                "layer": 3,
+                "start": 93.48,
+                "end": 111.96,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+                "more": true,
+                "tag": "Tip",
+                "faith": 0.99
+              },
+              {
+                "id": "n-07f4f80d22",
+                "text": "“it's a protocol and you might say well what's a protocol a protocol is basically a set of rules and guidelines that govern the communication between…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 93.48,
+                "end": 95.34,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "it's a protocol and you might say well what's a protocol a protocol is basically a set of rules and guidelines that govern the communication between two or more entities similar to a language it provides structure and just"
+              },
+              {
+                "id": "n-5b689a968e",
+                "text": "“as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 93.48,
+                "end": 111.96,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response"
+              }
+            ],
+            "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+            "topic": "Request and response messages",
+            "evidence": [
+              {
+                "start": 93.48,
+                "end": 111.96,
+                "text": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response"
+              },
+              {
+                "start": 78.48,
+                "end": 95.34,
+                "text": "it's a protocol and you might say well what's a protocol a protocol is basically a set of rules and guidelines that govern the communication between two or more entities similar to a language it provides structure and just"
+              },
+              {
+                "start": 109.56,
+                "end": 128.58,
+                "text": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional"
+              }
+            ],
+            "explain": "HTTP involves a request message from the client and a response message from the server.",
+            "mechanism": "1. Client sends a request message. 2. Request includes methods like GET or POST. 3. Server sends a response message back.",
+            "example": "A web browser requesting a webpage from a server.",
+            "exercise": "List three HTTP methods mentioned in the material.",
+            "diagram": "Client -> Request -> Server -> Response",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-50a30fb6ef",
+            "text": "Protocol is a set of rules",
+            "type": "concept",
+            "layer": 2,
+            "start": 78.48,
+            "end": 95.34,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": true,
+            "children": [
+              {
+                "id": "n-127b86f921",
+                "text": "Tip: Protocols define message formats and procedures for communication",
+                "type": "detail",
+                "layer": 3,
+                "start": 93.48,
+                "end": 111.96,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+                "more": true,
+                "tag": "Tip",
+                "faith": 0.71
+              }
+            ],
+            "source": "it's a protocol and you might say well what's a protocol a protocol is basically a set of rules and guidelines that govern the communication between two or more entities similar to a language it provides structure and just",
+            "topic": "Protocol",
+            "evidence": [
+              {
+                "start": 78.48,
+                "end": 95.34,
+                "text": "it's a protocol and you might say well what's a protocol a protocol is basically a set of rules and guidelines that govern the communication between two or more entities similar to a language it provides structure and just"
+              },
+              {
+                "start": 93.48,
+                "end": 111.96,
+                "text": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response"
+              }
+            ],
+            "explain": "A protocol is a set of rules and guidelines governing communication between entities.",
+            "mechanism": "1. It provides structure to communication. 2. It is similar to a language's grammar. 3. It defines how communication should take place.",
+            "example": "HTTP uses specific rules for message formatting.",
+            "exercise": "Compare a protocol to a spoken language.",
+            "diagram": "Entities <-> Rules <-> Communication",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-645205e19e",
+            "text": "Protocols have rules",
+            "type": "concept",
+            "layer": 2,
+            "start": 93.48,
+            "end": 111.96,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": true,
+            "children": [
+              {
+                "id": "n-a81af587ed",
+                "text": "Tip: Protocols have rules defining how communication should take place",
+                "type": "detail",
+                "layer": 3,
+                "start": 93.48,
+                "end": 111.96,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+                "more": true,
+                "tag": "Tip",
+                "faith": 0.68
+              }
+            ],
+            "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+            "topic": "Rules",
+            "evidence": [
+              {
+                "start": 93.48,
+                "end": 111.96,
+                "text": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response"
+              },
+              {
+                "start": 78.48,
+                "end": 95.34,
+                "text": "it's a protocol and you might say well what's a protocol a protocol is basically a set of rules and guidelines that govern the communication between two or more entities similar to a language it provides structure and just"
+              }
+            ],
+            "explain": "Protocols possess rules, message formats, and procedures that govern interaction.",
+            "mechanism": "1. Rules define communication structure. 2. Message formats dictate data layout. 3. Procedures outline the steps for exchange.",
+            "example": "HTTP defines the structure for request and response messages.",
+            "exercise": "Identify one element that protocols have besides rules.",
+            "diagram": "Rules + Formats + Procedures",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-a9a188c66b",
+            "text": "URL Structure",
+            "type": "concept",
+            "layer": 2,
+            "start": 90.96,
+            "end": 95.34,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "language it provides structure and just",
+            "topic": "URL structure",
+            "evidence": [
+              {
+                "start": 90.96,
+                "end": 95.34,
+                "text": "language it provides structure and just"
+              }
+            ],
+            "explain": "A URL provides structure within a language. It organizes web addresses logically.",
+            "mechanism": "1. Identify the components of a URL. 2. Understand how these parts define location. 3. Use the structure to navigate resources.",
+            "example": "https://www.example.com/page/about defines a specific location.",
+            "exercise": "Break down a sample URL into its structural parts.",
+            "diagram": "Protocol://Domain/Path",
+            "available": true,
+            "generatedBy": "nvidia",
+            "faith": 1.0
+          }
+        ],
+        "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+        "segmentId": "s1",
+        "theme": 1,
+        "points": [
+          {
+            "start": 47.76,
+            "end": 65.04,
+            "text": "testing and red teaming and for other roles like security architecture and devsecops and one thing that I've found most of the time is that all the really good candidates could answer the fundament…"
+          },
+          {
+            "start": 62.94,
+            "end": 81.6,
+            "text": "so really I think this is a video for everyone and with that let's revisit HTTP so first up what is HTTP kind of a weird question and sometimes this can catch people out what it is but how do you…"
+          },
+          {
+            "start": 93.48,
+            "end": 111.96,
+            "text": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages…"
+          }
+        ],
+        "explain": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the…",
+        "generatedBy": "nvidia",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 0,
+        "faith": 0.34,
+        "exercise": "Identify the purpose of a protocol in computing"
+      },
+      {
+        "id": "n-344ad36ec0",
+        "text": "Resource Request Response Messages",
+        "type": "section",
+        "layer": 1,
+        "start": 109.56,
+        "end": 184.62,
+        "summary": "Teaches about server responses and resource identification",
+        "tone": [],
+        "keywords": [
+          "resource",
+          "http",
+          "push",
+          "response messages",
+          "single",
+          "additional information"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-c162a01616",
+            "text": "Message Body",
+            "type": "concept",
+            "layer": 2,
+            "start": 140.76,
+            "end": 158.94,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-4af86fd562",
+                "text": "“message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 140.76,
+                "end": 128.58,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional"
+              },
+              {
+                "id": "n-f606374713",
+                "text": "“information about the request response messages typically include a status code response messages typically include a status code indicating whether…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 140.76,
+                "end": 143.4,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "information about the request response messages typically include a status code response messages typically include a status code indicating whether the request was successful and optionally message headers that provide additional information about the response and"
+              }
+            ],
+            "source": "potentially a body as well okay so that's good to know but what about the different versions of HTTP so in my experience HTTP 2 is a little overlooked but actually is increasing in popularity and I've definitely seen it crop up more",
+            "topic": "Message body",
+            "evidence": [
+              {
+                "start": 140.76,
+                "end": 158.94,
+                "text": "potentially a body as well okay so that's good to know but what about the different versions of HTTP so in my experience HTTP 2 is a little overlooked but actually is increasing in popularity and I've definitely seen it crop up more"
+              }
+            ],
+            "explain": "The message body is a part of a message. This concept was mentioned in the context of HTTP versions.",
+            "mechanism": "1. Identify the message structure. 2. Locate the body section. 3. Note its potential presence.",
+            "example": "The actual data being sent in an HTTP POST request.",
+            "exercise": "Review documentation for a simple HTTP request to locate where the body is defined.",
+            "diagram": "Request -> Headers | Body",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-8f5ba5b62b",
+            "text": "Response Messages",
+            "type": "concept",
+            "layer": 2,
+            "start": 125.4,
+            "end": 143.4,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "information about the request response messages typically include a status code response messages typically include a status code indicating whether the request was successful and optionally message headers that provide additional information about the response and",
+            "topic": "Response Messages",
+            "evidence": [
+              {
+                "start": 125.4,
+                "end": 143.4,
+                "text": "information about the request response messages typically include a status code response messages typically include a status code indicating whether the request was successful and optionally message headers that provide additional information about the response and"
+              }
+            ],
+            "explain": "Response messages include a status code indicating request success and optional message headers. These headers give extra details about the response.",
+            "mechanism": "1. Receive an HTTP response. 2. Check the status code for success or failure. 3. Examine message headers for supplementary data.",
+            "example": "A 200 OK status code with a Content-Type header.",
+            "exercise": "Use a tool like curl to inspect both the status code and headers of a successful API call.",
+            "diagram": "Request -> Status Code + Headers + Body",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-3a2ee46ca7",
+            "text": "Http Supports Multiplexing",
+            "type": "concept",
+            "layer": 2,
+            "start": 157.2,
+            "end": 174.78,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-19127c6825",
+                "text": "“often in web applications I've been testing over the last few years so at the very least we should know what it's all about HTTP 2 supports…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 157.2,
+                "end": 174.78,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "often in web applications I've been testing over the last few years so at the very least we should know what it's all about HTTP 2 supports multiplexing which allows multiple requests over a single connection with HTTP 1.1 a single"
+              },
+              {
+                "id": "n-a4e1c2beb9",
+                "text": "“potentially a body as well okay so that's good to know but what about the different versions of HTTP so in my experience HTTP 2 is a little…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 157.2,
+                "end": 158.94,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "potentially a body as well okay so that's good to know but what about the different versions of HTTP so in my experience HTTP 2 is a little overlooked but actually is increasing in popularity and I've definitely seen it crop up more"
+              }
+            ],
+            "source": "often in web applications I've been testing over the last few years so at the very least we should know what it's all about HTTP 2 supports multiplexing which allows multiple requests over a single connection with HTTP 1.1 a single",
+            "topic": "Http Supports Multiplexing",
+            "evidence": [
+              {
+                "start": 157.2,
+                "end": 174.78,
+                "text": "often in web applications I've been testing over the last few years so at the very least we should know what it's all about HTTP 2 supports multiplexing which allows multiple requests over a single connection with HTTP 1.1 a single"
+              }
+            ],
+            "explain": "HTTP 2 supports multiplexing, allowing multiple requests over one single connection. HTTP 1.1 uses a single connection for requests.",
+            "mechanism": "1. Use HTTP 2 for communication. 2. Send multiple requests concurrently. 3. Maintain one persistent connection.",
+            "example": "Loading multiple images on a webpage using a single HTTP/2 connection.",
+            "exercise": "Compare the connection usage when fetching several resources using HTTP/1.1 versus HTTP/2.",
+            "diagram": "HTTP/2: Single Conn -> Multiple Req\nHTTP/1.1: Single Conn -> Single Req",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-6136db5f66",
+            "text": "HTTP/2 Multiplexing",
+            "type": "concept",
+            "layer": 2,
+            "start": 157.2,
+            "end": 174.78,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-3354c26661",
+                "text": "“resource that can't be loaded would block all of the requests behind it server push is also a feature that allows servers to push resources to…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 172.8,
+                "end": 189.42,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "resource that can't be loaded would block all of the requests behind it server push is also a feature that allows servers to push resources to clients before they're requested but also flow control lets a client limit"
+              }
+            ],
+            "source": "often in web applications I've been testing over the last few years so at the very least we should know what it's all about HTTP 2 supports multiplexing which allows multiple requests over a single connection with HTTP 1.1 a single",
+            "topic": "HTTP/2 multiplexing",
+            "evidence": [
+              {
+                "start": 157.2,
+                "end": 174.78,
+                "text": "often in web applications I've been testing over the last few years so at the very least we should know what it's all about HTTP 2 supports multiplexing which allows multiple requests over a single connection with HTTP 1.1 a single"
+              }
+            ],
+            "explain": "HTTP/2 supports multiplexing allowing multiple requests over one connection. This improves efficiency compared to HTTP 1.1.",
+            "mechanism": "1. Establish a single connection. 2. Send multiple requests concurrently over that connection. 3. Receive responses interleaved over the same connection.",
+            "example": "Loading images and scripts for a webpage using one TCP connection.",
+            "exercise": "Compare the number of connections needed for 5 requests in HTTP 1.1 versus HTTP/2.",
+            "diagram": "Single Connection -> [Req1, Req2, Req3] -> [Resp1, Resp2, Resp3]",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-a4cdc58974",
+            "text": "Server Push",
+            "type": "concept",
+            "layer": 2,
+            "start": 172.8,
+            "end": 189.42,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "resource that can't be loaded would block all of the requests behind it server push is also a feature that allows servers to push resources to clients before they're requested but also flow control lets a client limit",
+            "topic": "Push",
+            "evidence": [
+              {
+                "start": 172.8,
+                "end": 189.42,
+                "text": "resource that can't be loaded would block all of the requests behind it server push is also a feature that allows servers to push resources to clients before they're requested but also flow control lets a client limit"
+              }
+            ],
+            "explain": "Server push lets servers send resources to clients before the client explicitly requests them. This prevents blocking caused by unrequested resources.",
+            "mechanism": "1. Server identifies necessary resources. 2. Server pushes resources to the client proactively. 3. Client receives resources before initiating a request for them.",
+            "example": "A web server sending CSS files before the browser parses the HTML needing them.",
+            "exercise": "Imagine a webpage; list two resources the server could push before the browser asks for them.",
+            "diagram": "Server -> [Resource] -> Client (Pre-request)",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          }
+        ],
+        "source": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional",
+        "segmentId": "s2",
+        "theme": 0,
+        "points": [
+          {
+            "start": 109.56,
+            "end": 128.58,
+            "text": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only…"
+          },
+          {
+            "start": 140.76,
+            "end": 158.94,
+            "text": "potentially a body as well okay so that's good to know but what about the different versions of HTTP so in my experience HTTP 2 is a little overlooked but actually is increasing in popularity and…"
+          },
+          {
+            "start": 157.2,
+            "end": 174.78,
+            "text": "often in web applications I've been testing over the last few years so at the very least we should know what it's all about HTTP 2 supports multiplexing which allows multiple requests over a single…"
+          }
+        ],
+        "explain": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional",
+        "generatedBy": "nvidia",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 1,
+        "faith": 0.45,
+        "exercise": "What does a URI identify in an HTTP request?"
+      },
+      {
+        "id": "n-36c0880162",
+        "text": "Scheme Requests Website",
+        "type": "section",
+        "layer": 1,
+        "start": 182.4,
+        "end": 255.12,
+        "summary": "Teaches about schemes and default ports",
+        "tone": [],
+        "keywords": [
+          "scheme",
+          "let's",
+          "requests",
+          "website",
+          "typical",
+          "topic equals"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-b8f77a7ef8",
+            "text": "HTTPS URL structure",
+            "type": "concept",
+            "layer": 2,
+            "start": 244.26,
+            "end": 262.62,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-9a88364660",
+                "text": "“requests and responses we need to make requests to resources to access a website this includes requesting for things like HTML images JavaScript CSS…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 244.26,
+                "end": 220.26,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "requests and responses we need to make requests to resources to access a website this includes requesting for things like HTML images JavaScript CSS and other files and this is done with"
+              },
+              {
+                "id": "n-03c1ceb8a9",
+                "text": "“somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 244.26,
+                "end": 262.62,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and https runs on 443 let's take a look at a simple request and response now we're"
+              }
+            ],
+            "source": "somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and https runs on 443 let's take a look at a simple request and response now we're",
+            "topic": "HTTPS and ports",
+            "evidence": [
+              {
+                "start": 244.26,
+                "end": 262.62,
+                "text": "somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and https runs on 443 let's take a look at a simple request and response now we're"
+              },
+              {
+                "start": 201.78,
+                "end": 220.26,
+                "text": "requests and responses we need to make requests to resources to access a website this includes requesting for things like HTML images JavaScript CSS and other files and this is done with"
+              },
+              {
+                "start": 216.42,
+                "end": 232.56,
+                "text": "URLs so uniform resource locators now let's break down how they work so a typical request might look something like this https :/"
+              },
+              {
+                "start": 228.44,
+                "end": 246.18,
+                "text": "tcm-sec.com blog and ? topic equals appsec part 3. so here we have the scheme the domain the path the query string and the fragments you can also pass credentials via the URL but this is"
+              }
+            ],
+            "explain": "A URL contains a scheme, a domain, a path, a query string, and fragments. The scheme shown in a typical request is https://.",
+            "mechanism": "1. Identify the scheme (e.g., https). 2. Identify the domain (e.g., tcm-sec.com). 3. Note the path and query string if present.",
+            "example": "https://tcm-sec.com/blog?topic=appsec",
+            "exercise": "Break down the URL https://example.com/page?id=1 into its five parts.",
+            "diagram": "Scheme://Domain/Path?Query",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-d431010ffb",
+            "text": "Website resources requested",
+            "type": "concept",
+            "layer": 2,
+            "start": 201.78,
+            "end": 220.26,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-9346bc1425",
+                "text": "“URLs so uniform resource locators now let's break down how they work so a typical request might look something like this https :/”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 216.42,
+                "end": 232.56,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "URLs so uniform resource locators now let's break down how they work so a typical request might look something like this https :/"
+              },
+              {
+                "id": "n-9abe8f27aa",
+                "text": "“tcm-sec.com blog and ? topic equals appsec part 3. so here we have the scheme the domain the path the query string and the fragments you can also…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 228.44,
+                "end": 246.18,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "tcm-sec.com blog and ? topic equals appsec part 3. so here we have the scheme the domain the path the query string and the fragments you can also pass credentials via the URL but this is"
+              }
+            ],
+            "source": "requests and responses we need to make requests to resources to access a website this includes requesting for things like HTML images JavaScript CSS and other files and this is done with",
+            "topic": "Images Javascript Css",
+            "evidence": [
+              {
+                "start": 201.78,
+                "end": 220.26,
+                "text": "requests and responses we need to make requests to resources to access a website this includes requesting for things like HTML images JavaScript CSS and other files and this is done with"
+              }
+            ],
+            "explain": "Accessing a website requires making requests for various resources. These resources include HTML, images, JavaScript, and CSS files.",
+            "mechanism": "1. Determine the required website content. 2. Identify necessary file types (HTML, image, JS, CSS). 3. Make requests for each identified resource.",
+            "example": "Loading a webpage requires requests for HTML, CSS, and JavaScript.",
+            "exercise": "List three different file types you expect a modern webpage to request.",
+            "diagram": "HTML -> Image, JS, CSS",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          }
+        ],
+        "source": "somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and https runs on 443 let's take a look at a simple request and response now we're",
+        "segmentId": "s3",
+        "theme": 0,
+        "points": [
+          {
+            "start": 201.78,
+            "end": 220.26,
+            "text": "requests and responses we need to make requests to resources to access a website this includes requesting for things like HTML images JavaScript CSS and other files and this is done with"
+          },
+          {
+            "start": 228.44,
+            "end": 246.18,
+            "text": "tcm-sec.com blog and ? topic equals appsec part 3. so here we have the scheme the domain the path the query string and the fragments you can also pass credentials via the URL but this is"
+          },
+          {
+            "start": 244.26,
+            "end": 262.62,
+            "text": "somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and https runs on 443 let's take a look at a simple…"
+          }
+        ],
+        "explain": "somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and https runs on 443 let's take a look at a simple request and response now we're",
+        "generatedBy": "nvidia",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 2,
+        "faith": 0.34,
+        "exercise": "When is the port number usually omitted in a URL?"
+      },
+      {
+        "id": "n-644d314847",
+        "text": "Data Requests Cookies Information",
+        "type": "section",
+        "layer": 1,
+        "start": 251.46,
+        "end": 635.54,
+        "summary": "Teaches about data submission and cookie handling",
+        "tone": [
+          "controversial",
+          "instructional"
+        ],
+        "keywords": [
+          "data",
+          "requests",
+          "cookies",
+          "curl",
+          "information",
+          "web server"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-6a211f155a",
+            "text": "Submitting Data Methods",
+            "type": "concept",
+            "layer": 2,
+            "start": 307.56,
+            "end": 326.4,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": true,
+            "children": [
+              {
+                "id": "n-7c116003c3",
+                "text": "Def: Submitting data to a web server usually to create new records put is also used for…",
+                "type": "detail",
+                "layer": 3,
+                "start": 307.56,
+                "end": 326.4,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "submitting data to a web server usually to create new records put is also used for submitting data to a web server but usually used to update information rather than create it and delete as you can tell is usually used to delete information from a web server for status",
+                "more": true,
+                "tag": "Def",
+                "faith": 1.0
+              },
+              {
+                "id": "n-adfb546cd7",
+                "text": "“going to take a closer look at the different sections soon but just to give you an overview here we have gets slash HTTP 1.1 everything below this…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 307.56,
+                "end": 279.12,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "going to take a closer look at the different sections soon but just to give you an overview here we have gets slash HTTP 1.1 everything below this is a header and we don't have a body in our request but often if we're submitting data or trying to update information we"
+              },
+              {
+                "id": "n-43d2731f63",
+                "text": "“and then we can add data to this request so you can either add some Json or you can add make some form data or just a string go on slash”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 541.56,
+                "end": 559.02,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "and then we can add data to this request so you can either add some Json or you can add make some form data or just a string go on slash"
+              }
+            ],
+            "source": "submitting data to a web server usually to create new records put is also used for submitting data to a web server but usually used to update information rather than create it and delete as you can tell is usually used to delete information from a web server for status",
+            "topic": "Submitting Data",
+            "evidence": [
+              {
+                "start": 307.56,
+                "end": 326.4,
+                "text": "submitting data to a web server usually to create new records put is also used for submitting data to a web server but usually used to update information rather than create it and delete as you can tell is usually used to delete information from a web server for status"
+              },
+              {
+                "start": 261.0,
+                "end": 279.12,
+                "text": "going to take a closer look at the different sections soon but just to give you an overview here we have gets slash HTTP 1.1 everything below this is a header and we don't have a body in our request but often if we're submitting data or trying to update information we"
+              }
+            ],
+            "explain": "POST is used for submitting data to a web server to create new records. PUT is used for submitting data to update existing information.",
+            "mechanism": "1. Identify the goal (create or update). 2. Use POST for creation. 3. Use PUT for updating.",
+            "example": "Creating a new user profile on a website using POST.",
+            "exercise": "Determine if a form submission to create a new blog post should use POST or PUT.",
+            "diagram": "Client -> POST/PUT -> Server",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-d678b2ea5c",
+            "text": "HTTP Response Structure",
+            "type": "concept",
+            "layer": 2,
+            "start": 277.14,
+            "end": 294.72,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": true,
+            "children": [
+              {
+                "id": "n-5791144e4f",
+                "text": "Watch-out: Codes it's useful to try and remember the common ones and then we can always do…",
+                "type": "detail",
+                "layer": 3,
+                "start": 324.3,
+                "end": 342.66,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "codes it's useful to try and remember the common ones and then we can always do a quick Google for others if needed you don't need to remember a hundred plus status codes or print out some cheat sheets and put it on your wall that said if you're a developer and you're working on things like rest…",
+                "more": true,
+                "tag": "Watch-out",
+                "faith": 0.99
+              },
+              {
+                "id": "n-a7bfbca58b",
+                "text": "“will in the response it looks like we're using HTTP 2 and we get the status code 200. this is followed by a variety of headers at the bottom and…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 277.14,
+                "end": 294.72,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "will in the response it looks like we're using HTTP 2 and we get the status code 200. this is followed by a variety of headers at the bottom and then we have a body which in this case is the HTML to render the page so next up are HTTP"
+              },
+              {
+                "id": "n-13d209a758",
+                "text": "“screen so we can actually save this to a file quite easily by just using Dash o and then we'll just do tcm.html like this and then if we want to…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 511.2,
+                "end": 529.8,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "screen so we can actually save this to a file quite easily by just using Dash o and then we'll just do tcm.html like this and then if we want to read this in the"
+              }
+            ],
+            "source": "will in the response it looks like we're using HTTP 2 and we get the status code 200. this is followed by a variety of headers at the bottom and then we have a body which in this case is the HTML to render the page so next up are HTTP",
+            "topic": "Code",
+            "evidence": [
+              {
+                "start": 277.14,
+                "end": 294.72,
+                "text": "will in the response it looks like we're using HTTP 2 and we get the status code 200. this is followed by a variety of headers at the bottom and then we have a body which in this case is the HTML to render the page so next up are HTTP"
+              },
+              {
+                "start": 324.3,
+                "end": 342.66,
+                "text": "codes it's useful to try and remember the common ones and then we can always do a quick Google for others if needed you don't need to remember a hundred plus status codes or print out some cheat sheets and put it on your wall that said if you're a developer and you're working on things like rest…"
+              }
+            ],
+            "explain": "An HTTP response includes a status code, various headers, and a body containing content like HTML. HTTP 2 was observed in a response example.",
+            "mechanism": "1. Receive the HTTP response. 2. Check the status code (e.g., 200). 3. Read headers followed by the body content.",
+            "example": "Receiving a 200 status code followed by HTML to render a webpage.",
+            "exercise": "Examine a received response and identify where the status code, headers, and body begin.",
+            "diagram": "Status Code -> Headers -> Body",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-ff4d9f385a",
+            "text": "Message Headers Location",
+            "type": "concept",
+            "layer": 2,
+            "start": 277.14,
+            "end": 294.72,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-dae6d0b677",
+                "text": "“they can also have a number of flags applied so to give you an overview the HTTP only flag restricts the cookie from being read by JavaScript this…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 435.54,
+                "end": 453.36,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "they can also have a number of flags applied so to give you an overview the HTTP only flag restricts the cookie from being read by JavaScript this is quite common these days and an important part of a defense in-depth model to protect against things like cross-site scripting"
+              },
+              {
+                "id": "n-b8789e6549",
+                "text": "“of HTTP to either improve or learn something new and of course build upon going forward in your absec journey if you liked the video of course don't…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 620.82,
+                "end": 635.54,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "of HTTP to either improve or learn something new and of course build upon going forward in your absec journey if you liked the video of course don't forget to like And subscribe and I'll see you next time"
+              }
+            ],
+            "source": "will in the response it looks like we're using HTTP 2 and we get the status code 200. this is followed by a variety of headers at the bottom and then we have a body which in this case is the HTML to render the page so next up are HTTP",
+            "topic": "Message Headers",
+            "evidence": [
+              {
+                "start": 277.14,
+                "end": 294.72,
+                "text": "will in the response it looks like we're using HTTP 2 and we get the status code 200. this is followed by a variety of headers at the bottom and then we have a body which in this case is the HTML to render the page so next up are HTTP"
+              }
+            ],
+            "explain": "Message headers appear in an HTTP response after the status code. The body contains the content, such as HTML.",
+            "mechanism": "1. Check the response for the status code. 2. Locate the headers immediately following the status code. 3. Identify the body content after all headers.",
+            "example": "Headers listing content type before the HTML body starts.",
+            "exercise": "In a sample response, point to the section immediately following the status code.",
+            "diagram": "Status Code -> Headers -> Body",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-70a0b2de9d",
+            "text": "Cookies are key-value pairs",
+            "type": "concept",
+            "layer": 2,
+            "start": 419.88,
+            "end": 437.34,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-938d60573a",
+                "text": "“headers and cookies some of the main headers that you need to know are host a lot of websites actually host multiple sites and basically they'll be…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 419.88,
+                "end": 389.88,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "headers and cookies some of the main headers that you need to know are host a lot of websites actually host multiple sites and basically they'll be using the same ihp address so the host header lets us tell the server which sites we're"
+              },
+              {
+                "id": "n-e9520c760d",
+                "text": "“methods likely you'll need to know the main ones and if you see others popping up you can them out on something like the mdn web docs so get is used…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 419.88,
+                "end": 309.78,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "methods likely you'll need to know the main ones and if you see others popping up you can them out on something like the mdn web docs so get is used for getting information from a web server you'll see this most of the time post is used for"
+              }
+            ],
+            "source": "we have cookies key value pairs that help us track information across multiple requests cookies are really really important so let's take a closer look they can be set with the set cookie header and once this is done they'll be sent in future requests",
+            "topic": "Cookies",
+            "evidence": [
+              {
+                "start": 419.88,
+                "end": 437.34,
+                "text": "we have cookies key value pairs that help us track information across multiple requests cookies are really really important so let's take a closer look they can be set with the set cookie header and once this is done they'll be sent in future requests"
+              },
+              {
+                "start": 371.88,
+                "end": 389.88,
+                "text": "headers and cookies some of the main headers that you need to know are host a lot of websites actually host multiple sites and basically they'll be using the same ihp address so the host header lets us tell the server which sites we're"
+              }
+            ],
+            "explain": "Cookies are key value pairs used to track information across multiple requests. They can be set using the set cookie header.",
+            "mechanism": "1. Set cookie using set cookie header. 2. Cookie is stored by the browser. 3. Cookie is sent in future requests.",
+            "example": "Tracking a user's logged-in session across different page views.",
+            "exercise": "Identify where a cookie might be used to maintain a shopping cart state.",
+            "diagram": "Request -> Set Cookie Header -> Browser Stores -> Future Request",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-89b3d16d68",
+            "text": "Same site cookie flags",
+            "type": "concept",
+            "layer": 2,
+            "start": 464.22,
+            "end": 483.3,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": true,
+            "children": [
+              {
+                "id": "n-4b69fd481c",
+                "text": "Watch-out: Strict cookies are not sent with cross-site requests",
+                "type": "detail",
+                "layer": 3,
+                "start": 464.22,
+                "end": 483.3,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "options so strict lacks and none strict cookies are not sent with cross-site requests same-site lacks which is now the default for Chrome if you don't set it only sends cookies with get requests when a user clicks on a button or a link",
+                "more": true,
+                "tag": "Watch-out",
+                "faith": 0.63
+              },
+              {
+                "id": "n-0aba7f287b",
+                "text": "“the secure flag tells the browser to only send the cookie over https connections and same site is an interesting flag that tells the browser how to…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 464.22,
+                "end": 468.48,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "the secure flag tells the browser to only send the cookie over https connections and same site is an interesting flag that tells the browser how to handle cookies in cross-site requests it can take one of three"
+              },
+              {
+                "id": "n-8cbce5a83f",
+                "text": "“options so strict lacks and none strict cookies are not sent with cross-site requests same-site lacks which is now the default for Chrome if you…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 464.22,
+                "end": 483.3,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "options so strict lacks and none strict cookies are not sent with cross-site requests same-site lacks which is now the default for Chrome if you don't set it only sends cookies with get requests when a user clicks on a button or a link"
+              }
+            ],
+            "source": "options so strict lacks and none strict cookies are not sent with cross-site requests same-site lacks which is now the default for Chrome if you don't set it only sends cookies with get requests when a user clicks on a button or a link",
+            "topic": "Cross-site Requests",
+            "evidence": [
+              {
+                "start": 464.22,
+                "end": 483.3,
+                "text": "options so strict lacks and none strict cookies are not sent with cross-site requests same-site lacks which is now the default for Chrome if you don't set it only sends cookies with get requests when a user clicks on a button or a link"
+              },
+              {
+                "start": 451.14,
+                "end": 468.48,
+                "text": "the secure flag tells the browser to only send the cookie over https connections and same site is an interesting flag that tells the browser how to handle cookies in cross-site requests it can take one of three"
+              },
+              {
+                "start": 479.64,
+                "end": 497.7,
+                "text": "or pre-fetch requests and none sends all of the cookies all the time on all cross-site requests so before we wrap up today's video let's take a quick look at curl which is a really handy command line tool for making requests so to make"
+              }
+            ],
+            "explain": "The same site flag controls how cookies are handled during cross-site requests. Options include strict, lax, and none.",
+            "mechanism": "1. Set cookie with same-site=strict. 2. Browser prevents sending in cross-site requests. 3. Set cookie with same-site=none to send always.",
+            "example": "Preventing a third-party advertisement from accessing session cookies.",
+            "exercise": "Determine which same-site setting prevents cookies from being sent on cross-site requests.",
+            "diagram": "Cross-Site Request -> Same-Site Flag Check -> Send/Block Cookie",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-495f50dc83",
+            "text": "Curl for making requests",
+            "type": "concept",
+            "layer": 2,
+            "start": 495.48,
+            "end": 512.22,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": true,
+            "children": [
+              {
+                "id": "n-6fd2022129",
+                "text": "Def: Future we can just head or cats or tail whatever you want to do or open…",
+                "type": "detail",
+                "layer": 3,
+                "start": 526.32,
+                "end": 544.56,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "future we can just head or cats or tail whatever you want to do or open the file up and read the information now if we want to send some post data we can curl and then what we want to do is add data",
+                "more": true,
+                "tag": "Def",
+                "faith": 0.99
+              },
+              {
+                "id": "n-d5f5f17b45",
+                "text": "“a basic request all we really need to do is just type curl https or HTTP depends on your target site and we'll just call out to tcmsac.com and you…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 495.48,
+                "end": 512.22,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "a basic request all we really need to do is just type curl https or HTTP depends on your target site and we'll just call out to tcmsac.com and you can see that this makes a request and prints out the response to"
+              },
+              {
+                "id": "n-81aefb1384",
+                "text": "“tcmsac.com and this would typically go to an endpoint that allows the submission of data another way I see this done is curl Dash X and then you can…”",
+                "type": "transcript",
+                "layer": 4,
+                "start": 556.88,
+                "end": 575.06,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "tcmsac.com and this would typically go to an endpoint that allows the submission of data another way I see this done is curl Dash X and then you can just do Dash D and just pass my data"
+              }
+            ],
+            "source": "a basic request all we really need to do is just type curl https or HTTP depends on your target site and we'll just call out to tcmsac.com and you can see that this makes a request and prints out the response to",
+            "topic": "Curl",
+            "evidence": [
+              {
+                "start": 495.48,
+                "end": 512.22,
+                "text": "a basic request all we really need to do is just type curl https or HTTP depends on your target site and we'll just call out to tcmsac.com and you can see that this makes a request and prints out the response to"
+              },
+              {
+                "start": 526.32,
+                "end": 544.56,
+                "text": "future we can just head or cats or tail whatever you want to do or open the file up and read the information now if we want to send some post data we can curl and then what we want to do is add data"
+              }
+            ],
+            "explain": "Curl is a command line tool used to make HTTP or HTTPS requests. A basic request requires typing curl followed by the protocol and target site.",
+            "mechanism": "1. Type 'curl' followed by 'https' or 'http'. 2. Specify the target site (e.g., tcmsac.com). 3. Use options like 'head' or 'cat' to handle the response.",
+            "example": "Running 'curl https://tcmsac.com' to print the response.",
+            "exercise": "Open your terminal and execute a basic curl command against a known website.",
+            "diagram": "curl [protocol] [url] -> Print Response",
+            "available": true,
+            "generatedBy": "nvidia",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 1.0
+          },
+          {
+            "id": "n-1e09df99a2",
+            "text": "HTTP protocol",
+            "type": "concept",
+            "layer": 2,
+            "start": 497.7,
+            "end": 503.7,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "is just type curl https or HTTP depends",
+            "topic": "HTTP",
+            "evidence": [
+              {
+                "start": 497.7,
+                "end": 503.7,
+                "text": "is just type curl https or HTTP depends"
+              }
+            ],
+            "explain": "HTTP is a type of protocol used for web communication. It can be accessed using curl, https, or HTTP.",
+            "mechanism": "1. Use curl to test the connection. 2. Specify the protocol (HTTP or HTTPS). 3. Send the request to the server.",
+            "example": "Accessing a webpage using http://example.com",
+            "exercise": "Use the curl command in your terminal to attempt a connection to a simple website.",
+            "diagram": "Client -> HTTP/HTTPS -> Server",
+            "available": true,
+            "generatedBy": "nvidia",
+            "faith": 1.0
+          },
+          {
+            "id": "n-c9d7c54414",
+            "text": "Status Codes provide feedback",
+            "type": "concept",
+            "layer": 2,
+            "start": 333.0,
+            "end": 336.24,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "plus status codes or print out some",
+            "topic": "Status codes",
+            "evidence": [
+              {
+                "start": 333.0,
+                "end": 336.24,
+                "text": "plus status codes or print out some"
+              }
+            ],
+            "explain": "Status codes provide feedback during communication.",
+            "mechanism": "1. Check for status codes in output. 2. Print out specific status codes. 3. Interpret the meaning of the returned code.",
+            "example": "Receiving a 200 OK status code.",
+            "exercise": "Run a simple HTTP request and identify the status code returned.",
+            "diagram": "Request -> Status Code",
+            "available": true,
+            "generatedBy": "nvidia",
+            "faith": 1.0
+          }
+        ],
+        "source": "or pre-fetch requests and none sends all of the cookies all the time on all cross-site requests so before we wrap up today's video let's take a quick look at curl which is a really handy command line tool for making requests so to make",
+        "segmentId": "s4",
+        "theme": 0,
+        "points": [
+          {
+            "start": 479.64,
+            "end": 497.7,
+            "text": "or pre-fetch requests and none sends all of the cookies all the time on all cross-site requests so before we wrap up today's video let's take a quick look at curl which is a really handy command…"
+          },
+          {
+            "start": 495.48,
+            "end": 512.22,
+            "text": "a basic request all we really need to do is just type curl https or HTTP depends on your target site and we'll just call out to tcmsac.com and you can see that this makes a request and prints out…"
+          },
+          {
+            "start": 526.32,
+            "end": 544.56,
+            "text": "future we can just head or cats or tail whatever you want to do or open the file up and read the information now if we want to send some post data we can curl and then what we want to do is add data"
+          }
+        ],
+        "explain": "or pre-fetch requests and none sends all of the cookies all the time on all cross-site requests so before we wrap up today's video let's take a quick look at curl which is a really handy command line tool for making requests so to make",
+        "generatedBy": "nvidia",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 3,
+        "faith": 0.33,
+        "exercise": "How can you test a basic HTTP request from the command line?"
+      },
+      {
+        "id": "n-52202ba3ef",
+        "text": "Quick recall",
+        "type": "section",
+        "layer": 1,
+        "start": 0.0,
+        "end": 635.54,
+        "summary": "HTTP defines how web communication works using rules and messages",
+        "tone": [],
+        "keywords": [],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-ef425c7ea9",
+            "text": "In one line: HTTP defines how web communication works using rules and messages",
+            "type": "concept",
+            "layer": 2,
+            "start": 0.0,
+            "end": 635.54,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+            "recall": true,
+            "oneline": true,
+            "faith": 0.46
+          },
+          {
+            "id": "n-eae5a162cf",
+            "text": "HTTP message structure",
+            "type": "concept",
+            "layer": 2,
+            "start": 93.48,
+            "end": 111.96,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+            "recall": true,
+            "faith": 0.58,
+            "explain": "HTTP messages include a request message from the client and a response from the server.",
+            "mechanism": "1. Client sends a request message. 2. Server sends a response. 3. These define how communication takes place.",
+            "diagram": "Client Request -> Server Response",
+            "example": "A web browser sending a GET request to a server.",
+            "exercise": "Identify where the client request and server response occur in a simple web interaction.",
+            "available": true,
+            "generatedBy": "nvidia"
+          },
+          {
+            "id": "n-4162758a62",
+            "text": "Server request message methods",
+            "type": "concept",
+            "layer": 2,
+            "start": 109.56,
+            "end": 128.58,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "message sent by the server request messages typically include methods such as get post put deletes a URI uniform resource identifier that identifies the resource being requested and option only message headers that provide additional",
+            "recall": true,
+            "faith": 0.85,
+            "explain": "Request messages include methods like get, post, put, and delete. A URI identifies the resource being requested.",
+            "generatedBy": "nvidia",
+            "mechanism": "1. Identify the resource using a URI. 2. Select an appropriate method (e.g., GET). 3. Include necessary message headers.",
+            "diagram": "Client -> Method + URI -> Server",
+            "example": "Requesting a specific user profile page on a website.",
+            "exercise": "List three HTTP methods and what action each typically performs.",
+            "available": true
+          },
+          {
+            "id": "n-a9696e7d8a",
+            "text": "Default port numbers",
+            "type": "concept",
+            "layer": 2,
+            "start": 244.26,
+            "end": 262.62,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "somewhat rare these days and the port number is not needed if the ports used is the default for that scheme for example HTTP runs on Port 80 and https runs on 443 let's take a look at a simple request and response now we're",
+            "recall": true,
+            "faith": 0.8,
+            "explain": "The port number is not needed if the port used is the default for the scheme. HTTP uses Port 80 and HTTPS uses Port 443.",
+            "mechanism": "1. Determine the communication scheme (HTTP or HTTPS). 2. Check the default port for that scheme. 3. Omit the port number from the request if it matches the default.",
+            "diagram": "Scheme -> Default Port (80/443)",
+            "example": "Making an HTTP request without specifying Port 80.",
+            "exercise": "State the default port for HTTPS.",
+            "available": true,
+            "generatedBy": "nvidia"
+          },
+          {
+            "id": "n-dc835762c8",
+            "text": "Cookie sending behavior",
+            "type": "concept",
+            "layer": 2,
+            "start": 479.64,
+            "end": 497.7,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "or pre-fetch requests and none sends all of the cookies all the time on all cross-site requests so before we wrap up today's video let's take a quick look at curl which is a really handy command line tool for making requests so to make",
+            "recall": true,
+            "faith": 0.64,
+            "explain": "The 'none' setting prevents sending all cookies on cross-site requests. Curl is a command-line tool for making requests.",
+            "mechanism": "1. Configure cookie settings to 'none' for cross-site requests. 2. Use the curl command-line tool. 3. Execute the request using curl.",
+            "diagram": "Curl Tool -> Request Execution",
+            "example": "Using curl to test an API endpoint without sending session cookies.",
+            "exercise": "Find out how to use curl to make a simple GET request.",
+            "available": true,
+            "generatedBy": "nvidia"
+          }
+        ],
+        "source": "as languages have their own syntax grammar and vocabulary protocols have rules message formats and procedures that Define how communication should take place so to give an overview HTTP messages consist of a request message sent by the clients and a response",
+        "recall": true,
+        "color": 4,
+        "faith": 0.0
+      }
+    ],
+    "explain": "Request and response messages & Rules · HTTP/2 multiplexing & Push · URL structure & Single · Cross-site Requests & Cookies",
+    "generatedBy": "extractive"
+  },
+  "edges": [
+    {
+      "id": "e-1a93b6c5eb",
+      "source": "n-eae96e1f83",
+      "target": "n-f82366a6cd",
+      "label": "related to",
+      "origin": "similar"
+    },
+    {
+      "id": "e-05583fdd62",
+      "source": "n-88d8fbc65d",
+      "target": "n-a4cdc58974",
+      "label": "related to",
+      "origin": "similar"
+    },
+    {
+      "id": "e-27c1076082",
+      "source": "n-a607e3801e",
+      "target": "n-ff4d9f385a",
+      "label": "related to",
+      "origin": "similar"
+    },
+    {
+      "id": "e-28db6892cf",
+      "source": "n-da833e0a36",
+      "target": "n-ca8a284ac5",
+      "label": "related to",
+      "origin": "similar"
+    }
+  ],
+  "segments": [
+    {
+      "id": "s1",
+      "start": 0.0,
+      "end": 111.96000000000001,
+      "title": "Protocol & Rules",
+      "keywords": [
+        "protocol",
+        "rules",
+        "revisit http",
+        "communication",
+        "roles",
+        "foundations"
+      ],
+      "topic": 0,
+      "theme": 1,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s2",
+      "start": 109.56,
+      "end": 184.62,
+      "title": "Resource & Http",
+      "keywords": [
+        "resource",
+        "http",
+        "push",
+        "response messages",
+        "single",
+        "additional information"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s3",
+      "start": 182.4,
+      "end": 255.12,
+      "title": "Scheme & Let's",
+      "keywords": [
+        "scheme",
+        "let's",
+        "requests",
+        "website",
+        "typical",
+        "topic equals"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s4",
+      "start": 251.459,
+      "end": 635.54,
+      "title": "Data & Requests",
+      "keywords": [
+        "data",
+        "requests",
+        "cookies",
+        "curl",
+        "information",
+        "web server"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    }
+  ],
+  "graph": {
+    "concepts": [
+      {
+        "id": "c1",
+        "label": "Http Supports Multiplexing",
+        "score": 100.0,
+        "aliases": [
+          "http supports multiplexing",
+          "http supports",
+          "supports multiplexing",
+          "multiplexing",
+          "supports"
+        ],
+        "segments": [
+          "s2",
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 11,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c2",
+        "label": "Request and response messages",
+        "score": 100.0,
+        "aliases": [
+          "request",
+          "and",
+          "response",
+          "messages"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 73.5,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c3",
+        "label": "HTTP methods",
+        "score": 99.0,
+        "aliases": [
+          "http",
+          "methods"
+        ],
+        "segments": [
+          "s1",
+          "s2"
+        ],
+        "firstTs": 109.56,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c4",
+        "label": "Status codes",
+        "score": 98.0,
+        "aliases": [
+          "status",
+          "codes"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 36.899,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c5",
+        "label": "Message Headers",
+        "score": 97.0,
+        "aliases": [
+          "message headers",
+          "headers",
+          "header"
+        ],
+        "segments": [
+          "s2",
+          "s4",
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 12,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c6",
+        "label": "Message body",
+        "score": 97.0,
+        "aliases": [
+          "message",
+          "body"
+        ],
+        "segments": [
+          "s1",
+          "s2"
+        ],
+        "firstTs": 109.56,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c7",
+        "label": "URL structure",
+        "score": 96.0,
+        "aliases": [
+          "url",
+          "structure"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 216.42,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c8",
+        "label": "URI",
+        "score": 95.0,
+        "aliases": [
+          "uri"
+        ],
+        "segments": [
+          "s1",
+          "s2"
+        ],
+        "firstTs": 109.56,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c9",
+        "label": "HTTPS and ports",
+        "score": 94.0,
+        "aliases": [
+          "https",
+          "and",
+          "ports"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 216.42,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c10",
+        "label": "HTTP/2 multiplexing",
+        "score": 93.0,
+        "aliases": [
+          "http/2",
+          "multiplexing"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 144.78,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c11",
+        "label": "Cookies",
+        "score": 92.0,
+        "aliases": [
+          "cookies"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 361.74,
+        "community": 0,
+        "centrality": 0.0
+      },
+      {
+        "id": "c12",
+        "label": "Curl",
+        "score": 91.0,
+        "aliases": [
+          "curl"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 31,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c13",
+        "label": "Response Messages",
+        "score": 2.6081,
+        "aliases": [
+          "response messages",
+          "status code",
+          "request response messages",
+          "code response messages",
+          "status code response",
+          "status code indicating",
+          "server request messages",
+          "typical request",
+          "status",
+          "http messages consist",
+          "request messages",
+          "request response",
+          "code response",
+          "code indicating",
+          "server request",
+          "typical",
+          "http messages",
+          "indicating",
+          "consist"
+        ],
+        "segments": [
+          "s1",
+          "s2",
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 6,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c14",
+        "label": "Single",
+        "score": 1.7832,
+        "aliases": [
+          "single",
+          "resource",
+          "uniform resource locators",
+          "uri uniform resource",
+          "uniform resource identifier",
+          "resource locators",
+          "resource identifier",
+          "uri uniform",
+          "single resource",
+          "locators",
+          "uniform resource",
+          "identifier",
+          "uniform"
+        ],
+        "segments": [
+          "s2",
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 7,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c15",
+        "label": "Images Javascript Css",
+        "score": 0.9903,
+        "aliases": [
+          "images javascript css",
+          "html images javascript",
+          "images javascript",
+          "html images",
+          "javascript css",
+          "css",
+          "html"
+        ],
+        "segments": [
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 8,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c16",
+        "label": "Hypertext Transfer Protocol",
+        "score": 0.7781,
+        "aliases": [
+          "hypertext transfer protocol",
+          "http hypertext transfer",
+          "hypertext transfer",
+          "transfer protocol",
+          "http hypertext",
+          "transfer",
+          "hypertext"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 9,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c17",
+        "label": "Topic Equals Appsec",
+        "score": 0.7014,
+        "aliases": [
+          "topic equals appsec",
+          "equals appsec",
+          "topic equals",
+          "equals",
+          "appsec"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 10,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c18",
+        "label": "Requests",
+        "score": 0.347,
+        "aliases": [
+          "requests",
+          "requesting",
+          "requested"
+        ],
+        "segments": [
+          "s2",
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 13,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c19",
+        "label": "Push",
+        "score": 0.3064,
+        "aliases": [
+          "push",
+          "server push"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 3,
+        "centrality": 0.0473
+      },
+      {
+        "id": "c20",
+        "label": "Dominant Protocol",
+        "score": 0.2661,
+        "aliases": [
+          "dominant protocol",
+          "dominant"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 14,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c21",
+        "label": "Overall Http",
+        "score": 0.2661,
+        "aliases": [
+          "overall http",
+          "overall"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 15,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c22",
+        "label": "Versions of Http",
+        "score": 0.2541,
+        "aliases": [
+          "versions of http",
+          "versions"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 16,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c23",
+        "label": "Strong Technical Foundations",
+        "score": 0.2408,
+        "aliases": [
+          "strong technical foundations",
+          "technical foundations"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 17,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c24",
+        "label": "Cross-site Requests",
+        "score": 0.233,
+        "aliases": [
+          "cross-site requests",
+          "cross-site"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 18,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c25",
+        "label": "Single Connection",
+        "score": 0.233,
+        "aliases": [
+          "single connection",
+          "connection"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 19,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c26",
+        "label": "Ports",
+        "score": 0.2163,
+        "aliases": [
+          "ports",
+          "port"
+        ],
+        "segments": [
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 20,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c27",
+        "label": "Client",
+        "score": 0.2163,
+        "aliases": [
+          "client",
+          "clients"
+        ],
+        "segments": [
+          "s1",
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 2,
+        "centrality": 0.0364
+      },
+      {
+        "id": "c28",
+        "label": "Additional Information",
+        "score": 0.2151,
+        "aliases": [
+          "additional information"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 21,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c29",
+        "label": "Scheme",
+        "score": 0.2048,
+        "aliases": [
+          "scheme"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 22,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c30",
+        "label": "Protocol",
+        "score": 0.1743,
+        "aliases": [
+          "protocol"
+        ],
+        "segments": [
+          "s1",
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 23,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c31",
+        "label": "Web Server",
+        "score": 0.1592,
+        "aliases": [
+          "web server"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 24,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c32",
+        "label": "Rules",
+        "score": 0.1568,
+        "aliases": [
+          "rules"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 25,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c33",
+        "label": "Roles",
+        "score": 0.1568,
+        "aliases": [
+          "roles"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 26,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c34",
+        "label": "Field",
+        "score": 0.1568,
+        "aliases": [
+          "field"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 27,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c35",
+        "label": "Communication",
+        "score": 0.1568,
+        "aliases": [
+          "communication"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 28,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c36",
+        "label": "Query String",
+        "score": 0.1451,
+        "aliases": [
+          "query string"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 4,
+        "centrality": 0.0473
+      },
+      {
+        "id": "c37",
+        "label": "Client Limit",
+        "score": 0.1451,
+        "aliases": [
+          "client limit"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 2,
+        "centrality": 0.069
+      },
+      {
+        "id": "c38",
+        "label": "Somewhat Rare",
+        "score": 0.1451,
+        "aliases": [
+          "somewhat rare"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.069
+      },
+      {
+        "id": "c39",
+        "label": "Com Blog",
+        "score": 0.1451,
+        "aliases": [
+          "com blog"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 5,
+        "centrality": 0.0473
+      },
+      {
+        "id": "c40",
+        "label": "Better Performance",
+        "score": 0.1451,
+        "aliases": [
+          "better performance"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 29,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c41",
+        "label": "Flow Control",
+        "score": 0.1451,
+        "aliases": [
+          "flow control"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 1,
+        "centrality": 0.069
+      },
+      {
+        "id": "c42",
+        "label": "Code",
+        "score": 0.1414,
+        "aliases": [
+          "code"
+        ],
+        "segments": [
+          "s2",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 30,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c43",
+        "label": "Push Resources",
+        "score": 0.1271,
+        "aliases": [
+          "push resources"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 3,
+        "centrality": 0.0473
+      },
+      {
+        "id": "c44",
+        "label": "Experience Http",
+        "score": 0.1271,
+        "aliases": [
+          "experience http"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 32,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c45",
+        "label": "Credentials",
+        "score": 0.1209,
+        "aliases": [
+          "credentials"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 33,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c46",
+        "label": "Domain",
+        "score": 0.1209,
+        "aliases": [
+          "domain"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 34,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c47",
+        "label": "Query",
+        "score": 0.1209,
+        "aliases": [
+          "query"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 4,
+        "centrality": 0.0473
+      },
+      {
+        "id": "c48",
+        "label": "Path",
+        "score": 0.1209,
+        "aliases": [
+          "path"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 35,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c49",
+        "label": "Performance",
+        "score": 0.1209,
+        "aliases": [
+          "performance"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 36,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c50",
+        "label": "Files",
+        "score": 0.1209,
+        "aliases": [
+          "files"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 37,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c51",
+        "label": "Rare",
+        "score": 0.1209,
+        "aliases": [
+          "rare"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.0364
+      },
+      {
+        "id": "c52",
+        "label": "Tcm-sec",
+        "score": 0.1209,
+        "aliases": [
+          "tcm-sec"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 38,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c53",
+        "label": "Control",
+        "score": 0.1209,
+        "aliases": [
+          "control"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 1,
+        "centrality": 0.0364
+      },
+      {
+        "id": "c54",
+        "label": "Break",
+        "score": 0.1209,
+        "aliases": [
+          "break"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 39,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c55",
+        "label": "Blog",
+        "score": 0.1209,
+        "aliases": [
+          "blog"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 5,
+        "centrality": 0.0473
+      },
+      {
+        "id": "c56",
+        "label": "Efficiency",
+        "score": 0.1209,
+        "aliases": [
+          "efficiency"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 40,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c57",
+        "label": "Images",
+        "score": 0.1209,
+        "aliases": [
+          "images"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 41,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c58",
+        "label": "Access",
+        "score": 0.1209,
+        "aliases": [
+          "access"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 42,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c59",
+        "label": "Somewhat",
+        "score": 0.1209,
+        "aliases": [
+          "somewhat"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.0364
+      },
+      {
+        "id": "c60",
+        "label": "Urls",
+        "score": 0.1209,
+        "aliases": [
+          "urls"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 43,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c61",
+        "label": "Flow",
+        "score": 0.1209,
+        "aliases": [
+          "flow"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 1,
+        "centrality": 0.0364
+      },
+      {
+        "id": "c62",
+        "label": "Website",
+        "score": 0.1209,
+        "aliases": [
+          "website"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 44,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c63",
+        "label": "Fragments",
+        "score": 0.1209,
+        "aliases": [
+          "fragments"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 45,
+        "centrality": 0.0071
+      },
+      {
+        "id": "c64",
+        "label": "Limit",
+        "score": 0.1209,
+        "aliases": [
+          "limit"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 2,
+        "centrality": 0.0364
+      },
+      {
+        "id": "c65",
+        "label": "Submitting Data",
+        "score": 0.1197,
+        "aliases": [
+          "submitting data"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 46,
+        "centrality": 0.0071
+      }
+    ],
+    "edges": [
+      {
+        "source": "c31",
+        "target": "c44",
+        "weight": 0.601,
+        "label": "related to"
+      },
+      {
+        "source": "c31",
+        "target": "c52",
+        "weight": 0.601,
+        "label": "related to"
+      },
+      {
+        "source": "c17",
+        "target": "c27",
+        "weight": 0.601,
+        "label": "related to"
+      },
+      {
+        "source": "c27",
+        "target": "c55",
+        "weight": 0.601,
+        "label": "related to"
+      },
+      {
+        "source": "c28",
+        "target": "c42",
+        "weight": 0.601,
+        "label": "related to"
+      },
+      {
+        "source": "c28",
+        "target": "c50",
+        "weight": 0.601,
+        "label": "related to"
+      },
+      {
+        "source": "c9",
+        "target": "c34",
+        "weight": 0.573,
+        "label": "related to"
+      },
+      {
+        "source": "c26",
+        "target": "c38",
+        "weight": 0.563,
+        "label": "related to"
+      },
+      {
+        "source": "c29",
+        "target": "c46",
+        "weight": 0.563,
+        "label": "related to"
+      }
+    ]
+  },
+  "transcript": [
+    {
+      "start": 0.0,
+      "end": 5.46,
+      "text": "welcome back to another video now today"
+    },
+    {
+      "start": 3.0,
+      "end": 7.8,
+      "text": "we're going to cover HTTP hypertext"
+    },
+    {
+      "start": 5.46,
+      "end": 10.44,
+      "text": "transfer protocol which is really a"
+    },
+    {
+      "start": 7.8,
+      "end": 12.72,
+      "text": "Cornerstone of web applications and in a"
+    },
+    {
+      "start": 10.44,
+      "end": 15.6,
+      "text": "nutshell enables the exchange of data"
+    },
+    {
+      "start": 12.72,
+      "end": 18.78,
+      "text": "over the internet today I wanted to"
+    },
+    {
+      "start": 15.6,
+      "end": 20.94,
+      "text": "revisit HTTP for a number of reasons the"
+    },
+    {
+      "start": 18.78,
+      "end": 22.8,
+      "text": "first being that in our field we build"
+    },
+    {
+      "start": 20.94,
+      "end": 25.44,
+      "text": "our knowledge on strong technical"
+    },
+    {
+      "start": 22.8,
+      "end": 28.02,
+      "text": "foundations however sometimes we forget"
+    },
+    {
+      "start": 25.44,
+      "end": 30.24,
+      "text": "to revisit these foundations which can"
+    },
+    {
+      "start": 28.02,
+      "end": 31.8,
+      "text": "be actually made even stronger given the"
+    },
+    {
+      "start": 30.24,
+      "end": 34.44,
+      "text": "experience that we might have gained"
+    },
+    {
+      "start": 31.8,
+      "end": 36.9,
+      "text": "since we last took the time to study it"
+    },
+    {
+      "start": 34.44,
+      "end": 38.64,
+      "text": "secondly for newcomers to the field this"
+    },
+    {
+      "start": 36.9,
+      "end": 40.8,
+      "text": "will help you build your foundation so"
+    },
+    {
+      "start": 38.64,
+      "end": 43.38,
+      "text": "that you can go on and be successful in"
+    },
+    {
+      "start": 40.8,
+      "end": 45.3,
+      "text": "your future endeavors and finally I've"
+    },
+    {
+      "start": 43.38,
+      "end": 47.76,
+      "text": "conducted a lot of interviews in the"
+    },
+    {
+      "start": 45.3,
+      "end": 49.62,
+      "text": "past some for offensive roles like pen"
+    },
+    {
+      "start": 47.76,
+      "end": 52.64,
+      "text": "testing and red teaming and for other"
+    },
+    {
+      "start": 49.62,
+      "end": 55.2,
+      "text": "roles like security architecture and"
+    },
+    {
+      "start": 52.64,
+      "end": 57.78,
+      "text": "devsecops and one thing that I've found"
+    },
+    {
+      "start": 55.2,
+      "end": 59.58,
+      "text": "most of the time is that all the really"
+    },
+    {
+      "start": 57.78,
+      "end": 61.5,
+      "text": "good candidates could answer the"
+    },
+    {
+      "start": 59.58,
+      "end": 62.94,
+      "text": "fundament answer questions with"
+    },
+    {
+      "start": 61.5,
+      "end": 65.04,
+      "text": "confidence"
+    },
+    {
+      "start": 62.94,
+      "end": 67.38,
+      "text": "so really I think this is a video for"
+    },
+    {
+      "start": 65.04,
+      "end": 71.58,
+      "text": "everyone and with that let's revisit"
+    },
+    {
+      "start": 67.38,
+      "end": 73.5,
+      "text": "HTTP so first up what is HTTP kind of a"
+    },
+    {
+      "start": 71.58,
+      "end": 75.84,
+      "text": "weird question and sometimes this can"
+    },
+    {
+      "start": 73.5,
+      "end": 78.48,
+      "text": "catch people out what it is but"
+    },
+    {
+      "start": 75.84,
+      "end": 81.6,
+      "text": "how do you actually articulate it well"
+    },
+    {
+      "start": 78.48,
+      "end": 83.7,
+      "text": "it's a protocol and you might say well"
+    },
+    {
+      "start": 81.6,
+      "end": 85.86,
+      "text": "what's a protocol a protocol is"
+    },
+    {
+      "start": 83.7,
+      "end": 88.44,
+      "text": "basically a set of rules and guidelines"
+    },
+    {
+      "start": 85.86,
+      "end": 90.96,
+      "text": "that govern the communication between"
+    },
+    {
+      "start": 88.44,
+      "end": 93.48,
+      "text": "two or more entities similar to a"
+    },
+    {
+      "start": 90.96,
+      "end": 95.34,
+      "text": "language it provides structure and just"
+    },
+    {
+      "start": 93.48,
+      "end": 97.68,
+      "text": "as languages have their own syntax"
+    },
+    {
+      "start": 95.34,
+      "end": 100.08,
+      "text": "grammar and vocabulary protocols have"
+    },
+    {
+      "start": 97.68,
+      "end": 102.42,
+      "text": "rules message formats and procedures"
+    },
+    {
+      "start": 100.08,
+      "end": 105.3,
+      "text": "that Define how communication should"
+    },
+    {
+      "start": 102.42,
+      "end": 107.34,
+      "text": "take place so to give an overview HTTP"
+    },
+    {
+      "start": 105.3,
+      "end": 109.56,
+      "text": "messages consist of a request message"
+    },
+    {
+      "start": 107.34,
+      "end": 111.96,
+      "text": "sent by the clients and a response"
+    },
+    {
+      "start": 109.56,
+      "end": 114.54,
+      "text": "message sent by the server request"
+    },
+    {
+      "start": 111.96,
+      "end": 117.84,
+      "text": "messages typically include methods such"
+    },
+    {
+      "start": 114.54,
+      "end": 120.42,
+      "text": "as get post put deletes a URI uniform"
+    },
+    {
+      "start": 117.84,
+      "end": 123.24,
+      "text": "resource identifier that identifies the"
+    },
+    {
+      "start": 120.42,
+      "end": 125.4,
+      "text": "resource being requested and option only"
+    },
+    {
+      "start": 123.24,
+      "end": 128.58,
+      "text": "message headers that provide additional"
+    },
+    {
+      "start": 125.4,
+      "end": 130.38,
+      "text": "information about the request response"
+    },
+    {
+      "start": 128.58,
+      "end": 132.3,
+      "text": "messages typically include a status code"
+    },
+    {
+      "start": 130.38,
+      "end": 134.04,
+      "text": "response messages typically include a"
+    },
+    {
+      "start": 132.3,
+      "end": 136.38,
+      "text": "status code indicating whether the"
+    },
+    {
+      "start": 134.04,
+      "end": 138.48,
+      "text": "request was successful and optionally"
+    },
+    {
+      "start": 136.38,
+      "end": 140.76,
+      "text": "message headers that provide additional"
+    },
+    {
+      "start": 138.48,
+      "end": 143.4,
+      "text": "information about the response and"
+    },
+    {
+      "start": 140.76,
+      "end": 144.78,
+      "text": "potentially a body as well okay so"
+    },
+    {
+      "start": 143.4,
+      "end": 147.9,
+      "text": "that's good to know but what about the"
+    },
+    {
+      "start": 144.78,
+      "end": 152.22,
+      "text": "different versions of HTTP so in my"
+    },
+    {
+      "start": 147.9,
+      "end": 154.92,
+      "text": "experience HTTP 2 is a little overlooked"
+    },
+    {
+      "start": 152.22,
+      "end": 157.2,
+      "text": "but actually is increasing in popularity"
+    },
+    {
+      "start": 154.92,
+      "end": 158.94,
+      "text": "and I've definitely seen it crop up more"
+    },
+    {
+      "start": 157.2,
+      "end": 161.82,
+      "text": "often in web applications I've been"
+    },
+    {
+      "start": 158.94,
+      "end": 163.68,
+      "text": "testing over the last few years so at"
+    },
+    {
+      "start": 161.82,
+      "end": 167.16,
+      "text": "the very least we should know what it's"
+    },
+    {
+      "start": 163.68,
+      "end": 169.5,
+      "text": "all about HTTP 2 supports multiplexing"
+    },
+    {
+      "start": 167.16,
+      "end": 172.8,
+      "text": "which allows multiple requests over a"
+    },
+    {
+      "start": 169.5,
+      "end": 174.78,
+      "text": "single connection with HTTP 1.1 a single"
+    },
+    {
+      "start": 172.8,
+      "end": 177.6,
+      "text": "resource that can't be loaded would"
+    },
+    {
+      "start": 174.78,
+      "end": 180.24,
+      "text": "block all of the requests behind it"
+    },
+    {
+      "start": 177.6,
+      "end": 182.4,
+      "text": "server push is also a feature that"
+    },
+    {
+      "start": 180.24,
+      "end": 184.62,
+      "text": "allows servers to push resources to"
+    },
+    {
+      "start": 182.4,
+      "end": 186.84,
+      "text": "clients before they're requested but"
+    },
+    {
+      "start": 184.62,
+      "end": 189.42,
+      "text": "also flow control lets a client limit"
+    },
+    {
+      "start": 186.84,
+      "end": 192.3,
+      "text": "the amount of data sent by the server so"
+    },
+    {
+      "start": 189.42,
+      "end": 194.4,
+      "text": "overall HTTP 2 provides better"
+    },
+    {
+      "start": 192.3,
+      "end": 195.96,
+      "text": "performance and efficiency but I think"
+    },
+    {
+      "start": 194.4,
+      "end": 198.18,
+      "text": "it's still going to be a little while"
+    },
+    {
+      "start": 195.96,
+      "end": 201.78,
+      "text": "until we see it as the dominant protocol"
+    },
+    {
+      "start": 198.18,
+      "end": 204.36,
+      "text": "over HTTP 1.1 so next let's talk about"
+    },
+    {
+      "start": 201.78,
+      "end": 207.3,
+      "text": "requests and responses we need to make"
+    },
+    {
+      "start": 204.36,
+      "end": 209.46,
+      "text": "requests to resources to access a"
+    },
+    {
+      "start": 207.3,
+      "end": 213.5,
+      "text": "website this includes requesting for"
+    },
+    {
+      "start": 209.46,
+      "end": 216.42,
+      "text": "things like HTML images JavaScript CSS"
+    },
+    {
+      "start": 213.5,
+      "end": 220.26,
+      "text": "and other files and this is done with"
+    },
+    {
+      "start": 216.42,
+      "end": 222.42,
+      "text": "URLs so uniform resource locators now"
+    },
+    {
+      "start": 220.26,
+      "end": 224.04,
+      "text": "let's break down how they work so a"
+    },
+    {
+      "start": 222.42,
+      "end": 228.44,
+      "text": "typical request might look something"
+    },
+    {
+      "start": 224.04,
+      "end": 232.56,
+      "text": "like this https :/"
+    },
+    {
+      "start": 228.44,
+      "end": 236.76,
+      "text": "tcm-sec.com blog and ? topic"
+    },
+    {
+      "start": 232.56,
+      "end": 239.52,
+      "text": "equals appsec part 3. so here we have"
+    },
+    {
+      "start": 236.76,
+      "end": 241.86,
+      "text": "the scheme the domain the path the query"
+    },
+    {
+      "start": 239.52,
+      "end": 244.26,
+      "text": "string and the fragments you can also"
+    },
+    {
+      "start": 241.86,
+      "end": 246.18,
+      "text": "pass credentials via the URL but this is"
+    },
+    {
+      "start": 244.26,
+      "end": 248.88,
+      "text": "somewhat rare these days and the port"
+    },
+    {
+      "start": 246.18,
+      "end": 251.46,
+      "text": "number is not needed if the ports used"
+    },
+    {
+      "start": 248.88,
+      "end": 255.12,
+      "text": "is the default for that scheme for"
+    },
+    {
+      "start": 251.46,
+      "end": 258.36,
+      "text": "example HTTP runs on Port 80 and https"
+    },
+    {
+      "start": 255.12,
+      "end": 261.0,
+      "text": "runs on 443 let's take a look at a"
+    },
+    {
+      "start": 258.36,
+      "end": 262.62,
+      "text": "simple request and response now we're"
+    },
+    {
+      "start": 261.0,
+      "end": 264.66,
+      "text": "going to take a closer look at the"
+    },
+    {
+      "start": 262.62,
+      "end": 267.12,
+      "text": "different sections soon but just to give"
+    },
+    {
+      "start": 264.66,
+      "end": 270.24,
+      "text": "you an overview here we have gets slash"
+    },
+    {
+      "start": 267.12,
+      "end": 272.76,
+      "text": "HTTP 1.1 everything below this is a"
+    },
+    {
+      "start": 270.24,
+      "end": 274.74,
+      "text": "header and we don't have a body in our"
+    },
+    {
+      "start": 272.76,
+      "end": 277.14,
+      "text": "request but often if we're submitting"
+    },
+    {
+      "start": 274.74,
+      "end": 279.12,
+      "text": "data or trying to update information we"
+    },
+    {
+      "start": 277.14,
+      "end": 281.94,
+      "text": "will in the response it looks like we're"
+    },
+    {
+      "start": 279.12,
+      "end": 284.4,
+      "text": "using HTTP 2 and we get the status code"
+    },
+    {
+      "start": 281.94,
+      "end": 286.92,
+      "text": "200. this is followed by a variety of"
+    },
+    {
+      "start": 284.4,
+      "end": 289.8,
+      "text": "headers at the bottom and then we have a"
+    },
+    {
+      "start": 286.92,
+      "end": 292.8,
+      "text": "body which in this case is the HTML to"
+    },
+    {
+      "start": 289.8,
+      "end": 294.72,
+      "text": "render the page so next up are HTTP"
+    },
+    {
+      "start": 292.8,
+      "end": 296.94,
+      "text": "methods likely you'll need to know the"
+    },
+    {
+      "start": 294.72,
+      "end": 297.9,
+      "text": "main ones and if you see others popping"
+    },
+    {
+      "start": 296.94,
+      "end": 300.24,
+      "text": "up you can"
+    },
+    {
+      "start": 297.9,
+      "end": 303.0,
+      "text": "them out on something like the mdn web"
+    },
+    {
+      "start": 300.24,
+      "end": 305.4,
+      "text": "docs so get is used for getting"
+    },
+    {
+      "start": 303.0,
+      "end": 307.56,
+      "text": "information from a web server you'll see"
+    },
+    {
+      "start": 305.4,
+      "end": 309.78,
+      "text": "this most of the time post is used for"
+    },
+    {
+      "start": 307.56,
+      "end": 312.6,
+      "text": "submitting data to a web server usually"
+    },
+    {
+      "start": 309.78,
+      "end": 315.12,
+      "text": "to create new records put is also used"
+    },
+    {
+      "start": 312.6,
+      "end": 316.56,
+      "text": "for submitting data to a web server but"
+    },
+    {
+      "start": 315.12,
+      "end": 319.38,
+      "text": "usually used to update information"
+    },
+    {
+      "start": 316.56,
+      "end": 321.72,
+      "text": "rather than create it and delete as you"
+    },
+    {
+      "start": 319.38,
+      "end": 324.3,
+      "text": "can tell is usually used to delete"
+    },
+    {
+      "start": 321.72,
+      "end": 326.4,
+      "text": "information from a web server for status"
+    },
+    {
+      "start": 324.3,
+      "end": 328.38,
+      "text": "codes it's useful to try and remember"
+    },
+    {
+      "start": 326.4,
+      "end": 330.72,
+      "text": "the common ones and then we can always"
+    },
+    {
+      "start": 328.38,
+      "end": 333.0,
+      "text": "do a quick Google for others if needed"
+    },
+    {
+      "start": 330.72,
+      "end": 334.8,
+      "text": "you don't need to remember a hundred"
+    },
+    {
+      "start": 333.0,
+      "end": 336.24,
+      "text": "plus status codes or print out some"
+    },
+    {
+      "start": 334.8,
+      "end": 339.12,
+      "text": "cheat sheets and put it on your wall"
+    },
+    {
+      "start": 336.24,
+      "end": 340.92,
+      "text": "that said if you're a developer and"
+    },
+    {
+      "start": 339.12,
+      "end": 342.66,
+      "text": "you're working on things like rest apis"
+    },
+    {
+      "start": 340.92,
+      "end": 345.06,
+      "text": "likely you'll need to know these codes"
+    },
+    {
+      "start": 342.66,
+      "end": 347.64,
+      "text": "in a little bit more detail so anything"
+    },
+    {
+      "start": 345.06,
+      "end": 350.4,
+      "text": "in the 100 range are informational"
+    },
+    {
+      "start": 347.64,
+      "end": 352.26,
+      "text": "responses usually everything is okay to"
+    },
+    {
+      "start": 350.4,
+      "end": 354.72,
+      "text": "carry out two hundreds as success"
+    },
+    {
+      "start": 352.26,
+      "end": 357.12,
+      "text": "messages which is great 300 are"
+    },
+    {
+      "start": 354.72,
+      "end": 359.28,
+      "text": "redirects to other resources or"
+    },
+    {
+      "start": 357.12,
+      "end": 361.74,
+      "text": "sometimes entirely different sites and"
+    },
+    {
+      "start": 359.28,
+      "end": 363.84,
+      "text": "400s are errors with the requests so"
+    },
+    {
+      "start": 361.74,
+      "end": 367.56,
+      "text": "basically you did something wrong and"
+    },
+    {
+      "start": 363.84,
+      "end": 369.54,
+      "text": "500s are server-side errors so the web"
+    },
+    {
+      "start": 367.56,
+      "end": 371.88,
+      "text": "application did something wrong all"
+    },
+    {
+      "start": 369.54,
+      "end": 374.34,
+      "text": "right so let's take a quick look at some"
+    },
+    {
+      "start": 371.88,
+      "end": 377.4,
+      "text": "headers and cookies some of the main"
+    },
+    {
+      "start": 374.34,
+      "end": 379.38,
+      "text": "headers that you need to know are host a"
+    },
+    {
+      "start": 377.4,
+      "end": 382.02,
+      "text": "lot of websites actually host multiple"
+    },
+    {
+      "start": 379.38,
+      "end": 385.02,
+      "text": "sites and basically they'll be using the"
+    },
+    {
+      "start": 382.02,
+      "end": 387.18,
+      "text": "same ihp address so the host header lets"
+    },
+    {
+      "start": 385.02,
+      "end": 389.88,
+      "text": "us tell the server which sites we're"
+    },
+    {
+      "start": 387.18,
+      "end": 392.1,
+      "text": "actually after next up we have the user"
+    },
+    {
+      "start": 389.88,
+      "end": 393.66,
+      "text": "agent this tells the server what browser"
+    },
+    {
+      "start": 392.1,
+      "end": 395.64,
+      "text": "we're running and you might sometimes"
+    },
+    {
+      "start": 393.66,
+      "end": 397.26,
+      "text": "need to manipulate this if you're"
+    },
+    {
+      "start": 395.64,
+      "end": 399.3,
+      "text": "running things like fuzzing tools or"
+    },
+    {
+      "start": 397.26,
+      "end": 401.82,
+      "text": "scanners so that your target doesn't"
+    },
+    {
+      "start": 399.3,
+      "end": 404.46,
+      "text": "filter your requests based on the user"
+    },
+    {
+      "start": 401.82,
+      "end": 406.38,
+      "text": "agents or lack of user agents if we're"
+    },
+    {
+      "start": 404.46,
+      "end": 409.2,
+      "text": "doing things like submitting a form or"
+    },
+    {
+      "start": 406.38,
+      "end": 411.3,
+      "text": "sending some Json the content length"
+    },
+    {
+      "start": 409.2,
+      "end": 413.7,
+      "text": "tells us web server exactly how much"
+    },
+    {
+      "start": 411.3,
+      "end": 415.38,
+      "text": "data to expect mainly this is for error"
+    },
+    {
+      "start": 413.7,
+      "end": 417.6,
+      "text": "checking though accepting coding will"
+    },
+    {
+      "start": 415.38,
+      "end": 419.88,
+      "text": "tell the web server what we support so"
+    },
+    {
+      "start": 417.6,
+      "end": 421.92,
+      "text": "that data can be compressed and finally"
+    },
+    {
+      "start": 419.88,
+      "end": 423.72,
+      "text": "we have cookies key value pairs that"
+    },
+    {
+      "start": 421.92,
+      "end": 426.0,
+      "text": "help us track information across"
+    },
+    {
+      "start": 423.72,
+      "end": 428.4,
+      "text": "multiple requests cookies are really"
+    },
+    {
+      "start": 426.0,
+      "end": 430.74,
+      "text": "really important so let's take a closer"
+    },
+    {
+      "start": 428.4,
+      "end": 433.2,
+      "text": "look they can be set with the set cookie"
+    },
+    {
+      "start": 430.74,
+      "end": 435.54,
+      "text": "header and once this is done they'll be"
+    },
+    {
+      "start": 433.2,
+      "end": 437.34,
+      "text": "sent in future requests"
+    },
+    {
+      "start": 435.54,
+      "end": 439.5,
+      "text": "they can also have a number of flags"
+    },
+    {
+      "start": 437.34,
+      "end": 442.32,
+      "text": "applied so to give you an overview the"
+    },
+    {
+      "start": 439.5,
+      "end": 444.78,
+      "text": "HTTP only flag restricts the cookie from"
+    },
+    {
+      "start": 442.32,
+      "end": 446.82,
+      "text": "being read by JavaScript this is quite"
+    },
+    {
+      "start": 444.78,
+      "end": 449.22,
+      "text": "common these days and an important part"
+    },
+    {
+      "start": 446.82,
+      "end": 451.14,
+      "text": "of a defense in-depth model to protect"
+    },
+    {
+      "start": 449.22,
+      "end": 453.36,
+      "text": "against things like cross-site scripting"
+    },
+    {
+      "start": 451.14,
+      "end": 455.34,
+      "text": "the secure flag tells the browser to"
+    },
+    {
+      "start": 453.36,
+      "end": 458.4,
+      "text": "only send the cookie over https"
+    },
+    {
+      "start": 455.34,
+      "end": 460.02,
+      "text": "connections and same site is an"
+    },
+    {
+      "start": 458.4,
+      "end": 462.18,
+      "text": "interesting flag that tells the browser"
+    },
+    {
+      "start": 460.02,
+      "end": 464.22,
+      "text": "how to handle cookies in cross-site"
+    },
+    {
+      "start": 462.18,
+      "end": 468.48,
+      "text": "requests it can take one of three"
+    },
+    {
+      "start": 464.22,
+      "end": 470.52,
+      "text": "options so strict lacks and none strict"
+    },
+    {
+      "start": 468.48,
+      "end": 472.86,
+      "text": "cookies are not sent with cross-site"
+    },
+    {
+      "start": 470.52,
+      "end": 474.96,
+      "text": "requests same-site lacks which is now"
+    },
+    {
+      "start": 472.86,
+      "end": 477.72,
+      "text": "the default for Chrome if you don't set"
+    },
+    {
+      "start": 474.96,
+      "end": 479.64,
+      "text": "it only sends cookies with get requests"
+    },
+    {
+      "start": 477.72,
+      "end": 483.3,
+      "text": "when a user clicks on a button or a link"
+    },
+    {
+      "start": 479.64,
+      "end": 485.34,
+      "text": "or pre-fetch requests and none sends all"
+    },
+    {
+      "start": 483.3,
+      "end": 488.22,
+      "text": "of the cookies all the time on all"
+    },
+    {
+      "start": 485.34,
+      "end": 490.5,
+      "text": "cross-site requests so before we wrap up"
+    },
+    {
+      "start": 488.22,
+      "end": 492.36,
+      "text": "today's video let's take a quick look at"
+    },
+    {
+      "start": 490.5,
+      "end": 495.48,
+      "text": "curl which is a really handy command"
+    },
+    {
+      "start": 492.36,
+      "end": 497.7,
+      "text": "line tool for making requests so to make"
+    },
+    {
+      "start": 495.48,
+      "end": 501.84,
+      "text": "a basic request all we really need to do"
+    },
+    {
+      "start": 497.7,
+      "end": 503.7,
+      "text": "is just type curl https or HTTP depends"
+    },
+    {
+      "start": 501.84,
+      "end": 506.64,
+      "text": "on your target site and we'll just call"
+    },
+    {
+      "start": 503.7,
+      "end": 508.8,
+      "text": "out to tcmsac.com"
+    },
+    {
+      "start": 506.64,
+      "end": 511.2,
+      "text": "and you can see that this makes a"
+    },
+    {
+      "start": 508.8,
+      "end": 512.22,
+      "text": "request and prints out the response to"
+    },
+    {
+      "start": 511.2,
+      "end": 515.28,
+      "text": "screen"
+    },
+    {
+      "start": 512.22,
+      "end": 518.58,
+      "text": "so we can actually save this to a file"
+    },
+    {
+      "start": 515.28,
+      "end": 522.24,
+      "text": "quite easily by just using Dash o and"
+    },
+    {
+      "start": 518.58,
+      "end": 524.1,
+      "text": "then we'll just do tcm.html"
+    },
+    {
+      "start": 522.24,
+      "end": 526.32,
+      "text": "like this"
+    },
+    {
+      "start": 524.1,
+      "end": 529.8,
+      "text": "and then if we want to read this in the"
+    },
+    {
+      "start": 526.32,
+      "end": 532.2,
+      "text": "future we can just head or cats or tail"
+    },
+    {
+      "start": 529.8,
+      "end": 535.02,
+      "text": "whatever you want to do or open the file"
+    },
+    {
+      "start": 532.2,
+      "end": 537.36,
+      "text": "up and read the information now if we"
+    },
+    {
+      "start": 535.02,
+      "end": 541.56,
+      "text": "want to send some post data we can curl"
+    },
+    {
+      "start": 537.36,
+      "end": 544.56,
+      "text": "and then what we want to do is add data"
+    },
+    {
+      "start": 541.56,
+      "end": 547.74,
+      "text": "and then we can add data to this request"
+    },
+    {
+      "start": 544.56,
+      "end": 548.94,
+      "text": "so you can either add some Json or you"
+    },
+    {
+      "start": 547.74,
+      "end": 553.58,
+      "text": "can add"
+    },
+    {
+      "start": 548.94,
+      "end": 553.58,
+      "text": "make some form data or just a string"
+    },
+    {
+      "start": 555.06,
+      "end": 559.02,
+      "text": "go on slash"
+    },
+    {
+      "start": 556.88,
+      "end": 560.76,
+      "text": "tcmsac.com and this would typically go"
+    },
+    {
+      "start": 559.02,
+      "end": 563.28,
+      "text": "to an endpoint that allows the"
+    },
+    {
+      "start": 560.76,
+      "end": 568.1,
+      "text": "submission of data another way I see"
+    },
+    {
+      "start": 563.28,
+      "end": 571.38,
+      "text": "this done is curl Dash X"
+    },
+    {
+      "start": 568.1,
+      "end": 575.06,
+      "text": "and then you can just do Dash D"
+    },
+    {
+      "start": 571.38,
+      "end": 575.06,
+      "text": "and just pass my data"
+    },
+    {
+      "start": 577.98,
+      "end": 584.48,
+      "text": "and we get the same thing so whatever"
+    },
+    {
+      "start": 581.16,
+      "end": 584.48,
+      "text": "syntax you prefer"
+    },
+    {
+      "start": 585.06,
+      "end": 590.4,
+      "text": "and of course if you want to know more"
+    },
+    {
+      "start": 587.28,
+      "end": 592.44,
+      "text": "about curl you can just man curl and you"
+    },
+    {
+      "start": 590.4,
+      "end": 595.08,
+      "text": "get all of the information that you need"
+    },
+    {
+      "start": 592.44,
+      "end": 598.44,
+      "text": "to use the tool here along with online"
+    },
+    {
+      "start": 595.08,
+      "end": 599.94,
+      "text": "resources as well super handy tool and I"
+    },
+    {
+      "start": 598.44,
+      "end": 603.3,
+      "text": "know that's a very brief introduction"
+    },
+    {
+      "start": 599.94,
+      "end": 605.28,
+      "text": "but really we'll learn by doing so I"
+    },
+    {
+      "start": 603.3,
+      "end": 606.72,
+      "text": "hope you can take this introduction do a"
+    },
+    {
+      "start": 605.28,
+      "end": 608.82,
+      "text": "little bit of practice some research on"
+    },
+    {
+      "start": 606.72,
+      "end": 611.82,
+      "text": "your own and then become confident in"
+    },
+    {
+      "start": 608.82,
+      "end": 614.52,
+      "text": "using curl in your day-to-day work or"
+    },
+    {
+      "start": 611.82,
+      "end": 616.74,
+      "text": "when you're doing CTF challenges so"
+    },
+    {
+      "start": 614.52,
+      "end": 618.42,
+      "text": "that's it for this video something a"
+    },
+    {
+      "start": 616.74,
+      "end": 620.82,
+      "text": "little bit different than usual but I"
+    },
+    {
+      "start": 618.42,
+      "end": 624.24,
+      "text": "hope it was useful to revisit the basics"
+    },
+    {
+      "start": 620.82,
+      "end": 626.46,
+      "text": "of HTTP to either improve or learn"
+    },
+    {
+      "start": 624.24,
+      "end": 629.04,
+      "text": "something new and of course build upon"
+    },
+    {
+      "start": 626.46,
+      "end": 630.78,
+      "text": "going forward in your absec journey if"
+    },
+    {
+      "start": 629.04,
+      "end": 633.0,
+      "text": "you liked the video of course don't"
+    },
+    {
+      "start": 630.78,
+      "end": 635.54,
+      "text": "forget to like And subscribe and I'll"
+    },
+    {
+      "start": 633.0,
+      "end": 635.54,
+      "text": "see you next time"
+    }
+  ]
+}

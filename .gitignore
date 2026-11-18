@@ -1,0 +1,14 @@
+.env
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
+venv/
+backend/data/
+*.egg-info/
+node_modules/
+dist/
+.DS_Store
+Thumbs.db
+SESSION_LOG.md
+OPTIMIZATION_README.md

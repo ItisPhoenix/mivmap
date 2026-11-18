@@ -1,0 +1,309 @@
+/**
+ * Node inspector (right-hand panel): edit text & summary, notes, external links,
+ * images (storyboard / captured frame / upload), tone tags, timestamps,
+ * cross-links, AI refinement and the "Ask" chat for the selected node(s).
+ * (The video's own words are on YouTube: there is no transcript block here.)
+ */
+import { captureCurrentFrame, currentVideoTime, pickImageFile, storyboardFrame } from './frames.js';
+import { REFINE_ACTIONS, runRefine } from './refine.js';
+import { el, fmtTime, isHttpUrl, plain, toast } from './shared.js';
+
+const TONES = ['enthusiastic', 'critical', 'controversial', 'cautionary', 'humorous', 'instructional', 'inspirational', 'analytical', 'skeptical', 'optimistic'];
+const TYPE_LABEL = { root: 'Topic', section: 'Section', concept: 'Key concept', detail: 'Detail', transcript: 'Quote' };
+
+export class InspectorPanel {
+  constructor({ host, model, renderer, api, seek, gamify, ask }) {
+    Object.assign(this, { host, model, renderer, api, seek, gamify, ask });
+    this.ids = [];
+    renderer.addEventListener('select', (e) => this.show(e.detail.ids));
+    model.addEventListener('change', (e) => {
+      if (e.detail.origin !== 'local-panel' && this.ids.length) this.#refreshSoon();
+    });
+    model.addEventListener('load', () => this.show([]));
+  }
+
+  #refreshSoon() {
+    if (this.host.contains(document.activeElement) && document.activeElement.matches('textarea, input')) return;
+    clearTimeout(this.refreshTimer);
+    this.refreshTimer = setTimeout(() => this.show(this.ids), 60);
+  }
+
+  show(ids) {
+    this.ids = ids.filter((id) => this.model.get(id));
+    if (!this.ids.length) {
+      this.host.hidden = true;
+      return;
+    }
+    this.host.hidden = false;
+    this.openedAt = performance.now();
+    const node = this.model.get(this.ids.at(-1));
+    this.host.replaceChildren(this.#render(node));
+  }
+
+  close() {
+    this.renderer.select([]);
+  }
+
+  #commit(id, patch) {
+    this.model.apply({ type: 'update', id, patch }, { origin: 'local' });
+  }
+
+  #render(node) {
+    const meta = this.model.meta || {};
+    const videoId = node.videoId || meta.videoId;
+    const frag = document.createDocumentFragment();
+
+    frag.append(
+      el('div', { class: 'panel-head' }, [
+        el('span', { class: 'panel-type' }, node.recall ? 'Quick recall' : node.tag ? `${node.tag} · detail` : TYPE_LABEL[node.type] || node.type),
+        el('button', { class: 'icon-btn', title: 'Close (Esc)', onclick: () => this.close() }, '✕'),
+      ]),
+    );
+
+    if (this.ids.length > 1) frag.append(el('p', { class: 'panel-multi' }, `${this.ids.length} nodes selected — Merge or add a cross-link below.`));
+
+    // --- text ---------------------------------------------------------------
+    const title = el('textarea', { class: 'panel-title', rows: 2, 'aria-label': 'Node text' });
+    title.value = node.text;
+    title.addEventListener('change', () => title.value.trim() && this.#commit(node.id, { text: title.value.trim() }));
+    frag.append(title);
+
+    const summary = el('textarea', { class: 'panel-summary', rows: 3, placeholder: 'Summary / explanation…' });
+    summary.value = node.summary || '';
+    summary.addEventListener('change', () => this.#commit(node.id, { summary: summary.value.trim() }));
+    frag.append(summary);
+
+    // Structured lesson for Deep Mode (and learning aids for other modes).
+    // Everything stays in the existing inspector; the canvas is untouched.
+    const lesson = node.why_it_matters || (Array.isArray(node.steps) && node.steps.length)
+      || node.worked_example || node.misconception || node.knowledge_check;
+    if (lesson || node.explain || node.example || node.diagram || node.exercise) {
+      const aids = el('section', { class: 'panel-learning' });
+      aids.append(el('h4', {}, node.lesson_available ? 'Lesson' : 'Learning aids'));
+      const text = (key, label) => {
+        const value = node[key];
+        if (!value) return;
+        aids.append(el('p', { class: `learning-${key}` }, `${label}: ${value}`));
+      };
+      text('explain', 'Definition');
+      text('why_it_matters', 'Why it matters');
+      if (Array.isArray(node.steps) && node.steps.length) {
+        aids.append(el('p', { class: 'learning-steps-title' }, 'How it works'));
+        const list = el('ol', { class: 'learning-steps' });
+        node.steps.forEach((step) => list.append(el('li', {}, step)));
+        aids.append(list);
+      }
+      text('worked_example', 'Worked example (supplemental)');
+      if (node.diagram) aids.append(el('pre', { class: 'learning-diagram' }, node.diagram));
+      text('misconception', 'Common misconception');
+      text('exercise', 'Practice');
+      if (node.knowledge_check && typeof node.knowledge_check === 'object') {
+        aids.append(el('p', { class: 'learning-check' }, `Check: ${node.knowledge_check.question || ''} Answer: ${node.knowledge_check.answer || ''}`));
+      } else {
+        text('example', 'Example');
+        text('exercise', 'Try it');
+      }
+      const provenance = node.provenance?.example_source === 'supplemental'
+        ? 'Worked example, diagram and exercise are teaching aids, not statements from the video.'
+        : 'Teaching aids are generated; verify against the transcript before treating them as source claims.';
+      aids.append(el('p', { class: 'panel-note' }, provenance));
+      frag.append(aids);
+    }
+
+    // --- timestamp ------------------------------------------------------------
+    const tsRow = el('div', { class: 'panel-row wrap' });
+    if (node.start !== null && node.start !== undefined) {
+      tsRow.append(el('button', { class: 'btn btn-accent', onclick: () => this.seek(node) }, `Watch at ${fmtTime(node.start)}`));
+    }
+    if (this.ask && this.ids.length === 1) tsRow.append(el('button', { class: 'btn', title: 'Ask a question about this node (a)', onclick: () => this.ask(node.id) }, '💬 Ask'));
+    if (videoId) {
+      tsRow.append(
+        el('button', {
+          class: 'btn btn-ghost',
+          title: 'Use the current playback time of the YouTube tab',
+          onclick: async () => {
+            const t = await currentVideoTime(videoId);
+            if (t === null) toast('Open the video in a YouTube tab first.');
+            else this.#commit(node.id, { start: Math.round(t * 10) / 10 });
+          },
+        }, '⏱ Set to now'),
+      );
+    }
+    if (tsRow.children.length) frag.append(tsRow);
+
+    if (node.videoId && node.videoId !== meta.videoId) frag.append(el('p', { class: 'panel-note' }, '🔗 From another video in the Knowledge Hub.'));
+
+    // --- tone -------------------------------------------------------------------
+    frag.append(el('h4', {}, 'Tone'));
+    frag.append(
+      el(
+        'div',
+        { class: 'chips' },
+        TONES.map((tone) => {
+          const on = (node.tone || []).includes(tone);
+          return el('button', {
+            class: `chip ${on ? 'on' : ''} tone-${tone}`,
+            onclick: () => this.#commit(node.id, { tone: on ? node.tone.filter((t) => t !== tone) : [...(node.tone || []), tone].slice(-3) }),
+          }, tone);
+        }),
+      ),
+    );
+
+    // --- image --------------------------------------------------------------------
+    frag.append(el('h4', {}, 'Visual'));
+    const imgBox = el('div', { class: 'panel-image' });
+    if (node.image?.src) {
+      imgBox.append(
+        el('img', { src: node.image.src, alt: 'Frame from the video' }),
+        el('small', {}, `${node.image.source || 'image'}${node.image.t ? ` @ ${fmtTime(node.image.t)}` : ''}`),
+      );
+    }
+    const imgActions = el('div', { class: 'panel-row wrap' });
+    if (meta.storyboardSpec && node.start !== null && node.start !== undefined) {
+      imgActions.append(
+        el('button', {
+          class: 'btn btn-small',
+          onclick: async () => {
+            try {
+              const src = await storyboardFrame(meta.storyboardSpec, meta.duration, node.start + 2);
+              this.#commit(node.id, { image: { src, t: node.start + 2, source: 'storyboard' } });
+            } catch (err) {
+              toast(err.message, { type: 'error' });
+            }
+          },
+        }, '🎞 Storyboard'),
+      );
+    }
+    if (videoId) {
+      imgActions.append(
+        el('button', {
+          class: 'btn btn-small',
+          title: 'Grab the frame currently shown in the YouTube tab',
+          onclick: async () => {
+            try {
+              this.#commit(node.id, { image: await captureCurrentFrame(videoId) });
+            } catch (err) {
+              toast(err.message, { type: 'error' });
+            }
+          },
+        }, '📸 Capture frame'),
+      );
+    }
+    imgActions.append(
+      el('button', {
+        class: 'btn btn-small',
+        onclick: async () => {
+          const image = await pickImageFile();
+          if (image) this.#commit(node.id, { image });
+        },
+      }, '⬆ Upload'),
+    );
+    if (node.image) imgActions.append(el('button', { class: 'btn btn-small btn-ghost', onclick: () => this.#commit(node.id, { image: null }) }, 'Remove'));
+    imgBox.append(imgActions);
+    frag.append(imgBox);
+
+    // --- notes -------------------------------------------------------------------------
+    frag.append(el('h4', {}, 'My notes'));
+    const notes = el('textarea', { class: 'panel-notes', rows: 4, placeholder: 'Write your own notes, questions, examples…' });
+    notes.value = node.notes || '';
+    let notesTimer;
+    notes.addEventListener('input', () => {
+      clearTimeout(notesTimer);
+      notesTimer = setTimeout(() => {
+        if (notes.value !== (node.notes || '')) {
+          const firstNote = !node.notes;
+          this.#commit(node.id, { notes: notes.value });
+          if (firstNote) this.gamify?.track('note_added');
+        }
+      }, 700);
+    });
+    frag.append(notes);
+
+    // --- links -----------------------------------------------------------------------------
+    frag.append(el('h4', {}, 'Links'));
+    const list = el(
+      'ul',
+      { class: 'panel-links' },
+      (node.links || []).map((link, i) =>
+        el('li', {}, [
+          el('a', { href: link.url, target: '_blank', rel: 'noopener noreferrer' }, link.title || link.url),
+          el('button', { class: 'icon-btn', title: 'Remove link', onclick: () => this.#commit(node.id, { links: node.links.filter((_, j) => j !== i) }) }, '✕'),
+        ]),
+      ),
+    );
+    const urlInput = el('input', { type: 'url', placeholder: 'https://…' });
+    const titleInput = el('input', { type: 'text', placeholder: 'Title (optional)' });
+    const addLink = () => {
+      const url = urlInput.value.trim();
+      if (!isHttpUrl(url)) {
+        toast('Enter a valid http(s) link.', { type: 'error' });
+        return;
+      }
+      this.#commit(node.id, { links: [...(node.links || []), { url, title: titleInput.value.trim() }] });
+      this.gamify?.track('link_added');
+    };
+    urlInput.addEventListener('keydown', (e) => e.key === 'Enter' && addLink());
+    frag.append(list, el('div', { class: 'panel-row link-form' }, [urlInput, titleInput, el('button', { class: 'btn btn-small', onclick: addLink }, 'Add')]));
+
+    // --- structure -------------------------------------------------------------------------------
+    frag.append(el('h4', {}, 'Structure'));
+    const structure = el('div', { class: 'panel-row wrap' }, [
+      el('button', { class: 'btn btn-small', onclick: () => this.#addChild(node) }, '＋ Child (Tab)'),
+      node.type !== 'root' ? el('button', { class: 'btn btn-small', onclick: () => this.#addSibling(node) }, '＋ Sibling (Enter)') : null,
+      node.type !== 'root' ? el('button', { class: 'btn btn-small btn-danger', onclick: () => this.model.remove(this.ids) }, '🗑 Delete') : null,
+    ]);
+    if (this.ids.length === 2) {
+      structure.append(
+        el('button', {
+          class: 'btn btn-small',
+          onclick: () => {
+            const label = prompt('Relationship label (e.g. "leads to", "contrasts with")', 'related to');
+            if (label !== null) this.model.addEdge(this.ids[0], this.ids[1], label || 'related to');
+          },
+        }, '⤳ Cross-link'),
+      );
+    }
+    frag.append(structure);
+
+    // --- AI -------------------------------------------------------------------------------------------
+    frag.append(el('h4', {}, this.api.online ? 'AI refinement' : 'AI refinement · offline'));
+    const instruction = el('input', { type: 'text', class: 'panel-instruction', placeholder: 'Optional instruction, e.g. "add real-world examples"' });
+    frag.append(instruction);
+    frag.append(
+      el(
+        'div',
+        { class: 'panel-row wrap' },
+        REFINE_ACTIONS.map((action) =>
+          el('button', {
+            class: 'btn btn-small btn-ai',
+            title: action.hint,
+            disabled: this.ids.length < action.min ? true : null,
+            onclick: () => runRefine({ api: this.api, model: this.model, action: action.id, ids: this.ids, instruction: instruction.value, gamify: this.gamify, renderer: this.renderer }),
+          }, `${action.icon} ${action.label}`),
+        ),
+      ),
+    );
+
+    if (node.sources?.length > 1) {
+      frag.append(el('h4', {}, 'Merged from'), el('ul', { class: 'panel-sources' }, node.sources.map((s) => el('li', {}, `${s.videoId || 'map'} ${s.start !== null && s.start !== undefined ? `@ ${fmtTime(s.start)}` : ''}`))));
+    }
+    frag.append(el('p', { class: 'panel-foot' }, `${(node.children || []).length} children · layer ${node.layer ?? 0} · ${plain(node.text).length} chars`));
+    return frag;
+  }
+
+  #addChild(node) {
+    const child = this.model.addChild(node.id);
+    this.renderer.render();
+    this.renderer.select(child.id);
+    this.renderer.startEdit(child.id);
+    this.gamify?.track('node_added');
+  }
+
+  #addSibling(node) {
+    const sibling = this.model.addSibling(node.id);
+    this.renderer.render();
+    this.renderer.select(sibling.id);
+    this.renderer.startEdit(sibling.id);
+    this.gamify?.track('node_added');
+  }
+}

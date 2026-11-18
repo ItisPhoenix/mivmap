@@ -1,0 +1,3630 @@
+{
+  "schema": "tubemind/1",
+  "id": "cadbf2686974ffb7",
+  "version": 1,
+  "meta": {
+    "videoId": "WUvTyaaNkzM",
+    "title": "Essence of linear algebra",
+    "channel": "",
+    "url": "https://www.youtube.com/watch?v=WUvTyaaNkzM",
+    "duration": 1003.42,
+    "mode": "deep",
+    "language": "en",
+    "sourceLanguage": "en",
+    "translation": {
+      "lang": "en",
+      "status": "english",
+      "detect_ms": 0.4,
+      "translate_ms": 0,
+      "units": 0,
+      "translated": 0,
+      "coverage": 1.0
+    },
+    "originalTitle": "Essence of linear algebra",
+    "transcriptSource": "youtube-captions",
+    "llm": "openai-compatible:particle-ai/particle-1:free",
+    "labelled": true,
+    "embeddings": "tfidf-lsa",
+    "createdAt": 1794934934722,
+    "buildSeconds": 2.98,
+    "timings": {
+      "transcript": 1435,
+      "translate": 1,
+      "detect": 0,
+      "segment": 1420,
+      "concepts": 65,
+      "assemble": 49,
+      "summary": 1,
+      "edges": 8,
+      "guard": 0,
+      "total": 2978,
+      "skeleton": 1542
+    },
+    "storyboardSpec": null,
+    "labelStats": {
+      "calls": 1,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "llm_ms": 0,
+      "applied": 25,
+      "candidates": 39
+    }
+  },
+  "root": {
+    "id": "n-23537a5ccc",
+    "text": "Essence of Linear Algebra",
+    "type": "root",
+    "layer": 0,
+    "start": 0.0,
+    "end": 1003.42,
+    "summary": "Core Ideas & Rule · Pi Times & Thinner · Original Problem & Function · Original Problem & Finer · Fixed · Input",
+    "tone": [
+      "critical"
+    ],
+    "keywords": [
+      "Original Problem",
+      "Finer",
+      "Finer Approximations",
+      "Core Ideas",
+      "Core",
+      "Original",
+      "Problem",
+      "Future Essence-of Type"
+    ],
+    "notes": "",
+    "links": [],
+    "image": null,
+    "collapsed": false,
+    "children": [
+      {
+        "id": "n-55a114e6ca",
+        "text": "Core Ideas & Rule",
+        "type": "section",
+        "layer": 1,
+        "start": 14.98,
+        "end": 96.84,
+        "summary": "But with a topic that's as broad as calculus, there's a lot of things that can mean, so here's what I have in mind specifically. In this initial video, I want to show how you might stumble into the core ideas of calculus by thinking very…",
+        "tone": [
+          "humorous"
+        ],
+        "keywords": [
+          "calculus",
+          "rule",
+          "formulas",
+          "core ideas",
+          "goal",
+          "series"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-31e0bb471b",
+            "text": "Videos",
+            "type": "concept",
+            "layer": 2,
+            "start": 16.31,
+            "end": 23.87,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "This is the first video in a series on the essence of calculus, and I'll be publishing the following videos once per day for the next 10 days.",
+            "topic": "Videos",
+            "evidence": [
+              {
+                "start": 16.31,
+                "end": 23.87,
+                "text": "This is the first video in a series on the essence of calculus, and I'll be publishing the following videos once per day for the next 10 days."
+              }
+            ],
+            "explain": "A video is recorded audiovisual instructional content. In the evidence, this is the first video in a calculus series, with following videos published once per day for the next 10 days.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "If the first video appears on March 1, list the expected release dates for the next three videos under a once-per-day schedule.",
+            "diagram": "First video -> Day 1 next video -> Day 2 next video -> ... -> Day 10 next video",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.82,
+            "why_it_matters": "Knowing the release schedule helps learners follow the series in order and plan study time instead of expecting all lessons immediately.",
+            "steps": [
+              "Identify this as the first video in the calculus series.",
+              "Note that subsequent videos are published once per day for the next 10 days.",
+              "Follow the videos in sequence according to that daily schedule."
+            ],
+            "worked_example": "Supplemental example: If the first video is released on Monday, the next video is expected Tuesday, then Wednesday, continuing once per day for the next 10 days.",
+            "misconception": "A common misconception is that all videos in the series are available at once; the evidence says following videos are published once per day.",
+            "knowledge_check": {
+              "question": "How often will the following videos be published?",
+              "answer": "Once per day for the next 10 days."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-249f8b9504",
+            "text": "Core",
+            "type": "concept",
+            "layer": 2,
+            "start": 86.82,
+            "end": 96.84,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-abb93ff5f9",
+                "text": "Def: In this initial video",
+                "type": "detail",
+                "layer": 3,
+                "start": 86.82,
+                "end": 96.84,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "In this initial video, I want to show how you might stumble into the core ideas of calculus by thinking very deeply about one specific bit of geometry, the area of a circle.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.92
+              }
+            ],
+            "source": "In this initial video, I want to show how you might stumble into the core ideas of calculus by thinking very deeply about one specific bit of geometry, the area of a circle.",
+            "topic": "Core",
+            "evidence": [
+              {
+                "start": 86.82,
+                "end": 96.84,
+                "text": "In this initial video, I want to show how you might stumble into the core ideas of calculus by thinking very deeply about one specific bit of geometry, the area of a circle."
+              },
+              {
+                "start": 57.67,
+                "end": 66.0,
+                "text": "That is, cover all those core ideas, but in a way that makes clear where they actually come from, and what they really mean, using an all-around visual approach."
+              }
+            ],
+            "explain": "The core ideas of calculus are foundational concepts such as accumulation, change, limits, derivatives, and integrals. In this evidence, they are introduced through a visual, geometric investigation—specifically by thinking deeply about the area of a circle—so learners see where the ideas come from and what they mean.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Use the area of a circle to explain visually how one core calculus idea—such as accumulation, limits, or rates of change—can emerge from geometry. Describe the picture you would draw and what it shows.",
+            "diagram": "Familiar geometry: circle area\n        |\n        v\nVisual decomposition: rings/sectors\n        |\n        v\nAccumulation and change\n        |\n        v\nCore calculus ideas: limits, derivatives, integrals",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.7,
+            "why_it_matters": "Understanding the geometric origin of calculus ideas helps learners connect formulas to meaning instead of memorizing procedures. A visual approach makes the core ideas more intuitive and shows how familiar geometry can motivate deeper mathematical concepts.",
+            "steps": [
+              "1. Begin with a familiar geometric object, such as a circle, and examine its area visually.",
+              "2. Break the object into simpler pieces or consider how the area changes as a parameter changes, building intuition about accumulation and change.",
+              "3. Connect that visual reasoning to core calculus ideas, such as limits, derivatives, or integrals, and explain where the idea comes from and what it means."
+            ],
+            "worked_example": "Supplemental example: Imagine a circle of radius r. Approximate its area with many thin concentric rings. As the rings become thinner, their total area approaches the circle’s area—an accumulation idea related to integration. Also, if A(r)=πr², then dA/dr=2πr, the circumference, showing how a derivative describes how area changes with radius.",
+            "misconception": "A common misconception is that calculus ideas are arbitrary formulas or procedures to memorize. The evidence emphasizes that they can arise from deep visual thinking about simple geometry, so their origin and meaning should be made clear.",
+            "knowledge_check": {
+              "question": "According to the evidence, what specific geometric idea is used to motivate the core ideas of calculus?",
+              "answer": "The area of a circle."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "But with a topic that's as broad as calculus, there's a lot of things that can mean, so here's what I have in mind specifically.",
+        "segmentId": "s1",
+        "theme": 1,
+        "points": [
+          {
+            "start": 23.87,
+            "end": 29.72,
+            "text": "The goal here, as the name suggests, is to really get the heart of the subject out in one binge-watchable set."
+          },
+          {
+            "start": 30.32,
+            "end": 37.05,
+            "text": "But with a topic that's as broad as calculus, there's a lot of things that can mean, so here's what I have in mind specifically."
+          },
+          {
+            "start": 86.82,
+            "end": 96.84,
+            "text": "In this initial video, I want to show how you might stumble into the core ideas of calculus by thinking very deeply about one specific bit of geometry, the area of a circle."
+          }
+        ],
+        "explain": "But with a topic that's as broad as calculus, there's a lot of things that can mean, so here's what I have in mind specifically. In this initial video, I want to show how you might stumble into the core ideas of calculus by thinking very…",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 0,
+        "faith": 0.5
+      },
+      {
+        "id": "n-566fc92816",
+        "text": "Pi Times & Thinner",
+        "type": "section",
+        "layer": 1,
+        "start": 97.78,
+        "end": 407.38,
+        "summary": "So approximating this unwrapped ring as a thin rectangle, its area is 2 pi times r, the radius, times dr, the little thickness. Is there a nice way to think about where this formula comes from?",
+        "tone": [],
+        "keywords": [
+          "ring",
+          "radius",
+          "pi times",
+          "area",
+          "circle",
+          "let's"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-255fa2c1d8",
+            "text": "Original",
+            "type": "concept",
+            "layer": 2,
+            "start": 180.18,
+            "end": 188.34,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "The width of that rectangle is the circumference of the original ring, which is 2 pi times r, right? that's essentially the definition of pi.",
+            "topic": "Original",
+            "evidence": [
+              {
+                "start": 180.18,
+                "end": 188.34,
+                "text": "The width of that rectangle is the circumference of the original ring, which is 2 pi times r, right? that's essentially the definition of pi."
+              }
+            ],
+            "explain": "The circumference of a circle is the distance around it. If a circular ring is cut and straightened without stretching, its length is preserved, so the rectangle formed has width equal to the original circumference, C = 2πr. This is essentially the definition of π as the ratio of circumference to diameter.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "A circular ring has radius 7 cm. If it is cut and straightened into a rectangle, what is the rectangle’s width? Use C = 2πr.",
+            "diagram": "Circle/ring:  O\n   cut here -->  C = 2πr\nStraighten without stretching:\n[========================]  width = C = 2πr",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.75,
+            "why_it_matters": "It connects circular geometry to linear/rectangular measurements and justifies using C = 2πr when a circle is unrolled or modeled as a rectangle.",
+            "steps": [
+              "1. Identify the radius r of the original ring and write its circumference as C = 2πr.",
+              "2. Imagine cutting the ring at one point and straightening it without stretching, so its length is preserved.",
+              "3. Set the rectangle’s width equal to that circumference, C = 2πr, and use it for area or length calculations."
+            ],
+            "worked_example": "For a ring with radius r = 5 cm, the circumference is C = 2π(5) = 10π ≈ 31.4 cm. After cutting and straightening, the rectangle’s width is about 31.4 cm.",
+            "misconception": "A common mistake is thinking the straightened rectangle’s width equals the diameter or that unrolling changes the circumference. The length is preserved, so the width is the original circumference, not the diameter.",
+            "knowledge_check": {
+              "question": "Why is the width of the rectangle equal to 2πr?",
+              "answer": "Because cutting and straightening the ring preserves its length, and the original ring’s length is its circumference, C = 2πr."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-cb6d28cca8",
+            "text": "Graph",
+            "type": "concept",
+            "layer": 2,
+            "start": 323.26,
+            "end": 329.79,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-1b9d004ba9",
+                "text": "Def: Each of these rectangles extends up to the point where it just barely touches that graph",
+                "type": "detail",
+                "layer": 3,
+                "start": 329.79,
+                "end": 334.8,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Each of these rectangles extends up to the point where it just barely touches that graph.",
+                "more": false,
+                "tag": "Def",
+                "faith": 1.0
+              }
+            ],
+            "source": "A nice way to think about this setup is to draw the graph of 2 pi r, which is a straight line that has a slope 2 pi.",
+            "topic": "Graph",
+            "evidence": [
+              {
+                "start": 323.26,
+                "end": 329.79,
+                "text": "A nice way to think about this setup is to draw the graph of 2 pi r, which is a straight line that has a slope 2 pi."
+              },
+              {
+                "start": 329.79,
+                "end": 334.8,
+                "text": "Each of these rectangles extends up to the point where it just barely touches that graph."
+              },
+              {
+                "start": 370.78,
+                "end": 375.3,
+                "text": "But notice, all of their areas in aggregate just looks like the area under a graph."
+              },
+              {
+                "start": 375.98,
+                "end": 383.4,
+                "text": "And that portion under the graph is just a triangle, a triangle with a base of 3 and a height that's 2 pi times 3."
+              }
+            ],
+            "explain": "A graph of y = 2πr is a straight line with slope 2π. The area under this line over an interval of r can be approximated by rectangles whose heights touch the graph, and in the limit the aggregate rectangle area equals the area under the graph.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Find the area under the graph y = 2πr from r = 0 to r = 5.",
+            "diagram": "y\n|\n|        / y = 2πr\n|      /\n|    /\n|  /\n|/\n+---------- r\n0         3\nArea under line = triangle = 1/2 · 3 · 6π",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.75,
+            "why_it_matters": "This graph connects a linear rate, circumference 2πr, to accumulated area. It shows how rectangle sums approximate area under a curve and how a simple triangle can give an exact accumulated result.",
+            "steps": [
+              "1. Draw r on the horizontal axis and y = 2πr on the vertical axis; the graph is a straight line through the origin with slope 2π.",
+              "2. Partition an interval of r and draw rectangles whose heights extend up to the line y = 2πr; their total area approximates the area under the graph.",
+              "3. For a linear graph, the exact area under the line is a triangle, so use area = 1/2 · base · height."
+            ],
+            "worked_example": "For r from 0 to 3, the line reaches height 2π·3 = 6π. The area under the graph is a triangle with base 3 and height 6π, so area = 1/2 · 3 · 6π = 9π.",
+            "misconception": "A common mistake is to treat the area under y = 2πr as a rectangle of constant height. Because the height changes linearly, the exact region is triangular; rectangles only approximate it unless the height is constant.",
+            "knowledge_check": {
+              "question": "What is the area under y = 2πr from r = 0 to r = 3?",
+              "answer": "9π, since the region is a triangle with base 3 and height 6π."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "So approximating this unwrapped ring as a thin rectangle, its area is 2 pi times r, the radius, times dr, the little thickness.",
+        "segmentId": "s2",
+        "theme": 0,
+        "points": [
+          {
+            "start": 100.97,
+            "end": 104.67,
+            "text": "Is there a nice way to think about where this formula comes from?"
+          },
+          {
+            "start": 208.6,
+            "end": 217.6,
+            "text": "So approximating this unwrapped ring as a thin rectangle, its area is 2 pi times r, the radius, times dr, the little thickness."
+          },
+          {
+            "start": 338.14,
+            "end": 343.73,
+            "text": "Each of these rectangles only approximates the area of the corresponding ring from the circle."
+          }
+        ],
+        "explain": "So approximating this unwrapped ring as a thin rectangle, its area is 2 pi times r, the radius, times dr, the little thickness. Is there a nice way to think about where this formula comes from?",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 1,
+        "faith": 0.38
+      },
+      {
+        "id": "n-289727acf3",
+        "text": "Original Problem & Function",
+        "type": "section",
+        "layer": 1,
+        "start": 410.18,
+        "end": 563.24,
+        "summary": "This happens whenever the quantities you're adding up, the one whose sum approximates the original problem, can be thought of as the areas of many thin rectangles sitting side by side.",
+        "tone": [
+          "critical"
+        ],
+        "keywords": [
+          "sum",
+          "quantities",
+          "problem",
+          "graph",
+          "original",
+          "traveled"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-133d93a999",
+            "text": "Function",
+            "type": "concept",
+            "layer": 2,
+            "start": 470.71,
+            "end": 482.42,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "Adding all of those numbers could be seen in a different, pretty clever way as adding the areas of many thin rectangles sitting underneath a graph, the graph of the function 2 pi r in this case.",
+            "topic": "Function",
+            "evidence": [
+              {
+                "start": 470.71,
+                "end": 482.42,
+                "text": "Adding all of those numbers could be seen in a different, pretty clever way as adding the areas of many thin rectangles sitting underneath a graph, the graph of the function 2 pi r in this case."
+              }
+            ],
+            "explain": "A function is a rule that assigns exactly one output to each allowed input. In the evidence, the function is 2πr, mapping a radius r to a circumference value.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Given f(r)=2πr, compute f(3) and explain what a thin rectangle under its graph represents.",
+            "diagram": "input r -> function 2πr -> output height -> graph -> thin rectangles -> sum of areas",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.78,
+            "why_it_matters": "Functions let you compute values and visualize them as graphs. The evidence uses the graph of 2πr and thin rectangles underneath it to reinterpret adding numbers as adding areas.",
+            "steps": [
+              "1. Identify the input variable and the output rule, such as r and 2πr.",
+              "2. Compute output values for chosen inputs to get heights on the graph.",
+              "3. Interpret the graph, e.g. thin rectangles under it approximate accumulated area."
+            ],
+            "worked_example": "For f(r)=2πr, f(1)=2π≈6.28 and f(2)=4π≈12.57. On the graph, these are heights; thin rectangles under the graph approximate area.",
+            "misconception": "A function is not just a formula, and its graph is not merely a picture; the graph encodes input-output pairs.",
+            "knowledge_check": {
+              "question": "What does the function 2πr assign to an input r?",
+              "answer": "It assigns the circumference value 2πr for radius r."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-c987c79908",
+            "text": "Original Problem",
+            "type": "concept",
+            "layer": 2,
+            "start": 482.94,
+            "end": 498.18,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "Then, and this is key, by considering smaller and smaller choices for dr, corresponding to better and better approximations of the original problem, the sum, thought of as the aggregate area of those rectangles, approaches the area under the graph.",
+            "topic": "Original Problem",
+            "evidence": [
+              {
+                "start": 482.94,
+                "end": 498.18,
+                "text": "Then, and this is key, by considering smaller and smaller choices for dr, corresponding to better and better approximations of the original problem, the sum, thought of as the aggregate area of those rectangles, approaches the area under the graph."
+              }
+            ],
+            "explain": "The original problem is the exact quantity being approximated, such as the area under a graph. In the evidence, it is approached by summing rectangle areas and letting the rectangle width dr become smaller and smaller, giving better approximations whose limit is the original quantity.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Use right rectangles of width dr=2/n to approximate the area under f(x)=x on [0,2]. Write the sum and find its limit as n→∞.",
+            "diagram": "Original problem: exact area under graph\n        |\n        v\nApproximate by rectangles with width dr\n        |\n        v\nAggregate rectangle area S(dr)\n        |\n        v\nLet dr -> 0: S(dr) -> exact area",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.63,
+            "why_it_matters": "It explains why refining an approximation is meaningful: finite sums are not the final answer; their limit as dr approaches 0 recovers the exact original problem, motivating the definite integral.",
+            "steps": [
+              "1. Identify the exact original quantity to recover, such as the area under a graph.",
+              "2. Approximate it by an aggregate sum of rectangles whose widths are dr.",
+              "3. Take smaller and smaller dr so the approximations improve, then use their limit as the original quantity."
+            ],
+            "worked_example": "Supplemental example: approximate the area under f(x)=x^2 on [0,1] using n right rectangles. With dr=1/n, the sum is Σ_{i=1}^n (i/n)^2(1/n). As n grows and dr→0, this sum approaches 1/3, the exact area.",
+            "misconception": "A finite rectangle sum with a particular dr is not exactly the original problem; it is only an approximation. The exact original quantity is the limit as dr becomes arbitrarily small.",
+            "knowledge_check": {
+              "question": "What happens to the aggregate rectangle area as dr becomes smaller and smaller?",
+              "answer": "It gives better approximations and approaches the exact area under the graph, i.e. the original problem."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-5e02738f4f",
+            "text": "Finer",
+            "type": "concept",
+            "layer": 2,
+            "start": 564.64,
+            "end": 575.61,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "If finer and finer approximations of the original problem correspond to thinner and thinner rings, then the original problem is equivalent to finding the area under some graph.",
+            "topic": "Finer",
+            "evidence": [
+              {
+                "start": 564.64,
+                "end": 575.61,
+                "text": "If finer and finer approximations of the original problem correspond to thinner and thinner rings, then the original problem is equivalent to finding the area under some graph."
+              }
+            ],
+            "explain": "“Finer” means using more numerous, thinner subdivisions (or rings) to approximate a quantity. As the approximations become finer, the discrete sum approaches the area under a graph.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Describe what happens to rectangle approximations of the area under y=x on [0,2] as the rectangles become finer.",
+            "diagram": "y\n|        curve\n|      __/\n|   __/ | |\n|__/ | | | |\n+------------ x\n thin rectangles get thinner as n increases",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.74,
+            "why_it_matters": "It explains the bridge from finite approximations to limits and definite integrals: refining a partition until widths shrink to zero turns a sum into an area.",
+            "steps": [
+              "1. Start with a coarse approximation using finitely many subintervals or rings.",
+              "2. Refine the approximation by increasing the number of pieces and making each piece thinner.",
+              "3. Take the limit as piece widths approach zero; the approximation becomes the area under the corresponding graph."
+            ],
+            "worked_example": "Supplemental example: Approximate the area under y=x^2 on [0,1] with n right-endpoint rectangles. The sum is (1/n^3)(1^2+...+n^2)=((n+1)(2n+1))/(6n^2). As n→∞, this tends to 1/3, the area under the graph.",
+            "misconception": "A common misconception is that any finite finer approximation is already exact. Finer approximations become exact only in the limiting process as widths tend to zero.",
+            "knowledge_check": {
+              "question": "What does it mean that finer and finer approximations correspond to thinner and thinner rings?",
+              "answer": "It means that as the subdivision is refined, the pieces shrink in width; in the limit, the sum of those pieces equals the area under the relevant graph."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "This happens whenever the quantities you're adding up, the one whose sum approximates the original problem, can be thought of as the areas of many thin rectangles sitting side by side.",
+        "segmentId": "s3",
+        "theme": 0,
+        "points": [
+          {
+            "start": 433.82,
+            "end": 444.06,
+            "text": "You had this problem that could be approximated with the sum of many small numbers, each of which looked like 2 pi r times dr, for values of r ranging between 0 and 3."
+          },
+          {
+            "start": 466.24,
+            "end": 470.71,
+            "text": "And secondly, the smaller our choice for dr, the better the approximation."
+          },
+          {
+            "start": 553.2,
+            "end": 563.24,
+            "text": "This happens whenever the quantities you're adding up, the one whose sum approximates the original problem, can be thought of as the areas of many thin rectangles sitting side by side."
+          }
+        ],
+        "explain": "This happens whenever the quantities you're adding up, the one whose sum approximates the original problem, can be thought of as the areas of many thin rectangles sitting side by side.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 2,
+        "faith": 0.3
+      },
+      {
+        "id": "n-29b4f47da6",
+        "text": "Original Problem & Finer",
+        "type": "section",
+        "layer": 1,
+        "start": 564.64,
+        "end": 618.02,
+        "summary": "If finer and finer approximations of the original problem correspond to thinner and thinner rings, then the original problem is equivalent to finding the area under some graph.",
+        "tone": [
+          "critical"
+        ],
+        "keywords": [
+          "equals",
+          "finer",
+          "thinner",
+          "original problem",
+          "graph",
+          "it's"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-7a8328b6a3",
+            "text": "Reframing",
+            "type": "concept",
+            "layer": 2,
+            "start": 583.47,
+            "end": 594.52,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "The point now is that you, as the mathematician having just solved a problem by reframing it as the area under a graph, might start thinking about how to find the areas under other graphs.",
+            "topic": "Reframing",
+            "evidence": [
+              {
+                "start": 583.47,
+                "end": 594.52,
+                "text": "The point now is that you, as the mathematician having just solved a problem by reframing it as the area under a graph, might start thinking about how to find the areas under other graphs."
+              }
+            ],
+            "explain": "Reframing is changing how a problem is represented or interpreted so that a different mathematical object or method can solve it. In the evidence, a problem is solved by reframing it as the area under a graph.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Take a counting problem you know and reframe it as an area under a graph. Solve it in the graph representation, then state one related graph whose area you could study next.",
+            "diagram": "Original problem\n      |\n      v\nReframe as area under a graph\n      |\n      v\nSolve area problem\n      |\n      v\nInterpret result in original problem\n      |\n      v\nGeneralize: areas under other graphs",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.86,
+            "why_it_matters": "Reframing can turn a hard problem into a familiar one, and after solving it you can generalize the new representation to related problems, such as finding areas under other graphs.",
+            "steps": [
+              "1. Identify the original problem and what makes it difficult in its current form.",
+              "2. Choose a new representation, such as area under a graph, that preserves the problem’s meaning.",
+              "3. Solve in the new representation, interpret the result in the original context, then ask how the method applies to other graphs or cases."
+            ],
+            "worked_example": "(supplemental) To sum 1+2+...+n, reframe the sum as the area of a staircase under a line graph; the area gives n(n+1)/2. Then generalize by asking for areas under other graphs.",
+            "misconception": "Reframing is not merely restating the problem; it must change the representation enough to enable a new solution method while preserving the original meaning.",
+            "knowledge_check": {
+              "question": "After solving a problem by reframing it as area under a graph, what does the evidence suggest you might do next?",
+              "answer": "Think about how to find the areas under other graphs."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-791e6fe9d9",
+            "text": "Equals",
+            "type": "concept",
+            "layer": 2,
+            "start": 604.76,
+            "end": 611.81,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "What's the area underneath that curve, say between the values of x equals 0 and x equals 3?",
+            "topic": "Equals",
+            "evidence": [
+              {
+                "start": 604.76,
+                "end": 611.81,
+                "text": "What's the area underneath that curve, say between the values of x equals 0 and x equals 3?"
+              }
+            ],
+            "explain": "The equals sign states that the expressions on both sides have the same value or refer to the same quantity. In phrases like 'x equals 0' and 'x equals 3', it identifies specific values of x.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Explain what the equals signs mean in the phrase 'the area between x=0 and x=3' and how they affect the calculation.",
+            "diagram": "x equals 0  --->  lower boundary\n                     |\n                     v\n              area under curve\n                     ^\n                     |\nx equals 3  --->  upper boundary",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.74,
+            "why_it_matters": "Equals is used to set conditions, define boundaries, substitute equivalent expressions, and solve equations. In the evidence, x=0 and x=3 specify the interval for finding area under a curve.",
+            "steps": [
+              "1. Identify the two expressions or quantities being compared by the equals sign.",
+              "2. Check whether they represent the same value or define a specific value for a variable.",
+              "3. Use that equality to substitute, solve, or set a boundary for a calculation."
+            ],
+            "worked_example": "Supplemental example: Find the area under y=x^2 between x=0 and x=3. The equals signs set the interval bounds: integrate x^2 from 0 to 3. The integral is [x^3/3] from 0 to 3 = 27/3 - 0 = 9.",
+            "misconception": "A common misconception is that 'equals' only means 'the answer comes next.' In mathematics, it means the two sides have the same value, and in x=0 or x=3 it assigns a specific value to x.",
+            "knowledge_check": {
+              "question": "In 'between x=0 and x=3', what do the equals signs indicate?",
+              "answer": "They indicate the specific boundary values x=0 and x=3 for the interval."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-97866a139c",
+            "text": "Endpoint",
+            "type": "concept",
+            "layer": 2,
+            "start": 618.71,
+            "end": 623.06,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "We'll fix that left endpoint in place at 0, and let the right endpoint vary.",
+            "topic": "Endpoint",
+            "evidence": [
+              {
+                "start": 618.71,
+                "end": 623.06,
+                "text": "We'll fix that left endpoint in place at 0, and let the right endpoint vary."
+              }
+            ],
+            "explain": "An endpoint is a boundary point of an interval. In this context, one endpoint can be held fixed while the other is allowed to vary.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "If the left endpoint is fixed at 0 and the right endpoint is t, write the interval and state which endpoint varies.",
+            "diagram": "left endpoint fixed        right endpoint varies\n      0  -------------------------  b\n      |                           |\n   fixed at 0                 variable",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.8,
+            "why_it_matters": "Endpoints define the interval being studied, such as the limits of accumulation or integration. Fixing one endpoint and varying the other lets you study how a quantity changes as the interval grows.",
+            "steps": [
+              "1. Identify the interval and its two endpoints.",
+              "2. Fix one endpoint at a specified value, such as the left endpoint at 0.",
+              "3. Let the other endpoint vary to form a family of intervals."
+            ],
+            "worked_example": "Supplemental example: Fix the left endpoint at 0 and let the right endpoint be b. The interval is [0, b]. As b changes, the interval changes while the left endpoint stays at 0.",
+            "misconception": "A common mistake is assuming both endpoints must change together. Here the left endpoint is deliberately fixed at 0 while only the right endpoint varies.",
+            "knowledge_check": {
+              "question": "In the setup described, which endpoint is fixed and at what value?",
+              "answer": "The left endpoint is fixed at 0."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "If finer and finer approximations of the original problem correspond to thinner and thinner rings, then the original problem is equivalent to finding the area under some graph.",
+        "segmentId": "s4",
+        "theme": 0,
+        "points": [
+          {
+            "start": 564.64,
+            "end": 575.61,
+            "text": "If finer and finer approximations of the original problem correspond to thinner and thinner rings, then the original problem is equivalent to finding the area under some graph."
+          },
+          {
+            "start": 604.76,
+            "end": 611.81,
+            "text": "What's the area underneath that curve, say between the values of x equals 0 and x equals 3?"
+          },
+          {
+            "start": 611.81,
+            "end": 614.76,
+            "text": "Well, it's hard to think about, right?"
+          }
+        ],
+        "explain": "If finer and finer approximations of the original problem correspond to thinner and thinner rings, then the original problem is equivalent to finding the area under some graph.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 3,
+        "faith": 0.47
+      },
+      {
+        "id": "n-2099ad653b",
+        "text": "Fixed",
+        "type": "section",
+        "layer": 1,
+        "start": 618.02,
+        "end": 693.78,
+        "summary": "We know it gives the area under the graph of x2 between some fixed left point and some variable right point, but we don't know what it is. A function a of x like this is called an integral of x2.",
+        "tone": [],
+        "keywords": [
+          "integral",
+          "function",
+          "endpoint",
+          "area",
+          "it's",
+          "reframed"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-53cde5a429",
+            "text": "Integral",
+            "type": "concept",
+            "layer": 2,
+            "start": 673.42,
+            "end": 689.34,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-6f2e868134",
+                "text": "Def: Calculus holds within it the tools to figure out what an integral like this is",
+                "type": "detail",
+                "layer": 3,
+                "start": 673.42,
+                "end": 689.34,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Calculus holds within it the tools to figure out what an integral like this is, but right now it's just a mystery function to us.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.96
+              }
+            ],
+            "source": "I'll tell you right now that finding this area, this integral function, is genuinely hard, and whenever you come across a genuinely hard question in math, a good policy is to not try too hard to get at the answer directly, since usually you just end up banging your head against a wall.",
+            "topic": "Integral",
+            "evidence": [
+              {
+                "start": 673.42,
+                "end": 689.34,
+                "text": "I'll tell you right now that finding this area, this integral function, is genuinely hard, and whenever you come across a genuinely hard question in math, a good policy is to not try too hard to get at the answer directly, since usually you just end up banging your head against a wall."
+              },
+              {
+                "start": 635.62,
+                "end": 639.13,
+                "text": "A function a of x like this is called an integral of x2."
+              },
+              {
+                "start": 639.13,
+                "end": 647.2,
+                "text": "Calculus holds within it the tools to figure out what an integral like this is, but right now it's just a mystery function to us."
+              }
+            ],
+            "explain": "An integral is a function that accumulates area under a curve; for example, a function a(x) can be called an integral of x^2.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Let f(x)=x^2. Write an integral function A(x) for area from 0 to x, then evaluate A(2).",
+            "diagram": "f(x)=x^2\n   |\n   v\naccumulate area up to x\n   |\n   v\nA(x)=integral function\n   |\n   v\nuse calculus tools -> A(x)=x^3/3",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.62,
+            "why_it_matters": "Integrals turn area/accumulation questions into functions, and calculus provides tools to determine them; direct guessing is often hard and inefficient.",
+            "steps": [
+              "1. Identify the function whose area or accumulation you want, such as f(x)=x^2.",
+              "2. Define an integral function A(x) that represents accumulated area up to x.",
+              "3. Use calculus tools or known antiderivative rules rather than trying to find the area directly by brute force."
+            ],
+            "worked_example": "Supplemental example: For f(x)=x^2, define A(x)=∫_0^x t^2 dt. Using the power rule gives A(x)=x^3/3, so A(3)=27/3=9.",
+            "misconception": "An integral is not only a fixed number or area; it can be a function that gives accumulated area as x changes.",
+            "knowledge_check": {
+              "question": "What is an integral of x^2 in the sense used here?",
+              "answer": "It is a function a(x) that represents the accumulated area under x^2; for example, A(x)=x^3/3 for area from 0 to x."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "We know it gives the area under the graph of x2 between some fixed left point and some variable right point, but we don't know what it is.",
+        "segmentId": "s5",
+        "theme": 0,
+        "points": [
+          {
+            "start": 635.62,
+            "end": 639.13,
+            "text": "A function a of x like this is called an integral of x2."
+          },
+          {
+            "start": 647.5,
+            "end": 654.92,
+            "text": "We know it gives the area under the graph of x2 between some fixed left point and some variable right point, but we don't know what it is."
+          },
+          {
+            "start": 690.08,
+            "end": 693.91,
+            "text": "Instead, play around with the idea, with no particular goal in mind."
+          }
+        ],
+        "explain": "We know it gives the area under the graph of x2 between some fixed left point and some variable right point, but we don't know what it is. A function a of x like this is called an integral of x2.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 4,
+        "faith": 0.3
+      },
+      {
+        "id": "n-cb6a4eb9bc",
+        "text": "Input",
+        "type": "section",
+        "layer": 1,
+        "start": 694.34,
+        "end": 942.36,
+        "summary": "And that's an approximation that should get better and better for smaller and smaller choices of dx. And this relationship between tiny changes to the mystery function and the values of x2 itself is true at all inputs, not just 3.",
+        "tone": [],
+        "keywords": [
+          "function",
+          "change",
+          "input",
+          "derivative",
+          "tiny",
+          "divided"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-7a85a376b4",
+            "text": "Input",
+            "type": "concept",
+            "layer": 2,
+            "start": 795.42,
+            "end": 808.1,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-f4d274577f",
+                "text": "Formula: That change, divided by the difference in the input values, which in this case is 0.001",
+                "type": "detail",
+                "layer": 3,
+                "start": 795.42,
+                "end": 808.1,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "That change, divided by the difference in the input values, which in this case is 0.001, should be about equal to the value of x2 for the starting input, in this case 3 squared.",
+                "more": false,
+                "tag": "Formula",
+                "faith": 0.95
+              }
+            ],
+            "source": "That change, divided by the difference in the input values, which in this case is 0.001, should be about equal to the value of x2 for the starting input, in this case 3 squared.",
+            "topic": "Input",
+            "evidence": [
+              {
+                "start": 795.42,
+                "end": 808.1,
+                "text": "That change, divided by the difference in the input values, which in this case is 0.001, should be about equal to the value of x2 for the starting input, in this case 3 squared."
+              },
+              {
+                "start": 742.05,
+                "end": 754.0,
+                "text": "A change to the output of a, this little da, is about equal to x2, where x is whatever input you started at, times dx, the little nudge to the input that caused a to change."
+              }
+            ],
+            "explain": "For a small input nudge dx, the resulting output change da is approximately the local sensitivity factor times dx. In the evidence, that factor is x^2, so da ≈ x^2·dx.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "At x = 4, suppose dx = 0.002 and the local factor is x^2. Estimate da and da/dx.",
+            "diagram": "x = 3\n  |\n  v\nnudge dx = 0.001\n  |\n  v\nlocal factor x^2 = 9\n  |\n  v\nda ≈ 9 × 0.001 = 0.009\n  |\n  v\nda/dx ≈ 9",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.79,
+            "why_it_matters": "It lets you estimate how much an output changes when the input changes slightly, using the derivative as a local sensitivity factor rather than recomputing the whole function.",
+            "steps": [
+              "Identify the starting input x and the small input change dx.",
+              "Evaluate the local sensitivity factor at that input; here it is x^2.",
+              "Estimate the output change as da ≈ x^2·dx, then check the ratio da/dx ≈ x^2."
+            ],
+            "worked_example": "Start at x = 3 and nudge the input by dx = 0.001. The local factor is x^2 = 9, so the predicted output change is da ≈ 9 × 0.001 = 0.009. The ratio is da/dx ≈ 0.009/0.001 = 9, matching 3^2. (Supplemental example.)",
+            "misconception": "The derivative factor x^2 is not the output value itself, and da ≈ x^2·dx is only a local approximation; it becomes less accurate for large input nudges.",
+            "knowledge_check": {
+              "question": "If the local sensitivity factor is x^2, x = 3, and dx = 0.001, what is the approximate output change da?",
+              "answer": "da ≈ 3^2 × 0.001 = 9 × 0.001 = 0.009."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "And that's an approximation that should get better and better for smaller and smaller choices of dx.",
+        "segmentId": "s6",
+        "theme": 2,
+        "points": [
+          {
+            "start": 742.05,
+            "end": 754.0,
+            "text": "A change to the output of a, this little da, is about equal to x2, where x is whatever input you started at, times dx, the little nudge to the input that caused a to change."
+          },
+          {
+            "start": 766.56,
+            "end": 771.93,
+            "text": "And that's an approximation that should get better and better for smaller and smaller choices of dx."
+          },
+          {
+            "start": 810.2,
+            "end": 818.09,
+            "text": "And this relationship between tiny changes to the mystery function and the values of x2 itself is true at all inputs, not just 3."
+          }
+        ],
+        "explain": "And that's an approximation that should get better and better for smaller and smaller choices of dx. And this relationship between tiny changes to the mystery function and the values of x2 itself is true at all inputs, not just 3.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 0,
+        "faith": 0.36
+      },
+      {
+        "id": "n-5c34468a9e",
+        "text": "Future Essence-of Type & Access",
+        "type": "section",
+        "layer": 1,
+        "start": 944.8,
+        "end": 1003.42,
+        "summary": "And as a thanks to the community, I keep ads off of new videos for their first month. And what follows in this series are the details, for derivatives and integrals and more.",
+        "tone": [],
+        "keywords": [
+          "series",
+          "videos",
+          "access",
+          "astounded",
+          "suggestions",
+          "type"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-dd1e32b4ca",
+            "text": "High-level View",
+            "type": "concept",
+            "layer": 2,
+            "start": 944.8,
+            "end": 949.94,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "All of this is only a high-level view, just a peek at some of the core ideas that emerge in calculus.",
+            "topic": "High-level View",
+            "evidence": [
+              {
+                "start": 944.8,
+                "end": 949.94,
+                "text": "All of this is only a high-level view, just a peek at some of the core ideas that emerge in calculus."
+              }
+            ],
+            "explain": "A high-level view is a brief overview or 'peek' at core ideas, meant to orient you before detailed study. The evidence says it is 'only a high-level view' and 'just a peek at some of the core ideas that emerge in calculus.'",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Write down three core calculus ideas from a high-level preview and one question you would need to answer to understand each idea more deeply.",
+            "diagram": "Core ideas preview\n   |\n   v\nBig-picture connections\n   |\n   v\nDetails and rigor later",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.81,
+            "why_it_matters": "It helps learners see the big picture and relationships among core calculus ideas before getting lost in technical details. It sets expectations that the overview is not exhaustive.",
+            "steps": [
+              "1. Identify the main core ideas being previewed.",
+              "2. Note how those ideas connect at a broad conceptual level.",
+              "3. Treat details, proofs, and edge cases as later work, not part of the overview."
+            ],
+            "worked_example": "Supplemental example: A calculus preview might mention limits, derivatives, and integrals as core ideas, showing that derivatives describe change and integrals describe accumulation, without deriving formulas or proving theorems yet.",
+            "misconception": "A high-level view is not a complete or rigorous treatment; it is only an initial orientation and should not be mistaken for the full subject.",
+            "knowledge_check": {
+              "question": "What does the evidence mean by calling calculus ideas a 'high-level view'?",
+              "answer": "It means the presentation is only a brief peek at core ideas, not a full or detailed treatment."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-9658f7bfe0",
+            "text": "Future Essence-of Type",
+            "type": "concept",
+            "layer": 2,
+            "start": 984.7,
+            "end": 991.92,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "You see, supporters got early access to the videos as I made them, and they'll continue to get early access for future essence-of type series.",
+            "topic": "Future Essence-of Type",
+            "evidence": [
+              {
+                "start": 984.7,
+                "end": 991.92,
+                "text": "You see, supporters got early access to the videos as I made them, and they'll continue to get early access for future essence-of type series."
+              }
+            ],
+            "explain": "In the evidence, “future essence-of type series” refers to upcoming installments of a content series that explores the essence of a type. The phrase is used to describe a supporter benefit: supporters will continue to receive early access to those future series.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Read the evidence sentence and answer: What group receives early access, and to what kind of future content?",
+            "diagram": "Supporter access\n      |\n      v\nEarly access to videos\n      |\n      v\nFuture essence-of-type series\n      |\n      v\nLater public release",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.79,
+            "why_it_matters": "It clarifies a recurring supporter perk and sets expectations that early access applies not only to current videos but also to future essence-of-type series. It should not be read as a formal technical classification or a guaranteed schedule.",
+            "steps": [
+              "1. Locate the phrase in the source and treat it as a content-series label, not a formal type system.",
+              "2. Identify the benefit attached to it: supporters get early access to videos as they are made.",
+              "3. Communicate that the same early-access benefit is expected to continue for future essence-of-type series, without promising dates or scope beyond the evidence."
+            ],
+            "worked_example": "Supplemental example: A creator makes an “essence of type” video series. Supporters receive each episode before the public release. The creator says supporters will keep getting early access for future series of that kind.",
+            "misconception": "A common misconception is that “future essence-of type series” names a formal product, type taxonomy, or guaranteed release schedule. The evidence only shows it as a future content series for which supporters receive early access.",
+            "knowledge_check": {
+              "question": "What will supporters continue to get for future essence-of type series?",
+              "answer": "Early access."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-7032ccdb0f",
+            "text": "Access",
+            "type": "concept",
+            "layer": 2,
+            "start": 984.7,
+            "end": 991.92,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "You see, supporters got early access to the videos as I made them, and they'll continue to get early access for future essence-of type series.",
+            "topic": "Access",
+            "evidence": [
+              {
+                "start": 984.7,
+                "end": 991.92,
+                "text": "You see, supporters got early access to the videos as I made them, and they'll continue to get early access for future essence-of type series."
+              }
+            ],
+            "explain": "Access here means early availability of videos to supporters before they are made available more broadly. The evidence says supporters got early access to videos as they were made and will continue to get early access for future essence-of type series.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Draw the access flow for a new essence-of video: creator release, supporter early access, and later audience availability. Label where supporter eligibility is checked.",
+            "diagram": "Creator makes video\n        |\n        v\nSupporters get early access\n        |\n        v\nFuture essence-of series continue early access for supporters",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.82,
+            "why_it_matters": "Early access rewards supporters, encourages continued support, and lets a creator sequence releases by audience tier while maintaining a benefit for supporters.",
+            "steps": [
+              "1. Identify the video or series that will be released, such as an essence-of type series.",
+              "2. Confirm who qualifies for early access, specifically supporters in this evidence.",
+              "3. Give supporters early access as videos are made, then handle any later broader release separately."
+            ],
+            "worked_example": "Supplemental example: A creator finishes a new essence-of video and sends the early access link to supporters first. Supporters watch it before the general audience, and the creator continues the same early access benefit for future videos in the series.",
+            "misconception": "A common misconception is that early access means supporters permanently own or exclusively control the content. The evidence only supports early access as a timing benefit for supporters, not permanent exclusivity.",
+            "knowledge_check": {
+              "question": "Who received early access to the videos in the evidence?",
+              "answer": "Supporters received early access to the videos as they were made, and they will continue to get early access for future essence-of type series."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "And as a thanks to the community, I keep ads off of new videos for their first month.",
+        "segmentId": "s7",
+        "theme": 1,
+        "points": [
+          {
+            "start": 949.94,
+            "end": 954.42,
+            "text": "And what follows in this series are the details, for derivatives and integrals and more."
+          },
+          {
+            "start": 984.7,
+            "end": 991.92,
+            "text": "You see, supporters got early access to the videos as I made them, and they'll continue to get early access for future essence-of type series."
+          },
+          {
+            "start": 991.92,
+            "end": 996.24,
+            "text": "And as a thanks to the community, I keep ads off of new videos for their first month."
+          }
+        ],
+        "explain": "And as a thanks to the community, I keep ads off of new videos for their first month. And what follows in this series are the details, for derivatives and integrals and more.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 1,
+        "faith": 0.41
+      },
+      {
+        "id": "n-1e91899721",
+        "text": "Quick recall",
+        "type": "section",
+        "layer": 1,
+        "start": 0.0,
+        "end": 1003.42,
+        "summary": "Covers core ideas & rule, pi times & thinner, original problem & function, original problem & finer, fixed",
+        "tone": [],
+        "keywords": [],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-85995da01d",
+            "text": "In one line: Covers core ideas & rule, pi times & thinner, original problem & function, original problem & finer, fixed",
+            "type": "concept",
+            "layer": 2,
+            "start": 0.0,
+            "end": 1003.42,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "But with a topic that's as broad as calculus, there's a lot of things that can mean, so here's what I have in mind specifically.",
+            "recall": true,
+            "oneline": true,
+            "faith": 0.0
+          },
+          {
+            "id": "n-94365a59db",
+            "text": "With a topic that's as broad as calculus",
+            "type": "concept",
+            "layer": 2,
+            "start": 30.32,
+            "end": 37.05,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "But with a topic that's as broad as calculus, there's a lot of things that can mean, so here's what I have in mind specifically.",
+            "recall": true,
+            "faith": 0.97,
+            "explain": "Calculus is a broad subject covering limits, derivatives, integrals, sequences/series, and applications. When someone says they want to learn “calculus,” the first task is to clarify which specific scope, level, and purpose is meant.",
+            "available": true,
+            "why_it_matters": "Because calculus is broad, an unspecified goal can lead to mismatched lessons, wasted time, and unclear progress. Defining the intended subtopics and outcomes makes study focused and assessable.",
+            "steps": [
+              "Identify the learner’s goal and context, such as exam preparation, engineering applications, or conceptual understanding.",
+              "List the relevant calculus subtopics, such as limits, differentiation, integration, or series.",
+              "Write a specific scope statement with level and expected outcomes so the broad topic becomes a concrete plan."
+            ],
+            "worked_example": "A student says, “I want to learn calculus.” The instructor asks why. The student needs optimization for economics. The scope is narrowed to limits, derivative rules, and optimization applications, rather than the entire calculus curriculum.",
+            "diagram": "Broad request: \"learn calculus\"\n        |\n        v\nClarify goal/context\n        |\n        v\nSelect subtopics + level\n        |\n        v\nSpecific scope statement\n        |\n        v\nFocused study plan",
+            "misconception": "A common misconception is that “calculus” always means the same complete course for everyone. In reality, the word can refer to many different subtopics, levels, and applications, so the intended meaning must be specified.",
+            "exercise": "Write a one-sentence scope statement for someone who says they want to learn calculus for business analytics. Include at least two specific subtopics and one intended outcome.",
+            "knowledge_check": {
+              "question": "Why should a broad topic like calculus be narrowed before study begins?",
+              "answer": "Narrowing it clarifies the intended subtopics, level, and outcomes, which prevents mismatched instruction and makes progress easier to measure."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-5eb5493a67",
+            "text": "Approximating this unwrapped ring as a thin rectangle",
+            "type": "concept",
+            "layer": 2,
+            "start": 208.6,
+            "end": 217.6,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "So approximating this unwrapped ring as a thin rectangle, its area is 2 pi times r, the radius, times dr, the little thickness.",
+            "recall": true,
+            "faith": 0.86,
+            "explain": "Approximating an unwrapped ring as a thin rectangle means treating a circular annulus of radius r and small thickness dr as a rectangle whose length is the circumference 2πr and whose height is dr. Its approximate area is therefore 2πr dr.",
+            "available": true,
+            "why_it_matters": "This is the differential-area idea behind slicing methods such as cylindrical shells and many area/volume integrals: a thin ring becomes a rectangle whose area is easy to integrate.",
+            "steps": [
+              "1. Identify the ring radius r and its small thickness dr.",
+              "2. Cut and unroll the ring so its circumference becomes a straight length 2πr.",
+              "3. Multiply length by thickness to get the thin-rectangle area 2πr dr."
+            ],
+            "worked_example": "For r = 5 and dr = 0.1, the unwrapped ring area is approximately 2π(5)(0.1) = π ≈ 3.1416 square units.",
+            "diagram": "ring of radius r, thickness dr\n        ___\n      /     \\\n     |   o   |   cut + unroll\n      \\ ___ /\n          |\n          v\n rectangle: length = 2πr\n +----------------------+\n |                      |  height = dr\n +----------------------+\n area ≈ (2πr)(dr)",
+            "misconception": "A common mistake is to use π dr^2 or to forget the circumference factor. The exact annulus area is π[(r+dr)^2 - r^2] = 2πr dr + π dr^2; the thin-rectangle approximation keeps only the first-order term 2πr dr.",
+            "exercise": "Use the thin-rectangle approximation to estimate the area of a ring with r = 3 and dr = 0.02.",
+            "knowledge_check": {
+              "question": "What rectangle dimensions approximate an unwrapped ring of radius r and thickness dr?",
+              "answer": "Length 2πr and height/thickness dr, giving area approximately 2πr dr."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-b9b1a9a147",
+            "text": "This happens whenever the quantities you're adding up",
+            "type": "concept",
+            "layer": 2,
+            "start": 553.2,
+            "end": 563.24,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "This happens whenever the quantities you're adding up, the one whose sum approximates the original problem, can be thought of as the areas of many thin rectangles sitting side by side.",
+            "recall": true,
+            "faith": 0.88,
+            "explain": "This is the idea of a Riemann sum: a total accumulation is approximated by adding up the areas of many thin rectangles placed side by side under or over a curve.",
+            "available": true,
+            "why_it_matters": "It connects finite sums of small contributions to the definite integral, which is the limit of such sums as the rectangles become thinner.",
+            "steps": [
+              "Partition the interval into subintervals and let Δx be a subinterval width.",
+              "On each subinterval, choose a sample point and approximate the contribution by rectangle area: height × Δx.",
+              "Add all rectangle areas and take the limit as the partition is refined to obtain the integral."
+            ],
+            "worked_example": "Supplemental example: Approximate ∫_0^1 x^2 dx using 4 right-endpoint rectangles. Δx=0.25, so sum = 0.25(0.25^2+0.5^2+0.75^2+1^2)=0.46875. The exact value is 1/3≈0.3333.",
+            "diagram": "a=x0 --[rect 1]-- x1 --[rect 2]-- x2 -- ... -- xn=b\n          sum of rectangle areas  ->  definite integral",
+            "misconception": "The rectangles do not have to be equal width, and the sample point does not have to be the left endpoint; any valid partition and sample points work, with the limit giving the integral.",
+            "exercise": "Approximate ∫_0^2 (x+1) dx using 4 equal-width right-endpoint rectangles.",
+            "knowledge_check": {
+              "question": "What does the sum of thin rectangle areas approximate?",
+              "answer": "It approximates the accumulated quantity represented by the definite integral of the function over the interval."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-0dbb2021cc",
+            "text": "If finer and finer approximations of the original problem correspond to thinner and thinner…",
+            "type": "concept",
+            "layer": 2,
+            "start": 564.64,
+            "end": 575.61,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "If finer and finer approximations of the original problem correspond to thinner and thinner rings, then the original problem is equivalent to finding the area under some graph.",
+            "recall": true,
+            "faith": 0.98,
+            "explain": "Refinement principle: when a problem is approximated by sums over finer and finer pieces—such as thinner and thinner rings—the limiting sum is equivalent to the area under a graph, i.e. a definite integral.",
+            "available": true,
+            "why_it_matters": "It converts discrete approximations into a continuous integral, which is the core bridge between Riemann sums and calculus area/accumulation problems.",
+            "steps": [
+              "1. Partition the object into thin pieces (rings, slices, rectangles) and express each piece’s contribution as approximately a function value times a small width.",
+              "2. Add the contributions over all pieces to form an approximation sum.",
+              "3. Let the piece width go to zero; if the sums stabilize, recognize the limit as the area under the graph, written as a definite integral."
+            ],
+            "worked_example": "Supplemental example: Approximate the area of a disk by thin rings. A ring at radius r with thickness Δr has area about 2πr Δr. Summing rings from r=0 to R and letting Δr→0 gives ∫₀ᴿ 2πr dr = πR², the disk area.",
+            "diagram": "Original problem\n   |\n   v\nPartition into thinner rings/pieces\n   |\n   v\nSum approximations: Σ f(r) Δr\n   |\n   v\nTake limit Δr → 0\n   |\n   v\nArea under graph = definite integral",
+            "misconception": "The approximation sum itself is not the final answer; the final answer is the limit of those sums as the pieces become arbitrarily thin.",
+            "exercise": "Use thin rectangles to approximate the area under y=x² on [0,1] with n equal subintervals, write the sum, and take n→∞ to find the exact area.",
+            "knowledge_check": {
+              "question": "What does the limit of finer and finer approximation sums represent?",
+              "answer": "It represents the area under the corresponding graph, expressed as a definite integral."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-4d621e4982",
+            "text": "We know it gives the area under the graph of x2 between some fixed…",
+            "type": "concept",
+            "layer": 2,
+            "start": 647.5,
+            "end": 654.92,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "We know it gives the area under the graph of x2 between some fixed left point and some variable right point, but we don't know what it is.",
+            "recall": true,
+            "faith": 0.91,
+            "explain": "An accumulation function A(x)=∫_a^x t^2 dt gives the area under the graph of t^2 from a fixed left point a to a variable right point x. It is a function of x, not a single fixed area.",
+            "available": true,
+            "why_it_matters": "It turns a definite integral with a variable upper limit into a function, which is the key idea behind the Fundamental Theorem of Calculus and many accumulated-quantity models.",
+            "steps": [
+              "1. Fix the left endpoint a and let the right endpoint be the variable x.",
+              "2. Define the accumulation function A(x)=∫_a^x t^2 dt, representing area under t^2 from a to x.",
+              "3. Evaluate or differentiate A as needed; for example, A'(x)=x^2 by the Fundamental Theorem of Calculus."
+            ],
+            "worked_example": "Let a=0. Then A(x)=∫_0^x t^2 dt=x^3/3. So A(3)=27/3=9, the area under t^2 from 0 to 3.",
+            "diagram": "fixed a  --->  [ area under t^2 from a to x ]  --->  variable x\n                         |\n                         v\n                    A(x)=∫_a^x t^2 dt",
+            "misconception": "A common mistake is treating ∫_a^x t^2 dt as a constant or confusing the variable upper limit x with the dummy integration variable t.",
+            "exercise": "Let A(x)=∫_1^x t^2 dt. Find A'(x) and A(2).",
+            "knowledge_check": {
+              "question": "What does A(x)=∫_a^x t^2 dt represent, and what is A'(x)?",
+              "answer": "It represents the area under t^2 from the fixed point a to the variable point x; A'(x)=x^2."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-3614f4904a",
+            "text": "That's an approximation that should get better and better for smaller and smaller choices…",
+            "type": "concept",
+            "layer": 2,
+            "start": 766.56,
+            "end": 771.93,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "And that's an approximation that should get better and better for smaller and smaller choices of dx.",
+            "recall": true,
+            "faith": 0.99,
+            "explain": "This is the idea of a local linear (differential) approximation: for a differentiable function, f(x+dx) is approximated by f(x)+f'(x)dx, and the approximation generally improves as dx becomes smaller.",
+            "available": true,
+            "why_it_matters": "It connects derivatives to numerical estimation and error control: shrinking dx reduces the nonlinear remainder, so the linear estimate becomes more reliable.",
+            "steps": [
+              "Choose a base point x where f(x) and f'(x) are easy to compute.",
+              "Form the linear approximation f(x+dx) ≈ f(x) + f'(x)·dx.",
+              "Use a smaller dx to reduce the approximation error, checking against the exact value if available."
+            ],
+            "worked_example": "Estimate sqrt(4.01). Let f(x)=sqrt(x), x=4, dx=0.01. f(4)=2, f'(4)=1/(2·2)=0.25. Estimate: 2+0.25(0.01)=2.0025. Exact sqrt(4.01)≈2.002498, so the error is about 0.000002.",
+            "diagram": "dx large:   f(x+dx) --?--> linear estimate has visible error\n              |\n              v\n dx smaller: f(x+dx) --?--> linear estimate closer to curve\n              |\n              v\n dx -> 0:    error -> 0 for differentiable f",
+            "misconception": "A smaller dx makes the approximation better, but it does not make it exact unless the function is already linear or dx is zero.",
+            "exercise": "Use a linear approximation at x=2 to estimate (2.01)^3, then compare with the exact value.",
+            "knowledge_check": {
+              "question": "Why does the linear approximation usually improve as dx gets smaller?",
+              "answer": "Because the error term depends on higher-order powers of dx, so as dx→0 the nonlinear remainder becomes small relative to the linear term."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          }
+        ],
+        "source": "But with a topic that's as broad as calculus, there's a lot of things that can mean, so here's what I have in mind specifically.",
+        "recall": true,
+        "color": 2,
+        "faith": 0.0
+      }
+    ],
+    "explain": "Core Ideas & Rule · Pi Times & Thinner · Original Problem & Function · Original Problem & Finer · Fixed · Input",
+    "generatedBy": "extractive"
+  },
+  "edges": [
+    {
+      "id": "e-57f8a08a83",
+      "source": "n-c987c79908",
+      "target": "n-255fa2c1d8",
+      "label": "related to",
+      "origin": "graph"
+    },
+    {
+      "id": "e-2a8c647950",
+      "source": "n-c987c79908",
+      "target": "n-c55d34273b",
+      "label": "related to",
+      "origin": "graph"
+    },
+    {
+      "id": "e-bb6a62e032",
+      "source": "n-791e6fe9d9",
+      "target": "n-b620f09007",
+      "label": "related to",
+      "origin": "similar"
+    },
+    {
+      "id": "e-4ee11fe1fe",
+      "source": "n-cb6d28cca8",
+      "target": "n-ad287832e7",
+      "label": "related to",
+      "origin": "similar"
+    },
+    {
+      "id": "e-e0f55c9768",
+      "source": "n-c987c79908",
+      "target": "n-5e02738f4f",
+      "label": "related to",
+      "origin": "similar"
+    },
+    {
+      "id": "e-3de8fb2973",
+      "source": "n-249f8b9504",
+      "target": "n-dd1e32b4ca",
+      "label": "related to",
+      "origin": "similar"
+    }
+  ],
+  "segments": [
+    {
+      "id": "s1",
+      "start": 14.98,
+      "end": 96.84,
+      "title": "Calculus & Rule",
+      "keywords": [
+        "calculus",
+        "rule",
+        "formulas",
+        "core ideas",
+        "goal",
+        "series"
+      ],
+      "topic": 0,
+      "theme": 1,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s2",
+      "start": 97.78,
+      "end": 407.38,
+      "title": "Ring & Radius",
+      "keywords": [
+        "ring",
+        "radius",
+        "pi times",
+        "area",
+        "circle",
+        "let's"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s3",
+      "start": 410.18,
+      "end": 563.24,
+      "title": "Sum & Quantities",
+      "keywords": [
+        "sum",
+        "quantities",
+        "problem",
+        "graph",
+        "original",
+        "traveled"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s4",
+      "start": 564.64,
+      "end": 618.02,
+      "title": "Equals & Finer",
+      "keywords": [
+        "equals",
+        "finer",
+        "thinner",
+        "original problem",
+        "graph",
+        "it's"
+      ],
+      "topic": 3,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s5",
+      "start": 618.02,
+      "end": 693.7800000000001,
+      "title": "Integral & Function",
+      "keywords": [
+        "integral",
+        "function",
+        "endpoint",
+        "area",
+        "it's",
+        "reframed"
+      ],
+      "topic": 3,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s6",
+      "start": 694.34,
+      "end": 942.36,
+      "title": "Function & Change",
+      "keywords": [
+        "function",
+        "change",
+        "input",
+        "derivative",
+        "tiny",
+        "divided"
+      ],
+      "topic": 1,
+      "theme": 2,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s7",
+      "start": 944.8,
+      "end": 1003.42,
+      "title": "Series & Videos",
+      "keywords": [
+        "series",
+        "videos",
+        "access",
+        "astounded",
+        "suggestions",
+        "type"
+      ],
+      "topic": 2,
+      "theme": 1,
+      "speakers": 1,
+      "fromChapter": false
+    }
+  ],
+  "graph": {
+    "concepts": [
+      {
+        "id": "c1",
+        "label": "Future Essence-of Type",
+        "score": 0.9253,
+        "aliases": [
+          "future essence-of type",
+          "essence-of type series",
+          "type series",
+          "essence-of type",
+          "future essence-of"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 3,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c2",
+        "label": "Original Problem",
+        "score": 0.6688,
+        "aliases": [
+          "original problem",
+          "original problem correspond",
+          "problem correspond"
+        ],
+        "segments": [
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.1191
+      },
+      {
+        "id": "c3",
+        "label": "Equals",
+        "score": 0.4058,
+        "aliases": [
+          "equals",
+          "equal"
+        ],
+        "segments": [
+          "s4",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 4,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c4",
+        "label": "Graph",
+        "score": 0.3327,
+        "aliases": [
+          "graph",
+          "graphs"
+        ],
+        "segments": [
+          "s2",
+          "s3",
+          "s4",
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 5,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c5",
+        "label": "High-level View",
+        "score": 0.3181,
+        "aliases": [
+          "high-level view",
+          "high-level"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 6,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c6",
+        "label": "Reframing",
+        "score": 0.3043,
+        "aliases": [
+          "reframing",
+          "reframed"
+        ],
+        "segments": [
+          "s4",
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 7,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c7",
+        "label": "Fixed",
+        "score": 0.2967,
+        "aliases": [
+          "fixed",
+          "fix"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 8,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c8",
+        "label": "Problem",
+        "score": 0.2642,
+        "aliases": [
+          "problem"
+        ],
+        "segments": [
+          "s2",
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.0628
+      },
+      {
+        "id": "c9",
+        "label": "Finer",
+        "score": 0.2642,
+        "aliases": [
+          "finer"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 1,
+        "centrality": 0.0816
+      },
+      {
+        "id": "c10",
+        "label": "Integral",
+        "score": 0.2584,
+        "aliases": [
+          "integral"
+        ],
+        "segments": [
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 9,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c11",
+        "label": "Videos",
+        "score": 0.2519,
+        "aliases": [
+          "videos"
+        ],
+        "segments": [
+          "s1",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 10,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c12",
+        "label": "Function",
+        "score": 0.2511,
+        "aliases": [
+          "function"
+        ],
+        "segments": [
+          "s3",
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 11,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c13",
+        "label": "Endpoint",
+        "score": 0.2511,
+        "aliases": [
+          "endpoint"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 12,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c14",
+        "label": "Access",
+        "score": 0.2448,
+        "aliases": [
+          "access"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 13,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c15",
+        "label": "Thinner",
+        "score": 0.2193,
+        "aliases": [
+          "thinner"
+        ],
+        "segments": [
+          "s2",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 14,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c16",
+        "label": "Pi Times",
+        "score": 0.2111,
+        "aliases": [
+          "pi times"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 15,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c17",
+        "label": "Integral of X2",
+        "score": 0.2077,
+        "aliases": [
+          "integral of x2"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 16,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c18",
+        "label": "Rule",
+        "score": 0.1962,
+        "aliases": [
+          "rule"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 17,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c19",
+        "label": "Core Ideas",
+        "score": 0.1955,
+        "aliases": [
+          "core ideas"
+        ],
+        "segments": [
+          "s1",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 2,
+        "centrality": 0.0816
+      },
+      {
+        "id": "c20",
+        "label": "Input",
+        "score": 0.1884,
+        "aliases": [
+          "input"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 18,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c21",
+        "label": "Original",
+        "score": 0.1874,
+        "aliases": [
+          "original"
+        ],
+        "segments": [
+          "s2",
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.0629
+      },
+      {
+        "id": "c22",
+        "label": "Finer Approximations",
+        "score": 0.1872,
+        "aliases": [
+          "finer approximations"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 1,
+        "centrality": 0.0816
+      },
+      {
+        "id": "c23",
+        "label": "Relevant Area",
+        "score": 0.1872,
+        "aliases": [
+          "relevant area"
+        ],
+        "segments": [
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 19,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c24",
+        "label": "Series",
+        "score": 0.1862,
+        "aliases": [
+          "series"
+        ],
+        "segments": [
+          "s1",
+          "s3",
+          "s4",
+          "s6",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 20,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c25",
+        "label": "Quantities",
+        "score": 0.1848,
+        "aliases": [
+          "quantities"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 21,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c26",
+        "label": "Graph of X2",
+        "score": 0.1813,
+        "aliases": [
+          "graph of x2"
+        ],
+        "segments": [
+          "s4",
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 22,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c27",
+        "label": "Ll Fix",
+        "score": 0.178,
+        "aliases": [
+          "ll fix"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 23,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c28",
+        "label": "Particular Goal",
+        "score": 0.178,
+        "aliases": [
+          "particular goal"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 24,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c29",
+        "label": "Practical Problems",
+        "score": 0.178,
+        "aliases": [
+          "practical problems"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 25,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c30",
+        "label": "Certain Graph",
+        "score": 0.178,
+        "aliases": [
+          "certain graph"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 26,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c31",
+        "label": "Hard Geometry",
+        "score": 0.178,
+        "aliases": [
+          "hard geometry"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 27,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c32",
+        "label": "Endpoint Vary",
+        "score": 0.178,
+        "aliases": [
+          "endpoint vary"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 28,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c33",
+        "label": "Integral Function",
+        "score": 0.178,
+        "aliases": [
+          "integral function"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 29,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c34",
+        "label": "Area",
+        "score": 0.1769,
+        "aliases": [
+          "area"
+        ],
+        "segments": [
+          "s1",
+          "s2",
+          "s3",
+          "s4",
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 30,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c35",
+        "label": "Divided",
+        "score": 0.1761,
+        "aliases": [
+          "divided"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 31,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c36",
+        "label": "Nudge",
+        "score": 0.1761,
+        "aliases": [
+          "nudge"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 32,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c37",
+        "label": "Radius",
+        "score": 0.1759,
+        "aliases": [
+          "radius"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 33,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c38",
+        "label": "Sum",
+        "score": 0.1744,
+        "aliases": [
+          "sum"
+        ],
+        "segments": [
+          "s2",
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 34,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c39",
+        "label": "Financial Backing",
+        "score": 0.1735,
+        "aliases": [
+          "financial backing"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 35,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c40",
+        "label": "Da Divided",
+        "score": 0.17,
+        "aliases": [
+          "da divided"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 36,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c41",
+        "label": "Change",
+        "score": 0.1651,
+        "aliases": [
+          "change"
+        ],
+        "segments": [
+          "s3",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 37,
+        "centrality": 0.0122
+      },
+      {
+        "id": "c42",
+        "label": "Core",
+        "score": 0.1629,
+        "aliases": [
+          "core"
+        ],
+        "segments": [
+          "s1",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 2,
+        "centrality": 0.0816
+      }
+    ],
+    "edges": [
+      {
+        "source": "c2",
+        "target": "c21",
+        "weight": 0.685,
+        "label": "related to"
+      },
+      {
+        "source": "c2",
+        "target": "c8",
+        "weight": 0.684,
+        "label": "related to"
+      },
+      {
+        "source": "c19",
+        "target": "c42",
+        "weight": 0.574,
+        "label": "related to"
+      },
+      {
+        "source": "c9",
+        "target": "c22",
+        "weight": 0.562,
+        "label": "related to"
+      }
+    ]
+  },
+  "transcript": [
+    {
+      "start": 14.98,
+      "end": 16.46,
+      "text": "Hey everyone, Grant here."
+    },
+    {
+      "start": 16.82,
+      "end": 19.83,
+      "text": "This is the first video in a series on the essence of calculus,"
+    },
+    {
+      "start": 19.83,
+      "end": 23.6,
+      "text": "and I'll be publishing the following videos once per day for the next 10 days."
+    },
+    {
+      "start": 24.3,
+      "end": 26.91,
+      "text": "The goal here, as the name suggests, is to really get"
+    },
+    {
+      "start": 26.91,
+      "end": 29.72,
+      "text": "the heart of the subject out in one binge-watchable set."
+    },
+    {
+      "start": 30.32,
+      "end": 34.18,
+      "text": "But with a topic that's as broad as calculus, there's a lot of things that can mean,"
+    },
+    {
+      "start": 34.18,
+      "end": 36.2,
+      "text": "so here's what I have in mind specifically."
+    },
+    {
+      "start": 36.94,
+      "end": 39.41,
+      "text": "Calculus has a lot of rules and formulas which"
+    },
+    {
+      "start": 39.41,
+      "end": 41.94,
+      "text": "are often presented as things to be memorized."
+    },
+    {
+      "start": 42.48,
+      "end": 45.75,
+      "text": "Lots of derivative formulas, the product rule, the chain rule,"
+    },
+    {
+      "start": 45.75,
+      "end": 49.98,
+      "text": "implicit differentiation, the fact that integrals and derivatives are opposite,"
+    },
+    {
+      "start": 49.98,
+      "end": 52.46,
+      "text": "Taylor series, just a lot of things like that."
+    },
+    {
+      "start": 52.96,
+      "end": 55.13,
+      "text": "And my goal is for you to come away feeling like"
+    },
+    {
+      "start": 55.13,
+      "end": 57.08,
+      "text": "you could have invented calculus yourself."
+    },
+    {
+      "start": 57.64,
+      "end": 61.64,
+      "text": "That is, cover all those core ideas, but in a way that makes clear where they"
+    },
+    {
+      "start": 61.64,
+      "end": 66.0,
+      "text": "actually come from, and what they really mean, using an all-around visual approach."
+    },
+    {
+      "start": 66.92,
+      "end": 70.43,
+      "text": "Inventing math is no joke, and there is a difference between being"
+    },
+    {
+      "start": 70.43,
+      "end": 74.04,
+      "text": "told why something's true, and actually generating it from scratch."
+    },
+    {
+      "start": 74.68,
+      "end": 79.09,
+      "text": "But at all points, I want you to think to yourself, if you were an early mathematician,"
+    },
+    {
+      "start": 79.09,
+      "end": 82.03,
+      "text": "pondering these ideas and drawing out the right diagrams,"
+    },
+    {
+      "start": 82.03,
+      "end": 86.24,
+      "text": "does it feel reasonable that you could have stumbled across these truths yourself?"
+    },
+    {
+      "start": 86.82,
+      "end": 91.57,
+      "text": "In this initial video, I want to show how you might stumble into the core ideas of"
+    },
+    {
+      "start": 91.57,
+      "end": 95.57,
+      "text": "calculus by thinking very deeply about one specific bit of geometry,"
+    },
+    {
+      "start": 95.57,
+      "end": 96.84,
+      "text": "the area of a circle."
+    },
+    {
+      "start": 97.78,
+      "end": 101.04,
+      "text": "Maybe that this is pi times its radius squared, but why?"
+    },
+    {
+      "start": 101.58,
+      "end": 104.46,
+      "text": "Is there a nice way to think about where this formula comes from?"
+    },
+    {
+      "start": 105.42,
+      "end": 109.33,
+      "text": "Well, contemplating this problem and leaving yourself open to exploring the"
+    },
+    {
+      "start": 109.33,
+      "end": 113.54,
+      "text": "interesting thoughts that come about can actually lead you to a glimpse of three"
+    },
+    {
+      "start": 113.55,
+      "end": 117.92,
+      "text": "big ideas in calculus, integrals, derivatives, and the fact that they're opposites."
+    },
+    {
+      "start": 119.84,
+      "end": 124.84,
+      "text": "But the story starts more simply, just you and a circle, let's say with radius 3."
+    },
+    {
+      "start": 125.7,
+      "end": 129.38,
+      "text": "You're trying to figure out its area, and after going through a lot of"
+    },
+    {
+      "start": 129.38,
+      "end": 133.49,
+      "text": "paper trying different ways to chop up and rearrange the pieces of that area,"
+    },
+    {
+      "start": 133.49,
+      "end": 136.85,
+      "text": "many of which might lead to their own interesting observations,"
+    },
+    {
+      "start": 136.85,
+      "end": 141.06,
+      "text": "maybe you try out the idea of slicing up the circle into many concentric rings."
+    },
+    {
+      "start": 142.0,
+      "end": 145.81,
+      "text": "This should seem promising because it respects the symmetry of the circle,"
+    },
+    {
+      "start": 145.81,
+      "end": 149.46,
+      "text": "and math has a tendency to reward you when you respect its symmetries."
+    },
+    {
+      "start": 150.36,
+      "end": 155.06,
+      "text": "Let's take one of those rings, which has some inner radius r that's between 0 and 3."
+    },
+    {
+      "start": 156.22,
+      "end": 159.92,
+      "text": "If we can find a nice expression for the area of each ring like this one,"
+    },
+    {
+      "start": 159.92,
+      "end": 162.25,
+      "text": "and if we have a nice way to add them all up,"
+    },
+    {
+      "start": 162.25,
+      "end": 165.5,
+      "text": "it might lead us to an understanding of the full circle's area."
+    },
+    {
+      "start": 166.42,
+      "end": 169.12,
+      "text": "Maybe you start by imagining straightening out this ring."
+    },
+    {
+      "start": 170.8,
+      "end": 174.99,
+      "text": "And you could try thinking through exactly what this new shape is and what its"
+    },
+    {
+      "start": 174.99,
+      "end": 179.18,
+      "text": "area should be, but for simplicity, let's just approximate it as a rectangle."
+    },
+    {
+      "start": 180.18,
+      "end": 183.86,
+      "text": "The width of that rectangle is the circumference of the original ring,"
+    },
+    {
+      "start": 183.86,
+      "end": 185.44,
+      "text": "which is 2 pi times r, right?"
+    },
+    {
+      "start": 185.86,
+      "end": 188.06,
+      "text": "that's essentially the definition of pi."
+    },
+    {
+      "start": 188.68,
+      "end": 189.38,
+      "text": "And its thickness?"
+    },
+    {
+      "start": 190.2,
+      "end": 194.15,
+      "text": "Well, that depends on how finely you chopped up the circle in the first place,"
+    },
+    {
+      "start": 194.15,
+      "end": 195.62,
+      "text": "which was kind of arbitrary."
+    },
+    {
+      "start": 196.34,
+      "end": 200.09,
+      "text": "In the spirit of using what will come to be standard calculus notation,"
+    },
+    {
+      "start": 200.09,
+      "end": 204.43,
+      "text": "let's call that thickness dr for a tiny difference in the radius from one ring to"
+    },
+    {
+      "start": 204.43,
+      "end": 204.96,
+      "text": "the next."
+    },
+    {
+      "start": 205.48,
+      "end": 207.88,
+      "text": "Maybe you think of it as something like 0.1."
+    },
+    {
+      "start": 208.98,
+      "end": 212.85,
+      "text": "So approximating this unwrapped ring as a thin rectangle,"
+    },
+    {
+      "start": 212.85,
+      "end": 217.6,
+      "text": "its area is 2 pi times r, the radius, times dr, the little thickness."
+    },
+    {
+      "start": 218.6,
+      "end": 222.44,
+      "text": "And even though that's not perfect, for smaller and smaller choices of dr,"
+    },
+    {
+      "start": 222.44,
+      "end": 226.48,
+      "text": "this is actually going to be a better and better approximation for that area,"
+    },
+    {
+      "start": 226.48,
+      "end": 230.99,
+      "text": "since the top and the bottom sides of this shape are going to get closer and closer to"
+    },
+    {
+      "start": 230.99,
+      "end": 232.6,
+      "text": "being exactly the same length."
+    },
+    {
+      "start": 233.54,
+      "end": 235.93,
+      "text": "So let's just move forward with this approximation,"
+    },
+    {
+      "start": 235.93,
+      "end": 238.7,
+      "text": "keeping in the back of our minds that it's slightly wrong,"
+    },
+    {
+      "start": 238.7,
+      "end": 242.36,
+      "text": "but it's going to become more accurate for smaller and smaller choices of dr."
+    },
+    {
+      "start": 243.22,
+      "end": 246.4,
+      "text": "That is, if we slice up the circle into thinner and thinner rings."
+    },
+    {
+      "start": 247.7,
+      "end": 252.38,
+      "text": "So just to sum up where we are, you've broken up the area of the circle into"
+    },
+    {
+      "start": 252.38,
+      "end": 257.19,
+      "text": "all of these rings, and you're approximating the area of each one of those as"
+    },
+    {
+      "start": 257.19,
+      "end": 262.06,
+      "text": "2 pi times its radius times dr, where the specific value for that inner radius"
+    },
+    {
+      "start": 262.06,
+      "end": 266.8,
+      "text": "ranges from 0 for the smallest ring up to just under 3 for the biggest ring,"
+    },
+    {
+      "start": 266.8,
+      "end": 271.98,
+      "text": "spaced out by whatever the thickness is that you choose for dr, something like 0.1."
+    },
+    {
+      "start": 273.14,
+      "end": 276.97,
+      "text": "And notice that the spacing between the values here corresponds to the"
+    },
+    {
+      "start": 276.97,
+      "end": 281.3,
+      "text": "thickness dr of each ring, the difference in radius from one ring to the next."
+    },
+    {
+      "start": 282.26,
+      "end": 286.01,
+      "text": "In fact, a nice way to think about the rectangles approximating each"
+    },
+    {
+      "start": 286.01,
+      "end": 289.82,
+      "text": "ring's area is to fit them all upright side by side along this axis."
+    },
+    {
+      "start": 290.66,
+      "end": 295.82,
+      "text": "Each one has a thickness dr, which is why they fit so snugly right there together,"
+    },
+    {
+      "start": 295.82,
+      "end": 301.23,
+      "text": "and the height of any one of these rectangles sitting above some specific value of r,"
+    },
+    {
+      "start": 301.23,
+      "end": 304.0,
+      "text": "like 0.6, is exactly 2 pi times that value."
+    },
+    {
+      "start": 304.64,
+      "end": 308.96,
+      "text": "That's the circumference of the corresponding ring that this rectangle approximates."
+    },
+    {
+      "start": 309.56,
+      "end": 312.55,
+      "text": "Pictures like this 2 pi r can get tall for the screen,"
+    },
+    {
+      "start": 312.55,
+      "end": 316.92,
+      "text": "2 times pi times 3 is around 19, so let's just throw up a y axis that's"
+    },
+    {
+      "start": 316.92,
+      "end": 321.35,
+      "text": "scaled a little differently so that we can actually fit all of these rectangles"
+    },
+    {
+      "start": 321.35,
+      "end": 322.18,
+      "text": "on the screen."
+    },
+    {
+      "start": 323.26,
+      "end": 326.94,
+      "text": "A nice way to think about this setup is to draw the graph of 2 pi r,"
+    },
+    {
+      "start": 326.94,
+      "end": 329.54,
+      "text": "which is a straight line that has a slope 2 pi."
+    },
+    {
+      "start": 330.1,
+      "end": 334.8,
+      "text": "Each of these rectangles extends up to the point where it just barely touches that graph."
+    },
+    {
+      "start": 336.0,
+      "end": 337.46,
+      "text": "Again, we're being approximate here."
+    },
+    {
+      "start": 337.9,
+      "end": 340.01,
+      "text": "Each of these rectangles only approximates the"
+    },
+    {
+      "start": 340.01,
+      "end": 342.22,
+      "text": "area of the corresponding ring from the circle."
+    },
+    {
+      "start": 342.94,
+      "end": 346.24,
+      "text": "But remember, that approximation, 2 pi r times dr,"
+    },
+    {
+      "start": 346.24,
+      "end": 350.8,
+      "text": "gets less and less wrong as the size of dr gets smaller and smaller."
+    },
+    {
+      "start": 351.8,
+      "end": 353.97,
+      "text": "And this has a very beautiful meaning when we're"
+    },
+    {
+      "start": 353.97,
+      "end": 356.54,
+      "text": "looking at the sum of the areas of all those rectangles."
+    },
+    {
+      "start": 357.08,
+      "end": 360.06,
+      "text": "For smaller and smaller choices of dr, you might at first"
+    },
+    {
+      "start": 360.06,
+      "end": 363.14,
+      "text": "think that turns the problem into a monstrously large sum."
+    },
+    {
+      "start": 363.6,
+      "end": 365.56,
+      "text": "there's many many rectangles to consider,"
+    },
+    {
+      "start": 365.56,
+      "end": 368.4,
+      "text": "and the decimal precision of each one of their areas is going to be an"
+    },
+    {
+      "start": 368.4,
+      "end": 369.2,
+      "text": "absolute nightmare."
+    },
+    {
+      "start": 370.06,
+      "end": 375.3,
+      "text": "But notice, all of their areas in aggregate just looks like the area under a graph."
+    },
+    {
+      "start": 375.98,
+      "end": 379.37,
+      "text": "And that portion under the graph is just a triangle,"
+    },
+    {
+      "start": 379.37,
+      "end": 383.4,
+      "text": "a triangle with a base of 3 and a height that's 2 pi times 3."
+    },
+    {
+      "start": 384.14,
+      "end": 390.5,
+      "text": "So its area, 1 half base times height, works out to be exactly pi times 3 squared."
+    },
+    {
+      "start": 391.36,
+      "end": 395.13,
+      "text": "Or if the radius of our original circle was some other value,"
+    },
+    {
+      "start": 395.13,
+      "end": 398.66,
+      "text": "capital R, that area comes out to be pi times r squared."
+    },
+    {
+      "start": 399.38,
+      "end": 401.46,
+      "text": "And that's the formula for the area of a circle."
+    },
+    {
+      "start": 402.32,
+      "end": 405.41,
+      "text": "It doesn't matter who you are or what you typically think of math,"
+    },
+    {
+      "start": 405.41,
+      "end": 407.38,
+      "text": "that right there is a beautiful argument."
+    },
+    {
+      "start": 410.18,
+      "end": 412.82,
+      "text": "But if you want to think like a mathematician here,"
+    },
+    {
+      "start": 412.82,
+      "end": 415.2,
+      "text": "you don't just care about finding the answer,"
+    },
+    {
+      "start": 415.2,
+      "end": 418.92,
+      "text": "you care about developing general problem-solving tools and techniques."
+    },
+    {
+      "start": 419.68,
+      "end": 423.77,
+      "text": "So take a moment to meditate on what exactly just happened and why it worked,"
+    },
+    {
+      "start": 423.77,
+      "end": 427.59,
+      "text": "because the way we transitioned from something approximate to something"
+    },
+    {
+      "start": 427.59,
+      "end": 431.78,
+      "text": "precise is actually pretty subtle and cuts deep to what calculus is all about."
+    },
+    {
+      "start": 433.82,
+      "end": 438.91,
+      "text": "You had this problem that could be approximated with the sum of many small numbers,"
+    },
+    {
+      "start": 438.91,
+      "end": 444.06,
+      "text": "each of which looked like 2 pi r times dr, for values of r ranging between 0 and 3."
+    },
+    {
+      "start": 446.6,
+      "end": 451.95,
+      "text": "Remember, the small number dr here represents our choice for the thickness of each ring,"
+    },
+    {
+      "start": 451.95,
+      "end": 452.98,
+      "text": "for example 0.1."
+    },
+    {
+      "start": 453.52,
+      "end": 455.64,
+      "text": "And there are two important things to note here."
+    },
+    {
+      "start": 456.08,
+      "end": 460.64,
+      "text": "First of all, not only is dr a factor in the quantities we're adding up,"
+    },
+    {
+      "start": 460.64,
+      "end": 465.58,
+      "text": "2 pi r times dr, it also gives the spacing between the different values of r."
+    },
+    {
+      "start": 466.24,
+      "end": 470.52,
+      "text": "And secondly, the smaller our choice for dr, the better the approximation."
+    },
+    {
+      "start": 472.2,
+      "end": 475.2,
+      "text": "Adding all of those numbers could be seen in a different,"
+    },
+    {
+      "start": 475.2,
+      "end": 478.47,
+      "text": "pretty clever way as adding the areas of many thin rectangles"
+    },
+    {
+      "start": 478.47,
+      "end": 482.42,
+      "text": "sitting underneath a graph, the graph of the function 2 pi r in this case."
+    },
+    {
+      "start": 482.94,
+      "end": 487.43,
+      "text": "Then, and this is key, by considering smaller and smaller choices for dr,"
+    },
+    {
+      "start": 487.43,
+      "end": 492.59,
+      "text": "corresponding to better and better approximations of the original problem, the sum,"
+    },
+    {
+      "start": 492.59,
+      "end": 495.91,
+      "text": "thought of as the aggregate area of those rectangles,"
+    },
+    {
+      "start": 495.91,
+      "end": 498.18,
+      "text": "approaches the area under the graph."
+    },
+    {
+      "start": 499.0,
+      "end": 503.48,
+      "text": "And because of that, you can conclude that the answer to the original question,"
+    },
+    {
+      "start": 503.48,
+      "end": 508.52,
+      "text": "in full unapproximated precision, is exactly the same as the area underneath this graph."
+    },
+    {
+      "start": 510.86,
+      "end": 515.26,
+      "text": "A lot of other hard problems in math and science can be broken down and"
+    },
+    {
+      "start": 515.26,
+      "end": 518.36,
+      "text": "approximated as the sum of many small quantities,"
+    },
+    {
+      "start": 518.36,
+      "end": 523.94,
+      "text": "like figuring out how far a car has traveled based on its velocity at each point in time."
+    },
+    {
+      "start": 524.76,
+      "end": 528.77,
+      "text": "In a case like that, you might range through many different points in time,"
+    },
+    {
+      "start": 528.77,
+      "end": 533.26,
+      "text": "and at each one multiply the velocity at that time times a tiny change in time, dt,"
+    },
+    {
+      "start": 533.26,
+      "end": 537.86,
+      "text": "which would give the corresponding little bit of distance traveled during that little"
+    },
+    {
+      "start": 537.86,
+      "end": 538.36,
+      "text": "time."
+    },
+    {
+      "start": 539.26,
+      "end": 543.16,
+      "text": "I'll talk through the details of examples like this later in the series,"
+    },
+    {
+      "start": 543.16,
+      "end": 547.38,
+      "text": "but at a high level many of these types of problems turn out to be equivalent"
+    },
+    {
+      "start": 547.38,
+      "end": 552.14,
+      "text": "to finding the area under some graph, in much the same way that our circle problem did."
+    },
+    {
+      "start": 553.2,
+      "end": 556.15,
+      "text": "This happens whenever the quantities you're adding up,"
+    },
+    {
+      "start": 556.15,
+      "end": 559.04,
+      "text": "the one whose sum approximates the original problem,"
+    },
+    {
+      "start": 559.04,
+      "end": 563.24,
+      "text": "can be thought of as the areas of many thin rectangles sitting side by side."
+    },
+    {
+      "start": 564.64,
+      "end": 569.78,
+      "text": "If finer and finer approximations of the original problem correspond to thinner and"
+    },
+    {
+      "start": 569.78,
+      "end": 575.11,
+      "text": "thinner rings, then the original problem is equivalent to finding the area under some"
+    },
+    {
+      "start": 575.11,
+      "end": 575.61,
+      "text": "graph."
+    },
+    {
+      "start": 576.6,
+      "end": 580.42,
+      "text": "Again, this is an idea we'll see in more detail later in the series,"
+    },
+    {
+      "start": 580.42,
+      "end": 583.18,
+      "text": "so don't worry if it's not 100% clear right now."
+    },
+    {
+      "start": 583.78,
+      "end": 587.15,
+      "text": "The point now is that you, as the mathematician having just"
+    },
+    {
+      "start": 587.15,
+      "end": 590.58,
+      "text": "solved a problem by reframing it as the area under a graph,"
+    },
+    {
+      "start": 590.58,
+      "end": 594.52,
+      "text": "might start thinking about how to find the areas under other graphs."
+    },
+    {
+      "start": 595.64,
+      "end": 600.32,
+      "text": "We were lucky in the circle problem that the relevant area turned out to be a triangle,"
+    },
+    {
+      "start": 600.32,
+      "end": 603.76,
+      "text": "but imagine instead something like a parabola, the graph of x2."
+    },
+    {
+      "start": 604.76,
+      "end": 608.01,
+      "text": "What's the area underneath that curve, say between"
+    },
+    {
+      "start": 608.01,
+      "end": 610.68,
+      "text": "the values of x equals 0 and x equals 3?"
+    },
+    {
+      "start": 612.08,
+      "end": 614.76,
+      "text": "Well, it's hard to think about, right?"
+    },
+    {
+      "start": 615.22,
+      "end": 618.02,
+      "text": "And let me reframe that question in a slightly different way."
+    },
+    {
+      "start": 618.02,
+      "end": 623.06,
+      "text": "We'll fix that left endpoint in place at 0, and let the right endpoint vary."
+    },
+    {
+      "start": 626.86,
+      "end": 630.56,
+      "text": "Are you able to find a function, a of x, that gives"
+    },
+    {
+      "start": 630.56,
+      "end": 634.18,
+      "text": "you the area under this parabola between 0 and x?"
+    },
+    {
+      "start": 635.62,
+      "end": 639.58,
+      "text": "A function a of x like this is called an integral of x2."
+    },
+    {
+      "start": 640.5,
+      "end": 644.6,
+      "text": "Calculus holds within it the tools to figure out what an integral like this is,"
+    },
+    {
+      "start": 644.6,
+      "end": 647.2,
+      "text": "but right now it's just a mystery function to us."
+    },
+    {
+      "start": 647.5,
+      "end": 651.32,
+      "text": "We know it gives the area under the graph of x2 between some fixed left"
+    },
+    {
+      "start": 651.32,
+      "end": 654.92,
+      "text": "point and some variable right point, but we don't know what it is."
+    },
+    {
+      "start": 655.66,
+      "end": 659.85,
+      "text": "And again, the reason we care about this kind of question is not just for"
+    },
+    {
+      "start": 659.85,
+      "end": 663.98,
+      "text": "the sake of asking hard geometry questions, it's because many practical"
+    },
+    {
+      "start": 663.98,
+      "end": 668.05,
+      "text": "problems that can be approximated by adding up a large number of small"
+    },
+    {
+      "start": 668.05,
+      "end": 672.3,
+      "text": "things can be reframed as a question about an area under a certain graph."
+    },
+    {
+      "start": 673.42,
+      "end": 677.37,
+      "text": "I'll tell you right now that finding this area, this integral function,"
+    },
+    {
+      "start": 677.37,
+      "end": 681.99,
+      "text": "is genuinely hard, and whenever you come across a genuinely hard question in math,"
+    },
+    {
+      "start": 681.99,
+      "end": 685.78,
+      "text": "a good policy is to not try too hard to get at the answer directly,"
+    },
+    {
+      "start": 685.78,
+      "end": 689.34,
+      "text": "since usually you just end up banging your head against a wall."
+    },
+    {
+      "start": 690.08,
+      "end": 693.78,
+      "text": "Instead, play around with the idea, with no particular goal in mind."
+    },
+    {
+      "start": 694.34,
+      "end": 698.56,
+      "text": "Spend some time building up familiarity with the interplay between the function"
+    },
+    {
+      "start": 698.56,
+      "end": 702.36,
+      "text": "defining the graph, in this case x2, and the function giving the area."
+    },
+    {
+      "start": 704.09,
+      "end": 708.02,
+      "text": "In that playful spirit, if you're lucky, here's something you might notice."
+    },
+    {
+      "start": 708.58,
+      "end": 714.78,
+      "text": "When you slightly increase x by some tiny nudge dx, look at the resulting change in area,"
+    },
+    {
+      "start": 714.78,
+      "end": 720.42,
+      "text": "represented with this sliver I'm going to call da for a tiny difference in area."
+    },
+    {
+      "start": 721.38,
+      "end": 725.51,
+      "text": "That sliver can be pretty well approximated with a rectangle,"
+    },
+    {
+      "start": 725.51,
+      "end": 728.62,
+      "text": "one whose height is x2 and whose width is dx."
+    },
+    {
+      "start": 729.66,
+      "end": 732.23,
+      "text": "And the smaller the size of that nudge dx, the"
+    },
+    {
+      "start": 732.23,
+      "end": 735.02,
+      "text": "more that sliver actually looks like a rectangle."
+    },
+    {
+      "start": 736.8,
+      "end": 741.08,
+      "text": "This gives us an interesting way to think about how a of x is related to x2."
+    },
+    {
+      "start": 742.0,
+      "end": 746.58,
+      "text": "A change to the output of a, this little da, is about equal to x2,"
+    },
+    {
+      "start": 746.58,
+      "end": 750.18,
+      "text": "where x is whatever input you started at, times dx,"
+    },
+    {
+      "start": 750.18,
+      "end": 754.0,
+      "text": "the little nudge to the input that caused a to change."
+    },
+    {
+      "start": 754.78,
+      "end": 760.32,
+      "text": "Or rearranged, da divided by dx, the ratio of a tiny change in a to the tiny"
+    },
+    {
+      "start": 760.32,
+      "end": 765.78,
+      "text": "change in x that caused it, is approximately whatever x2 is at that point."
+    },
+    {
+      "start": 766.56,
+      "end": 768.76,
+      "text": "And that's an approximation that should get better"
+    },
+    {
+      "start": 768.76,
+      "end": 770.96,
+      "text": "and better for smaller and smaller choices of dx."
+    },
+    {
+      "start": 772.1,
+      "end": 775.64,
+      "text": "In other words, we don't know what a of x is, that remains a mystery."
+    },
+    {
+      "start": 776.08,
+      "end": 779.5,
+      "text": "But we do know a property that this mystery function must have."
+    },
+    {
+      "start": 780.16,
+      "end": 784.97,
+      "text": "When you look at two nearby points, for example 3 and 3.001,"
+    },
+    {
+      "start": 784.97,
+      "end": 790.18,
+      "text": "consider the change to the output of a between those two points,"
+    },
+    {
+      "start": 790.18,
+      "end": 796.12,
+      "text": "the difference between the mystery function evaluated at 3.001 and 3.001."
+    },
+    {
+      "start": 796.12,
+      "end": 802.08,
+      "text": "That change, divided by the difference in the input values, which in this case is 0.001,"
+    },
+    {
+      "start": 802.08,
+      "end": 808.1,
+      "text": "should be about equal to the value of x2 for the starting input, in this case 3 squared."
+    },
+    {
+      "start": 810.2,
+      "end": 814.42,
+      "text": "And this relationship between tiny changes to the mystery function"
+    },
+    {
+      "start": 814.42,
+      "end": 818.44,
+      "text": "and the values of x2 itself is true at all inputs, not just 3."
+    },
+    {
+      "start": 819.42,
+      "end": 821.97,
+      "text": "That doesn't immediately tell us how to find a of x,"
+    },
+    {
+      "start": 821.97,
+      "end": 824.82,
+      "text": "but it provides a very strong clue that we can work with."
+    },
+    {
+      "start": 826.26,
+      "end": 828.74,
+      "text": "And there's nothing special about the graph x2 here."
+    },
+    {
+      "start": 829.28,
+      "end": 833.65,
+      "text": "Any function defined as the area under some graph has this property,"
+    },
+    {
+      "start": 833.65,
+      "end": 838.59,
+      "text": "that da divided by dx, a slight nudge to the output of a divided by a slight"
+    },
+    {
+      "start": 838.59,
+      "end": 843.73,
+      "text": "nudge to the input that caused it, is about equal to the height of the graph at"
+    },
+    {
+      "start": 843.73,
+      "end": 844.5,
+      "text": "that point."
+    },
+    {
+      "start": 846.2,
+      "end": 850.36,
+      "text": "Again, that's an approximation that gets better and better for smaller choices of dx."
+    },
+    {
+      "start": 851.64,
+      "end": 856.04,
+      "text": "And here, we're stumbling into another big idea from calculus, derivatives."
+    },
+    {
+      "start": 857.1,
+      "end": 862.11,
+      "text": "This ratio da divided by dx is called the derivative of a, or more technically,"
+    },
+    {
+      "start": 862.11,
+      "end": 867.24,
+      "text": "the derivative is whatever this ratio approaches as dx gets smaller and smaller."
+    },
+    {
+      "start": 868.18,
+      "end": 872.04,
+      "text": "I'll dive much more deeply into the idea of a derivative in the next video,"
+    },
+    {
+      "start": 872.04,
+      "end": 876.51,
+      "text": "but loosely speaking it's a measure of how sensitive a function is to small changes in"
+    },
+    {
+      "start": 876.51,
+      "end": 877.08,
+      "text": "its input."
+    },
+    {
+      "start": 877.94,
+      "end": 882.17,
+      "text": "You'll see as the series goes on that there are many ways you can visualize a derivative,"
+    },
+    {
+      "start": 882.17,
+      "end": 885.17,
+      "text": "depending on what function you're looking at and how you think"
+    },
+    {
+      "start": 885.17,
+      "end": 886.74,
+      "text": "about tiny nudges to its output."
+    },
+    {
+      "start": 888.6,
+      "end": 892.15,
+      "text": "We care about derivatives because they help us solve problems,"
+    },
+    {
+      "start": 892.15,
+      "end": 897.14,
+      "text": "and in our little exploration here, we already have a glimpse of one way they're used."
+    },
+    {
+      "start": 897.84,
+      "end": 900.44,
+      "text": "They are the key to solving integral questions,"
+    },
+    {
+      "start": 900.44,
+      "end": 903.42,
+      "text": "problems that require finding the area under a curve."
+    },
+    {
+      "start": 904.36,
+      "end": 907.67,
+      "text": "Once you gain enough familiarity with computing derivatives,"
+    },
+    {
+      "start": 907.67,
+      "end": 912.58,
+      "text": "you'll be able to look at a situation like this one where you don't know what a function"
+    },
+    {
+      "start": 912.58,
+      "end": 915.56,
+      "text": "is, but you do know that its derivative should be x2,"
+    },
+    {
+      "start": 915.56,
+      "end": 918.76,
+      "text": "and from that reverse engineer what the function must be."
+    },
+    {
+      "start": 920.7,
+      "end": 923.83,
+      "text": "This back and forth between integrals and derivatives,"
+    },
+    {
+      "start": 923.83,
+      "end": 927.99,
+      "text": "where the derivative of a function for the area under a graph gives you"
+    },
+    {
+      "start": 927.99,
+      "end": 932.1,
+      "text": "back the function defining the graph itself, is called the fundamental"
+    },
+    {
+      "start": 932.1,
+      "end": 933.32,
+      "text": "theorem of calculus."
+    },
+    {
+      "start": 934.22,
+      "end": 938.75,
+      "text": "It ties together the two big ideas of integrals and derivatives,"
+    },
+    {
+      "start": 938.75,
+      "end": 942.36,
+      "text": "and shows how each one is an inverse of the other."
+    },
+    {
+      "start": 944.8,
+      "end": 947.3,
+      "text": "All of this is only a high-level view, just a peek"
+    },
+    {
+      "start": 947.3,
+      "end": 949.86,
+      "text": "at some of the core ideas that emerge in calculus."
+    },
+    {
+      "start": 950.5,
+      "end": 954.42,
+      "text": "And what follows in this series are the details, for derivatives and integrals and more."
+    },
+    {
+      "start": 954.98,
+      "end": 959.11,
+      "text": "At all points, I want you to feel that you could have invented calculus yourself,"
+    },
+    {
+      "start": 959.11,
+      "end": 963.43,
+      "text": "that if you drew the right pictures and played with each idea in just the right way,"
+    },
+    {
+      "start": 963.43,
+      "end": 967.25,
+      "text": "these formulas and rules and constructs that are presented could have just"
+    },
+    {
+      "start": 967.25,
+      "end": 970.26,
+      "text": "as easily popped out naturally from your own explorations."
+    },
+    {
+      "start": 972.38,
+      "end": 976.3,
+      "text": "And before you go, it would feel wrong not to give the people who supported this"
+    },
+    {
+      "start": 976.3,
+      "end": 980.13,
+      "text": "series on Patreon a well-deserved thanks, both for their financial backing as"
+    },
+    {
+      "start": 980.13,
+      "end": 983.86,
+      "text": "well as for the suggestions they gave while the series was being developed."
+    },
+    {
+      "start": 984.7,
+      "end": 987.89,
+      "text": "You see, supporters got early access to the videos as I made them,"
+    },
+    {
+      "start": 987.89,
+      "end": 991.56,
+      "text": "and they'll continue to get early access for future essence-of type series."
+    },
+    {
+      "start": 992.14,
+      "end": 996.24,
+      "text": "And as a thanks to the community, I keep ads off of new videos for their first month."
+    },
+    {
+      "start": 997.02,
+      "end": 1000.46,
+      "text": "I'm still astounded that I can spend time working on videos like these,"
+    },
+    {
+      "start": 1000.46,
+      "end": 1003.42,
+      "text": "and in a very direct way, you are the one to thank for that."
+    }
+  ]
+}

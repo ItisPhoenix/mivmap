@@ -1,0 +1,15 @@
+# Core (lightweight, no GPU / torch needed) ---------------------------------
+fastapi>=0.110
+uvicorn[standard]>=0.29
+httpx>=0.27
+python-dotenv>=1.0
+pydantic>=2.6
+youtube-transcript-api>=1.0.0
+numpy>=1.26
+scikit-learn>=1.4
+networkx>=3.2
+# English-only maps: NLLB-200 translation runtime (CTranslate2 int8) + language detection.
+# The model itself is a one-time download + conversion: python ../scripts/convert_nllb.py
+ctranslate2==4.6.0
+sentencepiece==0.2.0
+langdetect==1.0.9

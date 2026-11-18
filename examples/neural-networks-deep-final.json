@@ -1,0 +1,4390 @@
+{
+  "schema": "tubemind/1",
+  "id": "6964824f5057217f",
+  "version": 1,
+  "meta": {
+    "videoId": "aircAruvnKk",
+    "title": "But what is a neural network?",
+    "channel": "",
+    "url": "https://www.youtube.com/watch?v=aircAruvnKk",
+    "duration": 1105.6399999999999,
+    "mode": "deep",
+    "language": "en",
+    "sourceLanguage": "en",
+    "translation": {
+      "lang": "en",
+      "status": "english",
+      "detect_ms": 0.4,
+      "translate_ms": 0,
+      "units": 0,
+      "translated": 0,
+      "coverage": 1.0
+    },
+    "originalTitle": "But what is a neural network?",
+    "transcriptSource": "youtube-captions",
+    "llm": "openai-compatible:particle-ai/particle-1:free",
+    "labelled": true,
+    "embeddings": "tfidf-lsa",
+    "createdAt": 1794934371462,
+    "buildSeconds": 3.55,
+    "timings": {
+      "transcript": 1333,
+      "translate": 1,
+      "detect": 0,
+      "segment": 1980,
+      "concepts": 138,
+      "assemble": 89,
+      "summary": 1,
+      "edges": 12,
+      "guard": 0,
+      "total": 3552,
+      "skeleton": 2218
+    },
+    "storyboardSpec": null,
+    "labelStats": {
+      "calls": 1,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "llm_ms": 0,
+      "applied": 27,
+      "candidates": 51
+    }
+  },
+  "root": {
+    "id": "n-effa6f2a57",
+    "text": "But What Is a Neural Network?",
+    "type": "root",
+    "layer": 0,
+    "start": 0.0,
+    "end": 1105.64,
+    "summary": "Particular Light-sensitive Cells & X28 · Recognize Handwritten Digits & Couple · Combine · Weighted Sum & Zero · Matrix Vector Product & Sum · Youtube's Recommendation Algorithm & Product",
+    "tone": [
+      "instructional"
+    ],
+    "keywords": [
+      "Matrix Vector Product",
+      "Crazy-smart Visual Cortex",
+      "Youtube's Recommendation Algorithm",
+      "Product",
+      "Biological Analogy",
+      "Underlie Youtube's Recommendation",
+      "Weighted Sum",
+      "Analogy"
+    ],
+    "notes": "",
+    "links": [],
+    "image": null,
+    "collapsed": false,
+    "children": [
+      {
+        "id": "n-3df27e60a2",
+        "text": "Particular Light-sensitive Cells & X28",
+        "type": "section",
+        "layer": 1,
+        "start": 4.22,
+        "end": 74.64,
+        "summary": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3. Unless you've been living under a rock, I think I hardly need to motivate the relevance and importance…",
+        "tone": [
+          "controversial"
+        ],
+        "keywords": [
+          "x28 pixels",
+          "firing",
+          "trouble recognizing",
+          "appreciate",
+          "visual cortex",
+          "resolution"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-e92fd7ce61",
+            "text": "X28 Pixels",
+            "type": "concept",
+            "layer": 2,
+            "start": 49.22,
+            "end": 66.18,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-9041c6c0f5",
+                "text": "Formula: If I told you, hey",
+                "type": "detail",
+                "layer": 3,
+                "start": 49.22,
+                "end": 66.18,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "But if I told you, hey, sit down and write for me a program that takes in a grid of 28x28 pixels like this and outputs a single number between 0 and 10, telling you what it thinks the digit is, well the task goes from comically trivial to dauntingly difficult.",
+                "more": false,
+                "tag": "Formula",
+                "faith": 0.98
+              }
+            ],
+            "source": "But if I told you, hey, sit down and write for me a program that takes in a grid of 28x28 pixels like this and outputs a single number between 0 and 10, telling you what it thinks the digit is, well the task goes from comically trivial to dauntingly difficult.",
+            "topic": "X28 Pixels",
+            "evidence": [
+              {
+                "start": 49.22,
+                "end": 66.18,
+                "text": "But if I told you, hey, sit down and write for me a program that takes in a grid of 28x28 pixels like this and outputs a single number between 0 and 10, telling you what it thinks the digit is, well the task goes from comically trivial to dauntingly difficult."
+              },
+              {
+                "start": 5.0,
+                "end": 13.72,
+                "text": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3."
+              }
+            ],
+            "explain": "X28 pixels refers to representing an image as a 28-by-28 pixel grid, i.e. 784 pixel values, commonly used as input for handwritten digit recognition. The evidence shows a sloppily written digit rendered at extremely low 28x28 resolution is still recognizable to a human brain as a 3.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Given a 28x28 pixel image, state how many pixel values it contains and explain why hand-coding rules to recognize the digit is difficult.",
+            "diagram": "handwritten digit\n      |\n      v\n28x28 pixel grid (784 values)\n      |\n      v\nmodel / classifier\n      |\n      v\npredicted digit label",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.63,
+            "why_it_matters": "A fixed 28x28 grid turns a visual digit into a numeric input a program can process. Humans easily recognize such low-resolution digits, but writing a program that takes a 28x28 grid and outputs the digit label is dauntingly difficult, which motivates machine learning.",
+            "steps": [
+              "1. Capture or isolate a handwritten digit image.",
+              "2. Rasterize/resize it to a 28x28 pixel grid and normalize the pixel values.",
+              "3. Feed the 784 values to a model that outputs a predicted digit label, typically 0-9."
+            ],
+            "worked_example": "A handwritten 3 is rendered at 28x28 pixels. A human immediately recognizes it as a 3, but a program must map the 784 pixel values to a single output number representing the digit.",
+            "misconception": "The 28x28 grid is not the digit itself; it is a low-resolution numeric representation. Low resolution does not make the classification task trivial for a program, even though it is easy for human vision.",
+            "knowledge_check": {
+              "question": "Why can a 28x28 pixel digit be easy for a human but hard for a hand-written program?",
+              "answer": "The human brain recognizes the low-resolution pattern as a digit, but a program must learn or infer a mapping from 784 pixel values to the correct digit label, which is difficult to specify with explicit rules."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-6ebb73ec81",
+            "text": "Particular Light-sensitive Cells",
+            "type": "concept",
+            "layer": 2,
+            "start": 28.9,
+            "end": 36.94,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "The particular light-sensitive cells in your eye that are firing when you see this 3 are very different from the ones firing when you see this 3.",
+            "topic": "Particular Light-sensitive Cells",
+            "evidence": [
+              {
+                "start": 28.9,
+                "end": 36.94,
+                "text": "The particular light-sensitive cells in your eye that are firing when you see this 3 are very different from the ones firing when you see this 3."
+              }
+            ],
+            "explain": "Particular light-sensitive cells are the specific photoreceptors and retinal neurons that respond when light from a visual feature falls on a given part of the retina. The same shape in different retinal positions activates different sets of these cells.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Draw two identical 3s, one centered and one shifted right. Predict which retinal regions and cell populations would be activated in each case, and explain why they differ.",
+            "diagram": "Light from 3 at position A -> lens -> retina patch A -> cells A fire\nLight from 3 at position B -> lens -> retina patch B -> cells B fire\nSame shape, different retinal location => different particular cells active",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.78,
+            "why_it_matters": "Vision depends not only on what pattern is present but on where it lands on the retina. Different activated cell populations let the brain encode spatial location and distinguish identical shapes seen in different places.",
+            "steps": [
+              "1. Locate where light from the viewed shape falls on the retina.",
+              "2. Identify which photoreceptors and downstream receptive fields are activated at that retinal position.",
+              "3. Compare the activated cell populations for the same shape presented in different positions."
+            ],
+            "worked_example": "A small 3 shown at the center of gaze activates one patch of cones and retinal ganglion cells. The same 3 shifted to the right activates a different patch. The brain uses the identity of the activated cells, not just the shape, to represent where the 3 is. (Supplemental example.)",
+            "misconception": "The same visual shape always activates exactly the same light-sensitive cells no matter where it appears. In fact, retinal position changes which cells are activated.",
+            "knowledge_check": {
+              "question": "Why can the same shape activate different light-sensitive cells?",
+              "answer": "Because the shape falls on different parts of the retina, so different photoreceptors and receptive fields receive the light."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-9f42087989",
+            "text": "Crazy-smart Visual Cortex",
+            "type": "concept",
+            "layer": 2,
+            "start": 37.52,
+            "end": 48.34,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "But something in that crazy-smart visual cortex of yours resolves these as representing the same idea, while at the same time recognizing other images as their own distinct ideas.",
+            "topic": "Crazy-smart Visual Cortex",
+            "evidence": [
+              {
+                "start": 37.52,
+                "end": 48.34,
+                "text": "But something in that crazy-smart visual cortex of yours resolves these as representing the same idea, while at the same time recognizing other images as their own distinct ideas."
+              }
+            ],
+            "explain": "The 'crazy-smart visual cortex' is the brain's visual processing system that can treat many different images as instances of the same idea while still separating them from other distinct ideas.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Supplemental exercise: Show three different handwritten versions of the digit '7' and one handwritten '1.' Explain how the visual cortex could group the three '7's as the same idea while keeping the '1' distinct.",
+            "diagram": "Varied images\n   |\n   v\n[Visual cortex extracts invariant features]\n   |\n   v\n[Compare with learned representations]\n   |\n   +--> same idea\n   |\n   +--> distinct idea",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.78,
+            "why_it_matters": "This ability supports robust recognition, generalization, and categorization: you can identify a concept across changes in angle, size, style, or context without confusing it with different concepts.",
+            "steps": [
+              "1. Receive varied visual inputs that may differ in position, size, angle, lighting, or style.",
+              "2. Extract stable features and patterns that are shared across those variations.",
+              "3. Compare the extracted pattern against learned representations to decide whether it matches the same idea or a distinct one."
+            ],
+            "worked_example": "Supplemental example: You see the letter 'A' handwritten in print, cursive, large, and tilted. Your visual cortex resolves all of them as the same idea, 'A,' while recognizing a nearby 'B' as a distinct idea.",
+            "misconception": "A common misconception is that the visual cortex simply records raw pixels or exact images. In fact, it abstracts away many surface differences so that the same idea can be recognized across varied appearances.",
+            "knowledge_check": {
+              "question": "What dual job does the visual cortex perform in the evidence?",
+              "answer": "It resolves different images as representing the same idea while also recognizing other images as their own distinct ideas."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3.",
+        "segmentId": "s1",
+        "theme": 1,
+        "points": [
+          {
+            "start": 5.0,
+            "end": 13.72,
+            "text": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3."
+          },
+          {
+            "start": 28.9,
+            "end": 36.94,
+            "text": "The particular light-sensitive cells in your eye that are firing when you see this 3 are very different from the ones firing when you see this 3."
+          },
+          {
+            "start": 67.16,
+            "end": 75.76,
+            "text": "Unless you've been living under a rock, I think I hardly need to motivate the relevance and importance of machine learning and neural networks to the present and to the future."
+          }
+        ],
+        "explain": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3. Unless you've been living under a rock, I think I hardly need to motivate the relevance and importance…",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 0,
+        "faith": 0.32
+      },
+      {
+        "id": "n-457485283b",
+        "text": "Recognize Handwritten Digits & Couple",
+        "type": "section",
+        "layer": 1,
+        "start": 75.12,
+        "end": 268.2,
+        "summary": "What we're going to do is put together a neural network that can learn to recognize handwritten digits. Right now when I say neuron all I want you to think about is a thing that holds a number, specifically a number between 0 and 1.",
+        "tone": [],
+        "keywords": [
+          "neurons",
+          "layers",
+          "variants",
+          "couple",
+          "neural network",
+          "digits"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-7ced50f9e3",
+            "text": "Neural Network",
+            "type": "concept",
+            "layer": 2,
+            "start": 125.04,
+            "end": 139.18,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-88ed59c0dc",
+                "text": "Def: My hope is that you come away feeling like the structure itself is motivated",
+                "type": "detail",
+                "layer": 3,
+                "start": 125.04,
+                "end": 139.18,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "My hope is that you come away feeling like the structure itself is motivated, and to feel like what it means when you read, or you hear about a neural network quote-unquote learning.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.97
+              }
+            ],
+            "source": "There are many many variants of neural networks, and in recent years there's been sort of a boom in research towards these variants, but in these two introductory videos you and I are just going to look at the simplest plain vanilla form with no added frills.",
+            "topic": "Neural Network",
+            "evidence": [
+              {
+                "start": 125.04,
+                "end": 139.18,
+                "text": "There are many many variants of neural networks, and in recent years there's been sort of a boom in research towards these variants, but in these two introductory videos you and I are just going to look at the simplest plain vanilla form with no added frills."
+              },
+              {
+                "start": 75.76,
+                "end": 84.46,
+                "text": "But what I want to do here is show you what a neural network actually is, assuming no background, and to help visualize what it's doing, not as a buzzword but as a piece of math."
+              },
+              {
+                "start": 85.02,
+                "end": 94.34,
+                "text": "My hope is that you come away feeling like the structure itself is motivated, and to feel like what it means when you read, or you hear about a neural network quote-unquote learning."
+              },
+              {
+                "start": 101.22,
+                "end": 106.04,
+                "text": "What we're going to do is put together a neural network that can learn to recognize handwritten digits."
+              }
+            ],
+            "explain": "A neural network is a mathematical model made of layered units that transform input numbers into output numbers using weights, biases, and activation functions. In the simplest plain-vanilla form, it has no added frills and can be trained to recognize patterns such as handwritten digits.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Supplemental exercise: A neuron has inputs [1, 2], weights [0.5, -0.2], and bias 0.1. Compute the weighted sum, then apply ReLU. Answer: weighted sum = 1*0.5 + 2*(-0.2) + 0.1 = 0.2; ReLU(0.2) = 0.2.",
+            "diagram": "Input pixels\n   |\n   v\n[ weighted sum + bias ]\n   |\n   v\n[ activation function ]\n   |\n   v\nHidden layer(s)\n   |\n   v\nOutput scores (0-9)\n   |\n   v\nCompare with label -> update weights",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.62,
+            "why_it_matters": "It turns the buzzword 'neural network' into concrete math: the structure is motivated, and 'learning' means the model adjusts its parameters from data rather than following hand-coded rules. This matters because it explains how a system can learn to recognize handwritten digits.",
+            "steps": [
+              "1. Represent the input as numbers, such as pixel values from a handwritten digit image.",
+              "2. Pass the numbers through layers of weighted sums and activation functions to produce an output, such as digit scores.",
+              "3. Compare the output with the correct label and update the weights and biases so future predictions improve."
+            ],
+            "worked_example": "Supplemental example: For handwritten digit recognition, a 28x28 image is flattened into 784 input values. A hidden layer computes weighted sums plus biases, applies an activation such as ReLU, and the output layer gives 10 scores for digits 0-9. Training adjusts weights to reduce the difference between predicted scores and the true digit label.",
+            "misconception": "A neural network is not magic or just a buzzword; it is a piece of math. Also, when it 'learns,' it is not learning consciously like a person—it is adjusting numerical parameters to reduce error.",
+            "knowledge_check": {
+              "question": "In a plain neural network, what does 'learning' mean?",
+              "answer": "Learning means adjusting weights and biases from data so the network's outputs better match the correct labels; it is parameter fitting, not conscious learning."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-75ce6f2efa",
+            "text": "Recognize Handwritten Digits",
+            "type": "concept",
+            "layer": 2,
+            "start": 149.12,
+            "end": 156.78,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "But even in this simplest form it can learn to recognize handwritten digits, which is a pretty cool thing for a computer to be able to do.",
+            "topic": "Recognize Handwritten Digits",
+            "evidence": [
+              {
+                "start": 149.12,
+                "end": 156.78,
+                "text": "But even in this simplest form it can learn to recognize handwritten digits, which is a pretty cool thing for a computer to be able to do."
+              }
+            ],
+            "explain": "Recognizing handwritten digits means using a model to map an image of a handwritten number, such as 0–9, to the correct digit label. The evidence notes that even a simplest-form system can learn this task.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Describe how you would test whether a handwritten-digit recognizer works on digits it was not trained on.",
+            "diagram": "Handwritten digit image\n        |\n        v\n[ pixel input ]\n        |\n        v\n[ trained model ]\n        |\n        v\n[ digit prediction: 0–9 ]",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.71,
+            "why_it_matters": "It shows that a basic learning system can perform a useful perception task: turning messy pixel input into a discrete category. This is a common introductory example of machine learning succeeding on real-world-style data.",
+            "steps": [
+              "Collect labeled examples of handwritten digit images, each paired with its correct digit label.",
+              "Train a model to associate image patterns with digit labels by adjusting it to reduce prediction errors.",
+              "Evaluate the trained model on new handwritten digit images and compare its predicted labels with the true labels."
+            ],
+            "worked_example": "Supplemental example: Suppose an image of a handwritten '7' is represented as pixel values. A trained model processes those pixels and outputs scores for digits 0–9; if the highest score is for '7', the prediction is correct.",
+            "misconception": "A common misconception is that recognizing handwritten digits requires the computer to understand handwriting the way a person does. In this context, it can instead learn statistical patterns from labeled image examples.",
+            "knowledge_check": {
+              "question": "What does the evidence say even the simplest form of the system can learn to do?",
+              "answer": "It can learn to recognize handwritten digits."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-b8b31f0491",
+            "text": "Layer",
+            "type": "concept",
+            "layer": 2,
+            "start": 243.04,
+            "end": 253.6,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-92c9607244",
+                "text": "Tip: There's also a couple layers in between called the hidden layers",
+                "type": "detail",
+                "layer": 3,
+                "start": 243.04,
+                "end": 253.6,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "There's also a couple layers in between called the hidden layers, which for the time being should just be a giant ? for how on earth this process of recognizing digits is going to be handled.",
+                "more": false,
+                "tag": "Tip",
+                "faith": 0.92
+              }
+            ],
+            "source": "There's also a couple layers in between called the hidden layers, which for the time being should just be a giant ? for how on earth this process of recognizing digits is going to be handled.",
+            "topic": "Layer",
+            "evidence": [
+              {
+                "start": 243.04,
+                "end": 253.6,
+                "text": "There's also a couple layers in between called the hidden layers, which for the time being should just be a giant ? for how on earth this process of recognizing digits is going to be handled."
+              },
+              {
+                "start": 216.72,
+                "end": 221.86,
+                "text": "So all of these 784 neurons make up the first layer of our network."
+              },
+              {
+                "start": 226.5,
+                "end": 232.17,
+                "text": "Now jumping over to the last layer, this has 10 neurons, each representing one of the digits."
+              },
+              {
+                "start": 254.26,
+                "end": 260.25,
+                "text": "In this network I chose two hidden layers, each one with 16 neurons, and admittedly that's kind of an arbitrary choice."
+              }
+            ],
+            "explain": "A layer is a group of neurons at the same stage in a neural network. The first layer receives the input, the last layer produces the output, and any layers between are hidden layers.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Sketch a network with an input layer of 4 neurons, one hidden layer of 3 neurons, and an output layer of 2 neurons. Label each layer.",
+            "diagram": "Input layer (784)\n      |\n      v\nHidden layer 1 (16)\n      |\n      v\nHidden layer 2 (16)\n      |\n      v\nOutput layer (10)",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.79,
+            "why_it_matters": "Layers organize a network into input, hidden, and output stages so information can flow from raw features to predictions. The number and size of layers define the network architecture.",
+            "steps": [
+              "1. Identify the input layer and count its neurons, such as 784 for an image input.",
+              "2. Add one or more hidden layers between input and output; in the evidence example, two hidden layers each have 16 neurons.",
+              "3. Define the output layer, such as 10 neurons for digit classes 0 through 9."
+            ],
+            "worked_example": "For a digit-recognition network: input layer = 784 neurons, hidden layer 1 = 16 neurons, hidden layer 2 = 16 neurons, output layer = 10 neurons. This is a supplemental example based on the evidence.",
+            "misconception": "Hidden layers are not automatically mysterious or undefined; they are simply intermediate neuron groups whose function is learned during training.",
+            "knowledge_check": {
+              "question": "In the evidence example, how many neurons are in the first layer and the last layer?",
+              "answer": "The first layer has 784 neurons, and the last layer has 10 neurons."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "What we're going to do is put together a neural network that can learn to recognize handwritten digits.",
+        "segmentId": "s2",
+        "theme": 0,
+        "points": [
+          {
+            "start": 101.22,
+            "end": 106.04,
+            "text": "What we're going to do is put together a neural network that can learn to recognize handwritten digits."
+          },
+          {
+            "start": 168.19,
+            "end": 171.66,
+            "text": "What are the neurons, and in what sense are they linked together?"
+          },
+          {
+            "start": 172.5,
+            "end": 180.6,
+            "text": "Right now when I say neuron all I want you to think about is a thing that holds a number, specifically a number between 0 and 1."
+          }
+        ],
+        "explain": "What we're going to do is put together a neural network that can learn to recognize handwritten digits. Right now when I say neuron all I want you to think about is a thing that holds a number, specifically a number between 0 and 1.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 1,
+        "faith": 0.34
+      },
+      {
+        "id": "n-d63474c241",
+        "text": "Combine",
+        "type": "section",
+        "layer": 1,
+        "start": 268.78,
+        "end": 530.62,
+        "summary": "The way the network operates, activations in one layer determine the activations of the next layer. A 9 has a loop up top and a line on the right.",
+        "tone": [
+          "instructional"
+        ],
+        "keywords": [
+          "layer",
+          "loop",
+          "image",
+          "edges",
+          "specific",
+          "activations"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-ad5d8464cb",
+            "text": "Firing",
+            "type": "concept",
+            "layer": 2,
+            "start": 289.14,
+            "end": 297.18,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "It's meant to be loosely analogous to how in biological networks of neurons, some groups of neurons firing cause certain others to fire.",
+            "topic": "Firing",
+            "evidence": [
+              {
+                "start": 289.14,
+                "end": 297.18,
+                "text": "It's meant to be loosely analogous to how in biological networks of neurons, some groups of neurons firing cause certain others to fire."
+              }
+            ],
+            "explain": "Firing is the activation of a unit or group of units in a network, loosely analogous to groups of neurons firing and causing other groups to fire.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Draw three units X, Y, Z. Let X and Y fire and connect both to Z. Mark which unit fires next and explain why.",
+            "diagram": "[A, B] --fire--> (connections) --activate--> [C]\n  ^                                  |\n  |________ feedback/context ________|",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.79,
+            "why_it_matters": "It describes how activity propagates: one set of active units can trigger activation in connected units, shaping network behavior.",
+            "steps": [
+              "1. Identify the units or group that become active.",
+              "2. Trace connections from those active units to downstream units.",
+              "3. Observe which downstream units become active as a result."
+            ],
+            "worked_example": "Supplemental example: In a simple network, units A and B fire together; because they connect to unit C, C then fires. This mirrors groups of neurons firing and causing other groups to fire.",
+            "misconception": "Firing is not just isolated activity in one unit; the analogy emphasizes groups firing and causing other groups to fire.",
+            "knowledge_check": {
+              "question": "What biological analogy is used for firing?",
+              "answer": "Groups of neurons firing and causing certain other groups of neurons to fire."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-1af9afe41b",
+            "text": "Loop",
+            "type": "concept",
+            "layer": 2,
+            "start": 366.66,
+            "end": 378.48,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-43d4003199",
+                "text": "Watch-out: I don't mean this specific loop of pixels",
+                "type": "detail",
+                "layer": 3,
+                "start": 366.66,
+                "end": 378.48,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "And I don't mean this specific loop of pixels, the hope would be that any generally loopy pattern towards the top sets off this neuron.",
+                "more": false,
+                "tag": "Watch-out",
+                "faith": 0.96
+              }
+            ],
+            "source": "Now in a perfect world, we might hope that each neuron in the second to last layer corresponds with one of these subcomponents, that anytime you feed in an image with, say, a loop up top,",
+            "topic": "Loop",
+            "evidence": [
+              {
+                "start": 366.66,
+                "end": 378.48,
+                "text": "Now in a perfect world, we might hope that each neuron in the second to last layer corresponds with one of these subcomponents, that anytime you feed in an image with, say, a loop up top,"
+              },
+              {
+                "start": 354.2,
+                "end": 356.92,
+                "text": "A 9 has a loop up top and a line on the right."
+              },
+              {
+                "start": 356.92,
+                "end": 361.18,
+                "text": "An 8 also has a loop up top, but it's paired with another loop down low."
+              },
+              {
+                "start": 383.71,
+                "end": 391.56,
+                "text": "And I don't mean this specific loop of pixels, the hope would be that any generally loopy pattern towards the top sets off this neuron."
+              }
+            ],
+            "explain": "A loop is a closed or nearly closed curved pattern in an image, such as the upper loop of a 9 or 8.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Sketch a 9 and an 8. Mark the shared upper loop in both, then mark the extra lower loop in the 8.",
+            "diagram": "image -> curve/edge features -> loop detector neuron -> digit classifier\n9:  upper loop + right line  -> loop detector fires\n8:  upper loop + lower loop -> loop detector fires",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.73,
+            "why_it_matters": "Loops are reusable visual subcomponents. A neuron in a later hidden layer may learn to respond to a general loopy pattern near the top, helping the network recognize digits like 9 and 8 without memorizing exact pixels.",
+            "steps": [
+              "1. Identify a closed or nearly closed curved contour in the image.",
+              "2. Treat it as a general pattern, not a specific set of pixel locations.",
+              "3. Use the detected loop as a feature for recognizing the whole digit."
+            ],
+            "worked_example": "A 9 has a loop up top and a line on the right. An 8 also has a loop up top, but it is paired with another loop down low. A loop-detector neuron can fire for the shared upper loop in both digits.",
+            "misconception": "A loop detector must memorize the exact pixels of one specific 9. In fact, the useful feature is any generally loopy pattern toward the top, not one exact pixel arrangement.",
+            "knowledge_check": {
+              "question": "What visual feature do a 9 and an 8 share in the evidence?",
+              "answer": "They both have a loop up top."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-9e62b4e5f5",
+            "text": "Edges",
+            "type": "concept",
+            "layer": 2,
+            "start": 443.54,
+            "end": 459.72,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-cceca7eebe",
+                "text": "Eg: Moreover, you can imagine how being able to detect edges and patterns like this would be really useful for other…",
+                "type": "detail",
+                "layer": 3,
+                "start": 443.54,
+                "end": 459.72,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Moreover, you can imagine how being able to detect edges and patterns like this would be really useful for other image recognition tasks.",
+                "more": false,
+                "tag": "Eg",
+                "faith": 0.98
+              }
+            ],
+            "source": "Maybe when an image like this one comes in, it lights up all of the neurons associated with around 8 to 10 specific little edges, which in turn lights up the neurons associated with the upper loop and a long vertical line, and those light up the neuron associated with a 9.",
+            "topic": "Edges",
+            "evidence": [
+              {
+                "start": 443.54,
+                "end": 459.72,
+                "text": "Maybe when an image like this one comes in, it lights up all of the neurons associated with around 8 to 10 specific little edges, which in turn lights up the neurons associated with the upper loop and a long vertical line, and those light up the neuron associated with a 9."
+              },
+              {
+                "start": 417.36,
+                "end": 422.78,
+                "text": "One reasonable way to do this would be to first recognize the various little edges that make it up."
+              },
+              {
+                "start": 423.78,
+                "end": 434.32,
+                "text": "Similarly, a long line, like the kind you might see in the digits 1 or 4 or 7, is really just a long edge, or maybe you think of it as a certain pattern of several smaller edges."
+              },
+              {
+                "start": 435.14,
+                "end": 442.72,
+                "text": "So maybe our hope is that each neuron in the second layer of the network corresponds with the various relevant little edges."
+              }
+            ],
+            "explain": "Edges are the small line-like visual features that combine to form larger shapes, such as digits. A long line in a digit like 1, 4, or 7 can be treated as one long edge or as a pattern of several smaller edges.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Take the digit 4 and list which edges could be detected first, then describe how those edges could combine into the larger strokes of the digit.",
+            "diagram": "Image -> little edges -> part features -> digit\n  ?      | | | |       upper loop     -> 9\n         short/long    + vertical line\n         segments",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.64,
+            "why_it_matters": "Recognizing edges is a useful intermediate step in visual recognition: early neurons can detect little edges, and later neurons can combine them into larger structures like loops and vertical lines that identify a digit.",
+            "steps": [
+              "Break the image into relevant little edges, such as short line segments or longer lines.",
+              "Have second-layer neurons respond to specific little edges in the image.",
+              "Combine those edge responses into larger parts, such as an upper loop and a long vertical line, which then activate a digit neuron."
+            ],
+            "worked_example": "Supplemental example: For a handwritten 9, edge detectors might fire for about 8 to 10 small edge fragments. Those fragments activate part-level neurons for an upper loop and a long vertical line, and those part neurons activate the neuron for 9.",
+            "misconception": "A long line must always be represented as many tiny edges; in fact, it can be treated as one long edge or as a pattern of smaller edges.",
+            "knowledge_check": {
+              "question": "In the evidence, what larger parts help activate the neuron associated with a 9?",
+              "answer": "An upper loop and a long vertical line."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "The way the network operates, activations in one layer determine the activations of the next layer.",
+        "segmentId": "s3",
+        "theme": 0,
+        "points": [
+          {
+            "start": 273.14,
+            "end": 278.48,
+            "text": "The way the network operates, activations in one layer determine the activations of the next layer."
+          },
+          {
+            "start": 354.2,
+            "end": 356.92,
+            "text": "A 9 has a loop up top and a line on the right."
+          },
+          {
+            "start": 435.14,
+            "end": 442.72,
+            "text": "So maybe our hope is that each neuron in the second layer of the network corresponds with the various relevant little edges."
+          }
+        ],
+        "explain": "The way the network operates, activations in one layer determine the activations of the next layer. A 9 has a loop up top and a line on the right.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 2,
+        "faith": 0.31
+      },
+      {
+        "id": "n-fadfee37e7",
+        "text": "Weighted Sum & Zero",
+        "type": "section",
+        "layer": 1,
+        "start": 531.44,
+        "end": 794.18,
+        "summary": "But maybe it's not that you want the neuron to light up when the weighted sum is bigger than 0. The connections between the other layers also have a bunch of weights and biases associated with them.",
+        "tone": [
+          "instructional"
+        ],
+        "keywords": [
+          "weights",
+          "weighted sum",
+          "pixel",
+          "layer",
+          "neuron",
+          "pixels"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-543411e4b1",
+            "text": "Weighted Sum",
+            "type": "concept",
+            "layer": 2,
+            "start": 582.78,
+            "end": 597.82,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-af55dc9aad",
+                "text": "Def: If we made the weights associated with almost all of the pixels zero except for some positive weights in this…",
+                "type": "detail",
+                "layer": 3,
+                "start": 582.78,
+                "end": 597.82,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Now if we made the weights associated with almost all of the pixels zero except for some positive weights in this region that we care about, then taking the weighted sum of all the pixel values really just amounts to adding up the values of the pixel just in the region that we care about.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.84
+              }
+            ],
+            "source": "Now if we made the weights associated with almost all of the pixels zero except for some positive weights in this region that we care about, then taking the weighted sum of all the pixel values really just amounts to adding up the values of the pixel just in the region that we care about.",
+            "topic": "Weighted Sum",
+            "evidence": [
+              {
+                "start": 582.78,
+                "end": 597.82,
+                "text": "Now if we made the weights associated with almost all of the pixels zero except for some positive weights in this region that we care about, then taking the weighted sum of all the pixel values really just amounts to adding up the values of the pixel just in the region that we care about."
+              },
+              {
+                "start": 558.54,
+                "end": 565.5,
+                "text": "Then take all of those activations from the first layer and compute their weighted sum according to these weights."
+              },
+              {
+                "start": 614.26,
+                "end": 623.54,
+                "text": "When you compute a weighted sum like this, you might come out with any number, but for this network what we want is for activations to be some value between 0 and 1."
+              }
+            ],
+            "explain": "A weighted sum multiplies each input activation by a corresponding weight and adds all the products into one number.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Compute the weighted sum for activations [1, 2, 3] with weights [0.5, 0, 1].",
+            "diagram": "activations a1..an\n      |\n      v\nmultiply by weights w1..wn\n      |\n      v\nsum all products -> raw z\n      |\n      v\nactivation function -> value in 0..1",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.62,
+            "why_it_matters": "It lets a neuron combine many inputs, and by setting most weights to zero it can focus on a specific region. The raw result can be any number, so an activation function is often used to map it to a value between 0 and 1.",
+            "steps": [
+              "1. Align each activation with its corresponding weight.",
+              "2. Multiply each activation by its weight.",
+              "3. Add all the weighted products to get the weighted sum."
+            ],
+            "worked_example": "Supplemental example: activations [0.2, 0.5, 0.1] with weights [1, 0, 2] give 0.2*1 + 0.5*0 + 0.1*2 = 0.4.",
+            "misconception": "A weighted sum is not necessarily an average; the weights do not have to sum to 1, and zero weights simply ignore their inputs.",
+            "knowledge_check": {
+              "question": "If almost all weights are zero except for some positive weights in one region, what does the weighted sum effectively do?",
+              "answer": "It effectively adds up the values in that region, scaled by the nonzero weights."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-c30ed925b0",
+            "text": "Sum",
+            "type": "concept",
+            "layer": 2,
+            "start": 582.78,
+            "end": 597.82,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-438fd0aa92",
+                "text": "Def: If we made the weights associated with almost all of the pixels zero except for some positive weights in this…",
+                "type": "detail",
+                "layer": 3,
+                "start": 582.78,
+                "end": 597.82,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Now if we made the weights associated with almost all of the pixels zero except for some positive weights in this region that we care about, then taking the weighted sum of all the pixel values really just amounts to adding up the values of the pixel just in the region that we care about.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.84
+              }
+            ],
+            "source": "Now if we made the weights associated with almost all of the pixels zero except for some positive weights in this region that we care about, then taking the weighted sum of all the pixel values really just amounts to adding up the values of the pixel just in the region that we care about.",
+            "topic": "Sum",
+            "evidence": [
+              {
+                "start": 582.78,
+                "end": 597.82,
+                "text": "Now if we made the weights associated with almost all of the pixels zero except for some positive weights in this region that we care about, then taking the weighted sum of all the pixel values really just amounts to adding up the values of the pixel just in the region that we care about."
+              },
+              {
+                "start": 558.54,
+                "end": 565.5,
+                "text": "Then take all of those activations from the first layer and compute their weighted sum according to these weights."
+              },
+              {
+                "start": 607.47,
+                "end": 612.7,
+                "text": "Then the sum is largest when those middle pixels are bright but the surrounding pixels are darker."
+              },
+              {
+                "start": 614.26,
+                "end": 623.54,
+                "text": "When you compute a weighted sum like this, you might come out with any number, but for this network what we want is for activations to be some value between 0 and 1."
+              }
+            ],
+            "explain": "A weighted sum is a computation that multiplies each input value by a corresponding weight, then adds all those products together. In a neural network layer, it combines activations from a previous layer according to learned weights.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Compute the weighted sum for inputs [1, 2, 3] and weights [0.5, 0, -1]. Which inputs affect the result?",
+            "diagram": "inputs:   x1   x2   x3\n           |    |    |\nweights:  w1   w2   w3\n           |    |    |\nproducts: x1*w1 x2*w2 x3*w3\n              \\   |   /\n               sum all products\n                    |\n             weighted sum",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.61,
+            "why_it_matters": "Weighted sums let a network emphasize some inputs and ignore others. For example, setting most pixel weights to zero except in a chosen region makes the weighted sum effectively add up only the pixels in that region, helping detect patterns there. The raw result can be any number, so networks often transform it afterward to get activations between 0 and 1.",
+            "steps": [
+              "1. Pair each input value with its corresponding weight.",
+              "2. Multiply each input by its weight.",
+              "3. Add all the resulting products to get the weighted sum."
+            ],
+            "worked_example": "Supplemental example: inputs [0.2, 0.8, 0.5] with weights [0, 1, 0] give (0.2×0) + (0.8×1) + (0.5×0) = 0.8. The zero weights ignore the first and third inputs, so the sum focuses on the middle input.",
+            "misconception": "A weighted sum is not the same as a simple average. Weights can be zero, positive, or negative, and the result can be any number, not necessarily between 0 and 1.",
+            "knowledge_check": {
+              "question": "If most weights are zero except for a small region, what does the weighted sum mainly add up?",
+              "answer": "It mainly adds up the input values in the region where the weights are nonzero, effectively focusing on that region."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-ddc9c2861b",
+            "text": "Weights",
+            "type": "concept",
+            "layer": 2,
+            "start": 794.96,
+            "end": 805.82,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-46bdfaca01",
+                "text": "Def: What that means is that taking the weighted sum of the activations in the first layer according to these weights…",
+                "type": "detail",
+                "layer": 3,
+                "start": 794.96,
+                "end": 805.82,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.92
+              }
+            ],
+            "source": "Or when the network does work but not for the reasons you might expect, digging into what the weights and biases are doing is a good way to challenge your assumptions and really expose the full space of possible solutions.",
+            "topic": "Weights",
+            "evidence": [
+              {
+                "start": 794.96,
+                "end": 805.82,
+                "text": "Or when the network does work but not for the reasons you might expect, digging into what the weights and biases are doing is a good way to challenge your assumptions and really expose the full space of possible solutions."
+              },
+              {
+                "start": 828.36,
+                "end": 838.0,
+                "text": "Then organize all of the weights as a matrix, where each row of that matrix corresponds to the connections between one layer and a particular neuron in the next layer."
+              },
+              {
+                "start": 838.54,
+                "end": 849.88,
+                "text": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here."
+              }
+            ],
+            "explain": "Weights are learned numeric parameters that scale connections between activations in one layer and a neuron in the next layer. Organized as a matrix, each row corresponds to the connections from one layer to a particular neuron in the next layer.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Given activations [1, 4] and weights [2, 0.5] for one next-layer neuron, compute the weighted sum and explain which row of the weight matrix you used.",
+            "diagram": "Layer activations        Weight matrix row        Weighted sum\n[a1, a2, ...]  --->  [w1, w2, ...]  --->  a1*w1 + a2*w2 + ...  --->  next neuron",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.61,
+            "why_it_matters": "Weights determine how input activations are combined into weighted sums, so inspecting them helps test assumptions about how a network works and exposes the space of possible solutions.",
+            "steps": [
+              "1. Identify the activations from the current layer and the neurons in the next layer.",
+              "2. Arrange the connection strengths as a weight matrix, with each row holding the weights feeding one next-layer neuron.",
+              "3. Compute each next-layer neuron’s weighted sum by multiplying activations by the corresponding row of weights and summing the terms."
+            ],
+            "worked_example": "Supplemental example: if layer activations are [2, 3] and one next-layer neuron has weights [0.5, -1], its weighted sum is 2*0.5 + 3*(-1) = 1 - 3 = -2 before any bias or activation function is applied.",
+            "misconception": "Weights are not the same as activations or biases; they are connection strengths that scale activations before summing, while biases shift the result afterward.",
+            "knowledge_check": {
+              "question": "In a weight matrix, what does each row correspond to?",
+              "answer": "Each row corresponds to the connections between one layer and a particular neuron in the next layer."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "But maybe it's not that you want the neuron to light up when the weighted sum is bigger than 0.",
+        "segmentId": "s4",
+        "theme": 0,
+        "points": [
+          {
+            "start": 655.82,
+            "end": 661.88,
+            "text": "But maybe it's not that you want the neuron to light up when the weighted sum is bigger than 0."
+          },
+          {
+            "start": 680.07,
+            "end": 682.44,
+            "text": "That additional number is called the bias."
+          },
+          {
+            "start": 732.52,
+            "end": 738.74,
+            "text": "The connections between the other layers also have a bunch of weights and biases associated with them."
+          }
+        ],
+        "explain": "But maybe it's not that you want the neuron to light up when the weighted sum is bigger than 0. The connections between the other layers also have a bunch of weights and biases associated with them.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 3,
+        "faith": 0.4
+      },
+      {
+        "id": "n-f02be17474",
+        "text": "Matrix Vector Product & Sum",
+        "type": "section",
+        "layer": 1,
+        "start": 794.96,
+        "end": 938.34,
+        "summary": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here.",
+        "tone": [
+          "instructional"
+        ],
+        "keywords": [
+          "matrix vector",
+          "layer",
+          "previous",
+          "organize",
+          "vector product",
+          "expression"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-10fb6c3bb1",
+            "text": "Matrix Vector Product",
+            "type": "concept",
+            "layer": 2,
+            "start": 838.54,
+            "end": 849.88,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-db35cf4a21",
+                "text": "Def: Back to our expression, instead of talking about adding the bias to each one of these values independently",
+                "type": "detail",
+                "layer": 3,
+                "start": 838.54,
+                "end": 849.88,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Back to our expression, instead of talking about adding the bias to each one of these values independently, we represent it by organizing all those biases into a vector, and adding the entire vector to the previous matrix vector product.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.97
+              }
+            ],
+            "source": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here.",
+            "topic": "Matrix Vector Product",
+            "evidence": [
+              {
+                "start": 838.54,
+                "end": 849.88,
+                "text": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here."
+              },
+              {
+                "start": 854.0,
+                "end": 868.6,
+                "text": "By the way, so much of machine learning just comes down to having a good grasp of linear algebra, so for any of you who want a nice visual understanding for matrices and what matrix vector multiplication means, take a look at the series I did on linear algebra, especially chapter 3."
+              },
+              {
+                "start": 869.24,
+                "end": 882.3,
+                "text": "Back to our expression, instead of talking about adding the bias to each one of these values independently, we represent it by organizing all those biases into a vector, and adding the entire vector to the previous matrix vector product."
+              }
+            ],
+            "explain": "A matrix-vector product combines a matrix of weights with a vector of activations to produce a new vector. Each output entry is a weighted sum of the input vector entries, using one row of the matrix as weights. In neural-network notation, a bias vector can then be added to the resulting product vector.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Compute [[2,-1],[0,3]] times [4,5], then add bias [1,2].",
+            "diagram": "x vector\n  |\n  v\n[ W rows dot x ] --> Wx vector --> + b vector --> final vector",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.65,
+            "why_it_matters": "It compactly represents many weighted sums at once, which is central to machine learning and neural-network computations. The evidence notes that much of machine learning depends on a good grasp of linear algebra, and that adding biases is represented by adding an entire vector to the matrix-vector product.",
+            "steps": [
+              "1. Align each row of the matrix with the entries of the input vector.",
+              "2. For each matrix row, compute the sum of products: row entry times corresponding vector entry.",
+              "3. Collect those sums into an output vector, then optionally add a bias vector entrywise."
+            ],
+            "worked_example": "Supplemental example: Let W = [[1,2],[3,4]] and x = [5,6]. Then Wx = [1*5+2*6, 3*5+4*6] = [17,39]. Adding bias b = [1,-1] gives [18,38].",
+            "misconception": "A matrix-vector product is not elementwise multiplication of the matrix and vector. Each output entry is a dot product or weighted sum of one matrix row with the input vector.",
+            "knowledge_check": {
+              "question": "What does each entry of a matrix-vector product Wx represent?",
+              "answer": "A weighted sum, or dot product, of one row of W with the input vector x."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-81ee7cbdd0",
+            "text": "Product",
+            "type": "concept",
+            "layer": 2,
+            "start": 838.54,
+            "end": 849.88,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-c186edb2fd",
+                "text": "Def: Back to our expression, instead of talking about adding the bias to each one of these values independently",
+                "type": "detail",
+                "layer": 3,
+                "start": 838.54,
+                "end": 849.88,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Back to our expression, instead of talking about adding the bias to each one of these values independently, we represent it by organizing all those biases into a vector, and adding the entire vector to the previous matrix vector product.",
+                "more": false,
+                "tag": "Def",
+                "faith": 0.97
+              }
+            ],
+            "source": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here.",
+            "topic": "Product",
+            "evidence": [
+              {
+                "start": 838.54,
+                "end": 849.88,
+                "text": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here."
+              },
+              {
+                "start": 869.24,
+                "end": 882.3,
+                "text": "Back to our expression, instead of talking about adding the bias to each one of these values independently, we represent it by organizing all those biases into a vector, and adding the entire vector to the previous matrix vector product."
+              }
+            ],
+            "explain": "In this context, the product is a matrix-vector product: a weights matrix multiplies an activation vector so each output is a weighted sum of activations; a bias vector is then added to the whole result.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Compute Wx+b for W = [[2,-1],[0,3]], x = [4,5], b = [1,1].",
+            "diagram": "x vector\n  |\n  v\n[ W matrix ] -- row dot x --> weighted sums\n  |\n  v\n+ b vector (elementwise)\n  |\n  v\noutput vector Wx + b",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.62,
+            "why_it_matters": "It compactly represents a neural-network layer: many weighted sums and bias additions become one matrix-vector product plus one vector addition.",
+            "steps": [
+              "1. Organize the weights as a matrix W and the activations as a vector x.",
+              "2. For each output row of W, compute the dot product with x; this is the weighted sum of activations.",
+              "3. Add the bias vector b elementwise to the resulting vector to get Wx + b."
+            ],
+            "worked_example": "Supplemental example: W = [[1,2],[3,4]], x = [5,6], b = [0.5,-1]. Then Wx = [1*5+2*6, 3*5+4*6] = [17,39], and Wx+b = [17.5,38].",
+            "misconception": "A common mistake is to treat matrix-vector multiplication as elementwise multiplication; it is actually a set of row-by-vector dot products, producing weighted sums.",
+            "knowledge_check": {
+              "question": "What does adding the bias vector after the matrix-vector product represent?",
+              "answer": "It adds one bias value to each output component of the matrix-vector product, matching the layer computation Wx+b."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here.",
+        "segmentId": "s5",
+        "theme": 0,
+        "points": [
+          {
+            "start": 812.02,
+            "end": 817.14,
+            "text": "So let me show you a more notationally compact way that these connections are represented."
+          },
+          {
+            "start": 838.54,
+            "end": 849.88,
+            "text": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on…"
+          },
+          {
+            "start": 883.28,
+            "end": 894.74,
+            "text": "Then as a final step, I'll wrap a sigmoid around the outside here, and what that's supposed to represent is that you're going to apply the sigmoid function to each specific component of the…"
+          }
+        ],
+        "explain": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 4,
+        "faith": 0.55
+      },
+      {
+        "id": "n-b21f40b294",
+        "text": "Youtube's Recommendation Algorithm & Product",
+        "type": "section",
+        "layer": 1,
+        "start": 939.2,
+        "end": 1009.94,
+        "summary": "How does this network learn the appropriate weights and biases just by looking at data? And in a way it's kind of reassuring that it looks complicated. if it were any simpler, what hope would we have that it could take on the challenge of…",
+        "tone": [
+          "controversial"
+        ],
+        "keywords": [
+          "function",
+          "complicated",
+          "challenge",
+          "it's",
+          "network",
+          "numbers"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-49973f4f6f",
+            "text": "Youtube's",
+            "type": "concept",
+            "layer": 2,
+            "start": 987.58,
+            "end": 997.42,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-3606a87391",
+                "text": "Tip: Maybe more honestly I should say subscribe",
+                "type": "detail",
+                "layer": 3,
+                "start": 987.58,
+                "end": 997.42,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "Maybe more honestly I should say subscribe so that the neural networks that underlie YouTube's recommendation algorithm are primed to believe that you want to see content from this channel get recommended to you.",
+                "more": false,
+                "tag": "Tip",
+                "faith": 0.92
+              }
+            ],
+            "source": "Now is the point I suppose I should say subscribe to stay notified about when that video or any new videos come out, but realistically most of you don't actually receive notifications from YouTube, do you?",
+            "topic": "Youtube's",
+            "evidence": [
+              {
+                "start": 987.58,
+                "end": 997.42,
+                "text": "Now is the point I suppose I should say subscribe to stay notified about when that video or any new videos come out, but realistically most of you don't actually receive notifications from YouTube, do you?"
+              },
+              {
+                "start": 998.02,
+                "end": 1008.51,
+                "text": "Maybe more honestly I should say subscribe so that the neural networks that underlie YouTube's recommendation algorithm are primed to believe that you want to see content from this channel get recommended to you."
+              }
+            ],
+            "explain": "YouTube's recommendation system is the algorithm that predicts which videos a viewer may want to watch and surfaces them as recommendations. The evidence notes that subscribing can act as a signal to the neural networks behind that system, even when notifications are unreliable.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Explain why a creator might say 'subscribe' even after acknowledging that most viewers do not receive YouTube notifications.",
+            "diagram": "Viewer subscribes -> subscription signal -> YouTube recommendation model -> channel videos more likely recommended",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.63,
+            "why_it_matters": "Creators ask viewers to subscribe because subscription signals can influence whether YouTube recommends their content, not only whether viewers receive notifications.",
+            "steps": [
+              "1. A viewer subscribes to a channel, creating an explicit interest signal.",
+              "2. YouTube's recommendation model uses signals such as subscriptions and engagement to estimate what the viewer wants to see.",
+              "3. The channel's videos may then be more likely to appear in that viewer's recommendations."
+            ],
+            "worked_example": "A viewer clicks Subscribe but rarely gets YouTube notifications. The creator still benefits because the subscription can prime the recommendation algorithm to treat the viewer as interested in that channel's content.",
+            "misconception": "Subscribing guarantees that you will receive notifications for every new video.",
+            "knowledge_check": {
+              "question": "According to the evidence, what can subscribing signal to YouTube?",
+              "answer": "It can signal to YouTube's recommendation algorithm that the viewer wants to see content from that channel recommended."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-d71f86fe12",
+            "text": "Youtube's Recommendation Algorithm",
+            "type": "concept",
+            "layer": 2,
+            "start": 998.02,
+            "end": 1008.51,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "Maybe more honestly I should say subscribe so that the neural networks that underlie YouTube's recommendation algorithm are primed to believe that you want to see content from this channel get recommended to you.",
+            "topic": "Youtube's Recommendation Algorithm",
+            "evidence": [
+              {
+                "start": 998.02,
+                "end": 1008.51,
+                "text": "Maybe more honestly I should say subscribe so that the neural networks that underlie YouTube's recommendation algorithm are primed to believe that you want to see content from this channel get recommended to you."
+              }
+            ],
+            "explain": "YouTube's recommendation algorithm is a system that uses neural networks to predict what content a viewer is likely to want and to rank recommendations accordingly. In the provided evidence, subscribing is described as a signal that can prime those networks to believe the viewer wants content from that channel recommended.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Name two viewer signals a recommendation system might use, and explain how one could affect what gets recommended.",
+            "diagram": "Viewer action (subscribe)\n        |\n        v\nSignal collected by system\n        |\n        v\nNeural networks model preference\n        |\n        v\nContent ranked/recommended",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.65,
+            "why_it_matters": "Recommendations strongly shape what viewers see and which creators get reach. Explicit actions like subscribing can act as preference signals that influence future recommendations.",
+            "steps": [
+              "1. Collect viewer signals such as subscriptions and other engagement behavior.",
+              "2. Use neural networks to model the viewer's likely preferences from those signals.",
+              "3. Rank and recommend content that the model predicts the viewer wants to see."
+            ],
+            "worked_example": "A viewer subscribes to a channel. The recommendation system treats that subscription as a signal that the viewer wants content from that channel, so it may be more likely to recommend videos from that channel in the future. This example is supplemental.",
+            "misconception": "Subscribing does not mean every video from a channel will always be recommended; it is one signal among many that the recommendation system may use.",
+            "knowledge_check": {
+              "question": "According to the evidence, what can subscribing do to YouTube's recommendation algorithm?",
+              "answer": "It can prime the neural networks underlying the algorithm to believe the viewer wants content from that channel recommended."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-13a0ec0278",
+            "text": "Underlie Youtube's Recommendation",
+            "type": "concept",
+            "layer": 2,
+            "start": 998.02,
+            "end": 1008.51,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "Maybe more honestly I should say subscribe so that the neural networks that underlie YouTube's recommendation algorithm are primed to believe that you want to see content from this channel get recommended to you.",
+            "topic": "Underlie Youtube's Recommendation",
+            "evidence": [
+              {
+                "start": 998.02,
+                "end": 1008.51,
+                "text": "Maybe more honestly I should say subscribe so that the neural networks that underlie YouTube's recommendation algorithm are primed to believe that you want to see content from this channel get recommended to you."
+              }
+            ],
+            "explain": "YouTube’s recommendation algorithm is powered by neural networks that learn from user behavior signals. A subscription is an explicit signal that can “prime” those networks to rank that channel’s content as more relevant to you.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "List three YouTube actions that could signal interest to a recommender system, and explain how each might affect future recommendations.",
+            "diagram": "User action (subscribe)\n        |\n        v\nRecommendation system logs signal\n        |\n        v\nNeural network learns/ranks relevance\n        |\n        v\nMore similar content recommended",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.68,
+            "why_it_matters": "Recommendations are not fixed; they respond to signals like subscriptions, watches, likes, and skips. Understanding this helps users intentionally shape what they see.",
+            "steps": [
+              "1. Take an explicit action such as subscribing to a channel.",
+              "2. The platform records that action as a relevance signal tied to your account.",
+              "3. The recommendation model uses such signals to rank and suggest similar content more often."
+            ],
+            "worked_example": "Supplemental example: If you subscribe to a cooking channel, YouTube’s recommender may infer you want cooking content and surface more cooking videos from that channel or similar channels.",
+            "misconception": "A subscription only controls notifications or channel updates; in practice it can also act as a recommendation signal.",
+            "knowledge_check": {
+              "question": "Why can subscribing to a channel affect YouTube recommendations?",
+              "answer": "Because subscriptions are user-behavior signals that recommendation models can use to infer interest and rank similar content higher."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "How does this network learn the appropriate weights and biases just by looking at data?",
+        "segmentId": "s6",
+        "theme": 0,
+        "points": [
+          {
+            "start": 963.4,
+            "end": 972.59,
+            "text": "And in a way it's kind of reassuring that it looks complicated. if it were any simpler, what hope would we have that it could take on the challenge of recognizing digits?"
+          },
+          {
+            "start": 975.08,
+            "end": 979.29,
+            "text": "How does this network learn the appropriate weights and biases just by looking at data?"
+          },
+          {
+            "start": 987.58,
+            "end": 997.42,
+            "text": "Now is the point I suppose I should say subscribe to stay notified about when that video or any new videos come out, but realistically most of you don't actually receive notifications from YouTube…"
+          }
+        ],
+        "explain": "How does this network learn the appropriate weights and biases just by looking at data? And in a way it's kind of reassuring that it looks complicated. if it were any simpler, what hope would we have that it could take on the challenge of…",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 0,
+        "faith": 0.43
+      },
+      {
+        "id": "n-e3076df703",
+        "text": "Biological Analogy & Relu",
+        "type": "section",
+        "layer": 1,
+        "start": 1010.76,
+        "end": 1105.64,
+        "summary": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive or active.",
+        "tone": [],
+        "keywords": [
+          "relu",
+          "lisha",
+          "zero",
+          "networks",
+          "biological analogy",
+          "deep"
+        ],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-1cc2b284b4",
+            "text": "Biological Analogy",
+            "type": "concept",
+            "layer": 2,
+            "start": 1039.42,
+            "end": 1049.84,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-342d43566f",
+                "text": "Def: Biological analogy with how neurons would either be activated or not",
+                "type": "detail",
+                "layer": 3,
+                "start": 1039.42,
+                "end": 1049.84,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "biological analogy with how neurons would either be activated or not.",
+                "more": false,
+                "tag": "Def",
+                "faith": 1.0
+              }
+            ],
+            "source": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive or active.",
+            "topic": "Biological Analogy",
+            "evidence": [
+              {
+                "start": 1039.42,
+                "end": 1049.84,
+                "text": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive or active."
+              },
+              {
+                "start": 1076.57,
+                "end": 1080.57,
+                "text": "biological analogy with how neurons would either be activated or not."
+              }
+            ],
+            "explain": "The biological analogy treats an artificial neuron like a simplified biological neuron: it receives weighted inputs, combines them into a weighted sum, and applies an activation function that squashes the result into a 0-to-1 range, loosely analogous to a neuron being inactive or active.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "For a neuron with weighted sum z=0, compute sigmoid(z) and explain what the result means under the inactive/active analogy.",
+            "diagram": "inputs x1,x2 -> multiply by weights -> sum + bias -> activation squash -> output in [0,1]\n                                      |\n                         biological analogy: inactive/active",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.63,
+            "why_it_matters": "It motivates early activation functions such as sigmoid and gives intuition for nonlinear firing-like behavior, but it is only a loose inspiration, not a literal model of brain biology.",
+            "steps": [
+              "1. Receive input values and multiply each by its corresponding weight.",
+              "2. Sum the weighted inputs, often adding a bias, to form the neuron's pre-activation value.",
+              "3. Apply a squashing activation function, such as sigmoid, to produce an output between 0 and 1 interpreted loosely as inactive-to-active."
+            ],
+            "worked_example": "Supplemental example: inputs x=[1,0], weights w=[2,-1], bias b=-0.5 give z=(1*2)+(0*-1)-0.5=1.5. Applying sigmoid gives about 0.817, so the artificial neuron is strongly active in the 0-to-1 analogy.",
+            "misconception": "The biological analogy does not mean an artificial neuron exactly mimics a real biological neuron or that its 0-to-1 output is literally a firing rate; it is a simplified motivational analogy.",
+            "knowledge_check": {
+              "question": "In the early-network biological analogy, what interval does the squashing activation map the weighted sum into?",
+              "answer": "Between 0 and 1."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-3281b5660f",
+            "text": "Analogy",
+            "type": "concept",
+            "layer": 2,
+            "start": 1039.42,
+            "end": 1049.84,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-ffc7cef632",
+                "text": "Def: Biological analogy with how neurons would either be activated or not",
+                "type": "detail",
+                "layer": 3,
+                "start": 1039.42,
+                "end": 1049.84,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "biological analogy with how neurons would either be activated or not.",
+                "more": false,
+                "tag": "Def",
+                "faith": 1.0
+              }
+            ],
+            "source": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive or active.",
+            "topic": "Analogy",
+            "evidence": [
+              {
+                "start": 1039.42,
+                "end": 1049.84,
+                "text": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive or active."
+              },
+              {
+                "start": 1076.57,
+                "end": 1080.57,
+                "text": "biological analogy with how neurons would either be activated or not."
+              }
+            ],
+            "explain": "An analogy is a mapping from a familiar source idea to a target idea. Here, the biological idea that neurons are either inactive or active is used as an intuition for squashing a weighted sum into the interval between zero and one in an artificial network.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Given the analogy 'biological neuron activity -> artificial activation output,' map each term: weighted sum, squashing function, output in [0,1]. Then state one way the analogy breaks down.",
+            "diagram": "Biological analogy:\n  neuron inactive/active  --->  bounded activity value\n\nArtificial mapping:\n  weighted sum z  --->  squashing function  --->  output in [0,1]\n      0.8         --->     sigmoid(z)      --->     0.69\n     -0.8         --->     sigmoid(z)      --->     0.31",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.61,
+            "why_it_matters": "Analogies make abstract mechanisms easier to remember and reason about, such as why an activation function turns an unbounded weighted sum into a bounded activity-like value. They also help explain design motivations, but they are not literal descriptions.",
+            "steps": [
+              "1. Identify the target concept: an artificial neuron's weighted sum and activation output.",
+              "2. Identify the source concept: biological neurons being inactive or active.",
+              "3. Map the correspondence and note limits: the weighted sum is squished into [0,1] as an activity-like signal, but real neurons and artificial units are not identical."
+            ],
+            "worked_example": "Suppose a weighted sum is z = 0.8. A sigmoid-style squashing maps it to about 0.69, closer to the active end of the 0-to-1 interval. If z = -0.8, it maps to about 0.31, closer to the inactive end. The analogy says this resembles a neuron being more or less active, not literally firing.",
+            "misconception": "The analogy does not mean artificial neurons are exact models of biological neurons, nor that biological neurons are simply binary on/off switches. It is a motivating comparison, not a literal equivalence.",
+            "knowledge_check": {
+              "question": "What does the biological neuron analogy help motivate in early neural networks?",
+              "answer": "It helps motivate squashing the relevant weighted sum into the interval between zero and one, as an activity-like signal inspired by neurons being inactive or active."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          },
+          {
+            "id": "n-8758275f4a",
+            "text": "Relu",
+            "type": "concept",
+            "layer": 2,
+            "start": 1091.16,
+            "end": 1104.62,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [
+              {
+                "id": "n-3c26dfad02",
+                "text": "Def: ReLU, ReLU stands for rectified linear unit?",
+                "type": "detail",
+                "layer": 3,
+                "start": 1091.16,
+                "end": 1104.62,
+                "summary": "",
+                "tone": [],
+                "keywords": [],
+                "notes": "",
+                "links": [],
+                "image": null,
+                "collapsed": false,
+                "children": [],
+                "source": "And ReLU, ReLU stands for rectified linear unit?",
+                "more": false,
+                "tag": "Def",
+                "faith": 1.0
+              }
+            ],
+            "source": "Using sigmoids didn't help training or it was very difficult to train at some point and people just tried ReLU and it happened to work very well for these incredibly deep neural networks.",
+            "topic": "Relu",
+            "evidence": [
+              {
+                "start": 1091.16,
+                "end": 1104.62,
+                "text": "Using sigmoids didn't help training or it was very difficult to train at some point and people just tried ReLU and it happened to work very well for these incredibly deep neural networks."
+              },
+              {
+                "start": 1056.1,
+                "end": 1058.98,
+                "text": "Yeah or rather ReLU seems to be much easier to train."
+              },
+              {
+                "start": 1059.4,
+                "end": 1062.68,
+                "text": "And ReLU, ReLU stands for rectified linear unit?"
+              }
+            ],
+            "explain": "ReLU (rectified linear unit) is an activation function defined as f(x)=max(0,x): it outputs x when x is positive and 0 when x is negative or zero.",
+            "mechanism": "",
+            "example": "",
+            "exercise": "Compute ReLU for x = -5, -1, 0, 2, and 10.",
+            "diagram": "x --> [ max(0, x) ] --> output\n\n-2 --> [ ReLU ] --> 0\n 0 --> [ ReLU ] --> 0\n 3 --> [ ReLU ] --> 3",
+            "available": true,
+            "generatedBy": "llm-deep",
+            "groundingNote": "Teaching content is not generated without evidence. See the timestamped transcript source.",
+            "faith": 0.73,
+            "why_it_matters": "ReLU made very deep neural networks easier to train; the evidence notes that sigmoids could make training difficult, while ReLU happened to work very well for incredibly deep networks.",
+            "steps": [
+              "Compute the input value x to the unit.",
+              "Apply the rule f(x)=max(0,x).",
+              "Pass the result forward: positive values stay unchanged, negative values become 0."
+            ],
+            "worked_example": "For inputs x = -2, 0, and 3: ReLU(-2)=0, ReLU(0)=0, ReLU(3)=3. This example is supplemental.",
+            "misconception": "ReLU is not a sigmoid activation and it is not the same as a purely linear function; it clips negative inputs to zero, which introduces nonlinearity.",
+            "knowledge_check": {
+              "question": "What does ReLU stand for, and what is its formula?",
+              "answer": "ReLU stands for rectified linear unit; its formula is f(x)=max(0,x)."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true
+          }
+        ],
+        "source": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive or active.",
+        "segmentId": "s7",
+        "theme": 2,
+        "points": [
+          {
+            "start": 1035.46,
+            "end": 1039.42,
+            "text": "So Lisha one thing I think we should quickly bring up is this sigmoid function."
+          },
+          {
+            "start": 1039.42,
+            "end": 1049.84,
+            "text": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive…"
+          },
+          {
+            "start": 1056.1,
+            "end": 1058.98,
+            "text": "Yeah or rather ReLU seems to be much easier to train."
+          }
+        ],
+        "explain": "As I understand it early networks use this to squish the relevant weighted sum into that interval between zero and one, kind of motivated by this biological analogy of neurons either being inactive or active.",
+        "generatedBy": "extractive",
+        "groundingNote": "Extractive section summary from the transcript.",
+        "color": 1,
+        "faith": 0.37
+      },
+      {
+        "id": "n-faaaccfa10",
+        "text": "Quick recall",
+        "type": "section",
+        "layer": 1,
+        "start": 0.0,
+        "end": 1105.64,
+        "summary": "Covers particular light-sensitive cells & X28, recognize handwritten digits & couple, combine, weighted sum & zero",
+        "tone": [],
+        "keywords": [],
+        "notes": "",
+        "links": [],
+        "image": null,
+        "collapsed": false,
+        "children": [
+          {
+            "id": "n-503d99689f",
+            "text": "In one line: Covers particular light-sensitive cells & X28, recognize handwritten digits & couple, combine, weighted sum & zero",
+            "type": "concept",
+            "layer": 2,
+            "start": 0.0,
+            "end": 1105.64,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3.",
+            "recall": true,
+            "oneline": true,
+            "faith": 0.0
+          },
+          {
+            "id": "n-0a35cff790",
+            "text": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels",
+            "type": "concept",
+            "layer": 2,
+            "start": 5.0,
+            "end": 13.72,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3.",
+            "recall": true,
+            "faith": 0.99,
+            "explain": "Definition: Even when a handwritten digit is messy and rendered at only 28x28 pixels, human vision can still identify it—here, as a 3—by relying on shape patterns rather than fine detail.",
+            "available": true,
+            "why_it_matters": "This illustrates why low-resolution image data can still be useful for recognition tasks and why robustness to noise, sloppy writing, and downsampling matters in machine learning and computer vision.",
+            "steps": [
+              "Capture or draw the handwritten digit, including natural variation and messiness.",
+              "Render or downsample the image to a very low resolution, such as 28x28 pixels.",
+              "Recognize the digit from coarse shape features, such as curves and strokes, rather than exact pixel-level detail."
+            ],
+            "worked_example": "A sloppily written digit is rendered at 28x28 pixels. Although much detail is lost, the overall curved strokes still form a recognizable 3, so a human can identify it without trouble.",
+            "diagram": "Handwritten digit\n      |\n      v\nDownsample to 28x28\n      |\n      v\nCoarse pixel pattern\n      |\n      v\nHuman recognizes: 3",
+            "misconception": "A common misconception is that extremely low resolution or messy handwriting must make recognition impossible; in this example, the brain still recognizes the digit from coarse shape cues.",
+            "exercise": "Sketch a messy digit 3 on a 28x28 grid, then list the coarse visual features that still make it recognizable as a 3.",
+            "knowledge_check": {
+              "question": "Why can a 28x28-pixel, sloppily written digit still be recognized as a 3?",
+              "answer": "Because recognition can rely on overall shape and stroke patterns rather than fine detail, so the coarse low-resolution image still contains enough information for the brain to identify it."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-702bae8b4a",
+            "text": "What we're going to do is put together a neural network that can learn…",
+            "type": "concept",
+            "layer": 2,
+            "start": 101.22,
+            "end": 106.04,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "What we're going to do is put together a neural network that can learn to recognize handwritten digits.",
+            "recall": true,
+            "faith": 0.89,
+            "explain": "Putting together a neural network to recognize handwritten digits means building a supervised model that maps digit images to labels 0–9 by learning weights from labeled examples.",
+            "available": true,
+            "why_it_matters": "It is a standard introductory machine-learning task because it demonstrates image classification, training loops, loss functions, and generalization from pixel data to correct digit labels.",
+            "steps": [
+              "Prepare labeled digit images, normalize pixel values, and split data into training, validation, and test sets.",
+              "Define a neural network architecture: input pixels, one or more hidden layers, and 10 output units for digits 0–9.",
+              "Train with a suitable loss and optimizer, then evaluate accuracy on unseen test images."
+            ],
+            "worked_example": "Supplemental example: Use 28×28 grayscale digit images flattened to 784 inputs, a hidden layer of 128 ReLU units, and 10 softmax outputs. Train with cross-entropy loss and report test accuracy.",
+            "diagram": "digit image -> flatten pixels -> hidden layer(s) -> 10-class output -> predicted digit",
+            "misconception": "The network does not understand digits like a human and does not simply memorize images; it learns statistical pixel patterns and must generalize to unseen handwriting.",
+            "exercise": "Describe a neural network architecture and training loop for classifying 28×28 handwritten digit images into 0–9.",
+            "knowledge_check": {
+              "question": "Why does the output layer usually have 10 units for handwritten digit recognition?",
+              "answer": "Because there are 10 possible digit classes, 0 through 9, and each output represents the model’s score for one class."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-8880af224f",
+            "text": "The way the network operates",
+            "type": "concept",
+            "layer": 2,
+            "start": 273.14,
+            "end": 278.48,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "The way the network operates, activations in one layer determine the activations of the next layer.",
+            "recall": true,
+            "faith": 0.85,
+            "explain": "In a neural network, operation is layer-by-layer: the activations produced in one layer are used to determine the activations of the next layer.",
+            "available": true,
+            "why_it_matters": "This sequential dependency means each layer transforms the previous layer’s representation, so the network builds increasingly abstract features and gradients can be propagated backward through the same chain.",
+            "steps": [
+              "1. Compute the first layer’s activations from the input using its weights, biases, and activation function.",
+              "2. Feed those activations into the next layer to compute its activations.",
+              "3. Repeat layer by layer until the output layer produces the final prediction."
+            ],
+            "worked_example": "Supplemental example: for input x, compute h = ReLU(W1x + b1), then compute output y = softmax(W2h + b2). The second layer depends on h, which was determined by the first layer.",
+            "diagram": "input x\n  |\n  v\n[layer 1: W1, b1, activation] -> h\n  |\n  v\n[layer 2: W2, b2, activation] -> y\n  |\n  v\noutput",
+            "misconception": "A common misconception is that all layers process the raw input independently; in fact, each layer normally receives the activations produced by the previous layer.",
+            "exercise": "For a two-layer network, explain how changing an activation value in layer 1 can change the activations in layer 2 and the final output.",
+            "knowledge_check": {
+              "question": "What determines the activations of the next layer in a standard feedforward network?",
+              "answer": "The activations of the current layer, transformed by the next layer’s weights, biases, and activation function."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-ab8c94023d",
+            "text": "Maybe it's not that you want the neuron to light up when the weighted…",
+            "type": "concept",
+            "layer": 2,
+            "start": 655.82,
+            "end": 661.88,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "But maybe it's not that you want the neuron to light up when the weighted sum is bigger than 0.",
+            "recall": true,
+            "faith": 0.98,
+            "explain": "A neuron does not have to 'light up' only when its weighted sum is greater than 0. Its firing/activation depends on the activation function and any bias or threshold applied to the weighted sum.",
+            "available": true,
+            "why_it_matters": "The firing rule defines the neuron's decision boundary and affects what patterns it can learn. Assuming a fixed z > 0 rule can hide the role of bias, thresholds, and nonlinear activations.",
+            "steps": [
+              "Compute the weighted sum plus bias: z = Σ(w_i x_i) + b.",
+              "Apply the chosen activation or threshold: output = f(z), e.g. fire if z > θ.",
+              "Interpret the output as the neuron's activation/firing value."
+            ],
+            "worked_example": "Let x = [1, 2], w = [0.5, -0.25], b = 0.1. Then z = 0.5(1) + (-0.25)(2) + 0.1 = 0.1. If the threshold is θ = 0.2, the neuron does not fire; if θ = 0, it does fire.",
+            "diagram": "inputs x_i\n   |\n   v\nweighted sum + bias: z = Σ w_i x_i + b\n   |\n   v\nactivation/threshold f(z)\n   |\n   v\noutput / firing decision",
+            "misconception": "A positive weighted sum always means the neuron fires. In fact, bias, threshold choice, and activation function can change the firing decision.",
+            "exercise": "For x = [2, 1], w = [0.3, 0.4], b = -0.5, compute z and decide whether the neuron fires for threshold θ = 0.1.",
+            "knowledge_check": {
+              "question": "Does a neuron necessarily fire when its weighted sum is greater than 0?",
+              "answer": "No. It fires according to its activation function and threshold/bias, which may require a different condition."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-6d8ebdce7e",
+            "text": "What that means is that taking the weighted sum of the activations in the…",
+            "type": "concept",
+            "layer": 2,
+            "start": 838.54,
+            "end": 849.88,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the terms in the matrix vector product of everything we have on the left here.",
+            "recall": true,
+            "faith": 0.87,
+            "explain": "A layer's activation is computed as a weighted sum of the previous layer's activations: multiply each input activation by its corresponding weight, add the products, and usually add a bias. When all neurons in a layer are computed together, these weighted sums form the entries of a matrix-vector product.",
+            "available": true,
+            "why_it_matters": "This is the core linear operation in neural networks. It lets many weighted sums be expressed compactly and computed efficiently as matrix-vector multiplication, and it clarifies how each output depends on all inputs.",
+            "steps": [
+              "Identify the input activations from the previous layer and the weights connecting them to one output neuron.",
+              "Multiply each input activation by its corresponding weight, then add all the products together.",
+              "Add the bias if present; repeat for each output neuron, which together forms the matrix-vector product."
+            ],
+            "worked_example": "Inputs x = [2, 3], weights for one neuron w = [0.5, -1], bias b = 1. Weighted sum = 0.5*2 + (-1)*3 + 1 = 1 - 3 + 1 = -1. This -1 is one entry in the layer's matrix-vector product.",
+            "diagram": "x1 --w11--\\\n           +--> z1 = w11*x1 + w12*x2 + b1\nx2 --w12--/",
+            "misconception": "A weighted sum is not elementwise multiplication of two vectors. Each weight belongs to a specific connection, and the products are added together to produce one output value.",
+            "exercise": "Given inputs x = [1, 4], weights w = [2, -0.5], and bias b = 0, compute the weighted sum for one neuron.",
+            "knowledge_check": {
+              "question": "What operation turns individual weighted sums of previous-layer activations into a single compact layer computation?",
+              "answer": "A matrix-vector product (plus a bias vector), where the weight matrix contains the connection weights."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          },
+          {
+            "id": "n-42ac1c99c7",
+            "text": "How does this network learn the appropriate weights and biases just by looking at…",
+            "type": "concept",
+            "layer": 2,
+            "start": 975.08,
+            "end": 979.29,
+            "summary": "",
+            "tone": [],
+            "keywords": [],
+            "notes": "",
+            "links": [],
+            "image": null,
+            "collapsed": false,
+            "children": [],
+            "source": "How does this network learn the appropriate weights and biases just by looking at data?",
+            "recall": true,
+            "faith": 1.0,
+            "explain": "Learning weights and biases means adjusting the network’s parameters so its predictions better match the training data. This is done by defining a loss that measures prediction error, computing gradients of that loss with respect to every weight and bias, and repeatedly updating the parameters in the direction that reduces the loss, usually via gradient descent and backpropagation.",
+            "available": true,
+            "why_it_matters": "This is what lets a network discover useful patterns from examples instead of requiring hand-coded rules. Without parameter learning, the network architecture alone cannot adapt to data.",
+            "steps": [
+              "1. Run a forward pass: feed training data through the network to get predictions, then compute a loss that measures how wrong those predictions are.",
+              "2. Run backpropagation: compute the gradient of the loss with respect to each weight and bias, showing how each parameter contributed to the error.",
+              "3. Update parameters: move each weight and bias a small step opposite its gradient, scaled by a learning rate, and repeat over many examples/epochs until the loss decreases."
+            ],
+            "worked_example": "Supplemental example: For a tiny neuron y = wx + b, one training point x = 1, target = 3, initialize w = 0, b = 0, learning rate = 0.1, and use loss = 0.5(prediction - target)^2. Prediction is 0, error is -3. Gradients are dL/dw = -3 and dL/db = -3. Updates give w = 0 - 0.1(-3) = 0.3 and b = 0.3. The next prediction is 0.6, closer to 3, and the process repeats.",
+            "diagram": "Training data\n   |\n   v\nForward pass -> prediction\n   |\n   v\nLoss = error measure\n   |\n   v\nBackpropagation -> gradients for weights/biases\n   |\n   v\nUpdate weights/biases opposite gradients\n   |\n   +--> repeat until loss is low",
+            "misconception": "A common misconception is that the network directly “looks at” data and immediately knows the right weights. In practice it starts with initial parameters and improves them iteratively by reducing a loss; it is not simply memorizing labels or inferring rules in one step.",
+            "exercise": "For y = wx + b, one point x = 2, target = 5, initialize w = 1, b = 0, learning rate = 0.1, and use loss = 0.5(prediction - target)^2. Compute the prediction, gradients, and one update step for w and b.",
+            "knowledge_check": {
+              "question": "What signal tells the network how to change its weights and biases?",
+              "answer": "The gradients of the loss with respect to each weight and bias, computed by backpropagation, tell the network how changing each parameter would affect the error."
+            },
+            "provenance": {
+              "example_source": "supplemental"
+            },
+            "lesson_available": true,
+            "generatedBy": "llm-deep"
+          }
+        ],
+        "source": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3.",
+        "recall": true,
+        "color": 2,
+        "faith": 0.0
+      }
+    ],
+    "explain": "Particular Light-sensitive Cells & X28 · Recognize Handwritten Digits & Couple · Combine · Weighted Sum & Zero · Matrix Vector Product & Sum · Youtube's Recommendation Algorithm & Product",
+    "generatedBy": "extractive"
+  },
+  "edges": [
+    {
+      "id": "e-ba8a34802a",
+      "source": "n-f475e6ccc2",
+      "target": "n-ddc9c2861b",
+      "label": "related to",
+      "origin": "similar"
+    },
+    {
+      "id": "e-e2747cd8c8",
+      "source": "n-6ebb73ec81",
+      "target": "n-ad5d8464cb",
+      "label": "related to",
+      "origin": "similar"
+    }
+  ],
+  "segments": [
+    {
+      "id": "s1",
+      "start": 4.22,
+      "end": 74.64,
+      "title": "X28 Pixels & Firing",
+      "keywords": [
+        "x28 pixels",
+        "firing",
+        "trouble recognizing",
+        "appreciate",
+        "visual cortex",
+        "resolution"
+      ],
+      "topic": 3,
+      "theme": 1,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s2",
+      "start": 75.12,
+      "end": 268.2,
+      "title": "Neurons & Layers",
+      "keywords": [
+        "neurons",
+        "layers",
+        "variants",
+        "couple",
+        "neural network",
+        "digits"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s3",
+      "start": 268.78,
+      "end": 530.62,
+      "title": "Layer & Loop",
+      "keywords": [
+        "layer",
+        "loop",
+        "image",
+        "edges",
+        "specific",
+        "activations"
+      ],
+      "topic": 0,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s4",
+      "start": 531.44,
+      "end": 794.1800000000001,
+      "title": "Weights & Weighted Sum",
+      "keywords": [
+        "weights",
+        "weighted sum",
+        "pixel",
+        "layer",
+        "neuron",
+        "pixels"
+      ],
+      "topic": 0,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s5",
+      "start": 794.96,
+      "end": 938.34,
+      "title": "Matrix Vector & Layer",
+      "keywords": [
+        "matrix vector",
+        "layer",
+        "previous",
+        "organize",
+        "vector product",
+        "expression"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s6",
+      "start": 939.2,
+      "end": 1009.9399999999999,
+      "title": "Function & Complicated",
+      "keywords": [
+        "function",
+        "complicated",
+        "challenge",
+        "it's",
+        "network",
+        "numbers"
+      ],
+      "topic": 1,
+      "theme": 0,
+      "speakers": 1,
+      "fromChapter": false
+    },
+    {
+      "id": "s7",
+      "start": 1010.76,
+      "end": 1105.6399999999999,
+      "title": "Relu & Lisha",
+      "keywords": [
+        "relu",
+        "lisha",
+        "zero",
+        "networks",
+        "biological analogy",
+        "deep"
+      ],
+      "topic": 1,
+      "theme": 2,
+      "speakers": 1,
+      "fromChapter": false
+    }
+  ],
+  "graph": {
+    "concepts": [
+      {
+        "id": "c1",
+        "label": "Matrix Vector Product",
+        "score": 0.7056,
+        "aliases": [
+          "matrix vector product",
+          "matrix vector",
+          "vector product",
+          "vector products"
+        ],
+        "segments": [
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 2,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c2",
+        "label": "Particular Light-sensitive Cells",
+        "score": 0.6382,
+        "aliases": [
+          "particular light-sensitive cells",
+          "light-sensitive cells",
+          "particular light-sensitive",
+          "light-sensitive"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 5,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c3",
+        "label": "Recognize Handwritten Digits",
+        "score": 0.4827,
+        "aliases": [
+          "recognize handwritten digits",
+          "handwritten digits",
+          "recognize handwritten"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 6,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c4",
+        "label": "Crazy-smart Visual Cortex",
+        "score": 0.4786,
+        "aliases": [
+          "crazy-smart visual cortex",
+          "crazy-smart visual",
+          "crazy-smart"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c5",
+        "label": "Youtube's Recommendation Algorithm",
+        "score": 0.3239,
+        "aliases": [
+          "youtube's recommendation algorithm",
+          "recommendation algorithm"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 1,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c6",
+        "label": "Weights",
+        "score": 0.3075,
+        "aliases": [
+          "weights",
+          "weighted"
+        ],
+        "segments": [
+          "s4",
+          "s5",
+          "s6",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 7,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c7",
+        "label": "Layer",
+        "score": 0.2743,
+        "aliases": [
+          "layer",
+          "layers"
+        ],
+        "segments": [
+          "s2",
+          "s3",
+          "s4",
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 8,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c8",
+        "label": "Product",
+        "score": 0.2696,
+        "aliases": [
+          "product",
+          "products"
+        ],
+        "segments": [
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 2,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c9",
+        "label": "Youtube's",
+        "score": 0.2491,
+        "aliases": [
+          "youtube's",
+          "youtube"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 9,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c10",
+        "label": "Relu",
+        "score": 0.2428,
+        "aliases": [
+          "relu"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 10,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c11",
+        "label": "X28 Pixels",
+        "score": 0.2242,
+        "aliases": [
+          "x28 pixels"
+        ],
+        "segments": [
+          "s1",
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 11,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c12",
+        "label": "Lisha",
+        "score": 0.2135,
+        "aliases": [
+          "lisha"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 12,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c13",
+        "label": "Complicated",
+        "score": 0.2109,
+        "aliases": [
+          "complicated"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 13,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c14",
+        "label": "Vector",
+        "score": 0.2095,
+        "aliases": [
+          "vector"
+        ],
+        "segments": [
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 14,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c15",
+        "label": "Matrix",
+        "score": 0.2095,
+        "aliases": [
+          "matrix"
+        ],
+        "segments": [
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 15,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c16",
+        "label": "Biological Analogy",
+        "score": 0.2067,
+        "aliases": [
+          "biological analogy"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 3,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c17",
+        "label": "Neural Network",
+        "score": 0.1889,
+        "aliases": [
+          "neural network"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 16,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c18",
+        "label": "X28",
+        "score": 0.1869,
+        "aliases": [
+          "x28"
+        ],
+        "segments": [
+          "s1",
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 17,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c19",
+        "label": "Firing",
+        "score": 0.1869,
+        "aliases": [
+          "firing"
+        ],
+        "segments": [
+          "s1",
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 18,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c20",
+        "label": "Resolution of X28",
+        "score": 0.1861,
+        "aliases": [
+          "resolution of x28"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 19,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c21",
+        "label": "Importance of Machine",
+        "score": 0.1861,
+        "aliases": [
+          "importance of machine"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 20,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c22",
+        "label": "Grid of X28",
+        "score": 0.1861,
+        "aliases": [
+          "grid of x28"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 21,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c23",
+        "label": "Function",
+        "score": 0.1831,
+        "aliases": [
+          "function"
+        ],
+        "segments": [
+          "s4",
+          "s5",
+          "s6",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 22,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c24",
+        "label": "Zero",
+        "score": 0.1773,
+        "aliases": [
+          "zero"
+        ],
+        "segments": [
+          "s4",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 23,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c25",
+        "label": "Challenge",
+        "score": 0.1751,
+        "aliases": [
+          "challenge"
+        ],
+        "segments": [
+          "s5",
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 24,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c26",
+        "label": "Underlie Youtube's Recommendation",
+        "score": 0.1744,
+        "aliases": [
+          "underlie youtube's recommendation"
+        ],
+        "segments": [
+          "s6"
+        ],
+        "firstTs": 0.0,
+        "community": 1,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c27",
+        "label": "Linear Algebra",
+        "score": 0.174,
+        "aliases": [
+          "linear algebra"
+        ],
+        "segments": [
+          "s5"
+        ],
+        "firstTs": 0.0,
+        "community": 25,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c28",
+        "label": "Weighted Sum",
+        "score": 0.1726,
+        "aliases": [
+          "weighted sum"
+        ],
+        "segments": [
+          "s4",
+          "s5",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 4,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c29",
+        "label": "Analogy",
+        "score": 0.1723,
+        "aliases": [
+          "analogy"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 3,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c30",
+        "label": "Deep",
+        "score": 0.1723,
+        "aliases": [
+          "deep"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 26,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c31",
+        "label": "Activated",
+        "score": 0.1723,
+        "aliases": [
+          "activated"
+        ],
+        "segments": [
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 27,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c32",
+        "label": "Low Resolution",
+        "score": 0.1595,
+        "aliases": [
+          "low resolution"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 28,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c33",
+        "label": "Distinct Ideas",
+        "score": 0.1595,
+        "aliases": [
+          "distinct ideas"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 29,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c34",
+        "label": "Trouble Recognizing",
+        "score": 0.1595,
+        "aliases": [
+          "trouble recognizing"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 30,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c35",
+        "label": "Visual Cortex",
+        "score": 0.1595,
+        "aliases": [
+          "visual cortex"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 0,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c36",
+        "label": "Ones Firing",
+        "score": 0.1595,
+        "aliases": [
+          "ones firing"
+        ],
+        "segments": [
+          "s1"
+        ],
+        "firstTs": 0.0,
+        "community": 31,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c37",
+        "label": "Couple",
+        "score": 0.1574,
+        "aliases": [
+          "couple"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 32,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c38",
+        "label": "Variants",
+        "score": 0.1574,
+        "aliases": [
+          "variants"
+        ],
+        "segments": [
+          "s2"
+        ],
+        "firstTs": 0.0,
+        "community": 33,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c39",
+        "label": "Edges",
+        "score": 0.1564,
+        "aliases": [
+          "edges"
+        ],
+        "segments": [
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 34,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c40",
+        "label": "Loop",
+        "score": 0.1564,
+        "aliases": [
+          "loop"
+        ],
+        "segments": [
+          "s3",
+          "s4"
+        ],
+        "firstTs": 0.0,
+        "community": 35,
+        "centrality": 0.0101
+      },
+      {
+        "id": "c41",
+        "label": "Sum",
+        "score": 0.1528,
+        "aliases": [
+          "sum"
+        ],
+        "segments": [
+          "s4",
+          "s5",
+          "s7"
+        ],
+        "firstTs": 0.0,
+        "community": 4,
+        "centrality": 0.0676
+      },
+      {
+        "id": "c42",
+        "label": "Combine",
+        "score": 0.1526,
+        "aliases": [
+          "combine"
+        ],
+        "segments": [
+          "s3"
+        ],
+        "firstTs": 0.0,
+        "community": 36,
+        "centrality": 0.0101
+      }
+    ],
+    "edges": [
+      {
+        "source": "c4",
+        "target": "c35",
+        "weight": 0.617,
+        "label": "related to"
+      },
+      {
+        "source": "c1",
+        "target": "c8",
+        "weight": 0.577,
+        "label": "related to"
+      },
+      {
+        "source": "c16",
+        "target": "c29",
+        "weight": 0.562,
+        "label": "related to"
+      },
+      {
+        "source": "c28",
+        "target": "c41",
+        "weight": 0.556,
+        "label": "related to"
+      },
+      {
+        "source": "c5",
+        "target": "c26",
+        "weight": 0.552,
+        "label": "related to"
+      }
+    ]
+  },
+  "transcript": [
+    {
+      "start": 4.22,
+      "end": 5.4,
+      "text": "This is a 3."
+    },
+    {
+      "start": 6.06,
+      "end": 10.71,
+      "text": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels,"
+    },
+    {
+      "start": 10.71,
+      "end": 13.72,
+      "text": "but your brain has no trouble recognizing it as a 3."
+    },
+    {
+      "start": 14.34,
+      "end": 16.56,
+      "text": "And I want you to take a moment to appreciate how"
+    },
+    {
+      "start": 16.56,
+      "end": 18.96,
+      "text": "crazy it is that brains can do this so effortlessly."
+    },
+    {
+      "start": 19.7,
+      "end": 22.96,
+      "text": "this, this and this are also recognizable as 3s,"
+    },
+    {
+      "start": 22.96,
+      "end": 27.21,
+      "text": "even though the specific values of each pixel is very different from one"
+    },
+    {
+      "start": 27.21,
+      "end": 28.32,
+      "text": "image to the next."
+    },
+    {
+      "start": 28.9,
+      "end": 32.95,
+      "text": "The particular light-sensitive cells in your eye that are firing when you"
+    },
+    {
+      "start": 32.95,
+      "end": 36.94,
+      "text": "see this 3 are very different from the ones firing when you see this 3."
+    },
+    {
+      "start": 37.52,
+      "end": 42.74,
+      "text": "But something in that crazy-smart visual cortex of yours resolves these as representing"
+    },
+    {
+      "start": 42.74,
+      "end": 47.84,
+      "text": "the same idea, while at the same time recognizing other images as their own distinct"
+    },
+    {
+      "start": 47.84,
+      "end": 48.34,
+      "text": "ideas."
+    },
+    {
+      "start": 49.22,
+      "end": 54.63,
+      "text": "But if I told you, hey, sit down and write for me a program that takes in a grid of"
+    },
+    {
+      "start": 54.63,
+      "end": 59.13,
+      "text": "28x28 pixels like this and outputs a single number between 0 and 10,"
+    },
+    {
+      "start": 59.13,
+      "end": 64.75,
+      "text": "telling you what it thinks the digit is, well the task goes from comically trivial to"
+    },
+    {
+      "start": 64.75,
+      "end": 66.18,
+      "text": "dauntingly difficult."
+    },
+    {
+      "start": 67.16,
+      "end": 70.86,
+      "text": "Unless you've been living under a rock, I think I hardly need to motivate the relevance"
+    },
+    {
+      "start": 70.86,
+      "end": 74.64,
+      "text": "and importance of machine learning and neural networks to the present and to the future."
+    },
+    {
+      "start": 75.12,
+      "end": 78.95,
+      "text": "But what I want to do here is show you what a neural network actually is,"
+    },
+    {
+      "start": 78.95,
+      "end": 82.26,
+      "text": "assuming no background, and to help visualize what it's doing,"
+    },
+    {
+      "start": 82.26,
+      "end": 84.46,
+      "text": "not as a buzzword but as a piece of math."
+    },
+    {
+      "start": 85.02,
+      "end": 88.78,
+      "text": "My hope is that you come away feeling like the structure itself is motivated,"
+    },
+    {
+      "start": 88.78,
+      "end": 91.46,
+      "text": "and to feel like what it means when you read,"
+    },
+    {
+      "start": 91.46,
+      "end": 94.34,
+      "text": "or you hear about a neural network quote-unquote learning."
+    },
+    {
+      "start": 95.36,
+      "end": 98.26,
+      "text": "This video is just going to be devoted to the structure component of that,"
+    },
+    {
+      "start": 98.26,
+      "end": 100.26,
+      "text": "and the following one is going to tackle learning."
+    },
+    {
+      "start": 100.96,
+      "end": 103.28,
+      "text": "What we're going to do is put together a neural"
+    },
+    {
+      "start": 103.28,
+      "end": 106.04,
+      "text": "network that can learn to recognize handwritten digits."
+    },
+    {
+      "start": 109.36,
+      "end": 112.06,
+      "text": "This is a somewhat classic example for introducing the topic,"
+    },
+    {
+      "start": 112.06,
+      "end": 114.23,
+      "text": "and I'm happy to stick with the status quo here,"
+    },
+    {
+      "start": 114.23,
+      "end": 117.5,
+      "text": "because at the end of the two videos I want to point you to a couple good"
+    },
+    {
+      "start": 117.5,
+      "end": 120.91,
+      "text": "resources where you can learn more, and where you can download the code that"
+    },
+    {
+      "start": 120.91,
+      "end": 123.08,
+      "text": "does this and play with it on your own computer."
+    },
+    {
+      "start": 125.04,
+      "end": 127.66,
+      "text": "There are many many variants of neural networks,"
+    },
+    {
+      "start": 127.66,
+      "end": 132.25,
+      "text": "and in recent years there's been sort of a boom in research towards these variants,"
+    },
+    {
+      "start": 132.25,
+      "end": 136.94,
+      "text": "but in these two introductory videos you and I are just going to look at the simplest"
+    },
+    {
+      "start": 136.94,
+      "end": 139.18,
+      "text": "plain vanilla form with no added frills."
+    },
+    {
+      "start": 139.86,
+      "end": 143.89,
+      "text": "This is kind of a necessary prerequisite for understanding any of the more powerful"
+    },
+    {
+      "start": 143.89,
+      "end": 148.21,
+      "text": "modern variants, and trust me it still has plenty of complexity for us to wrap our minds"
+    },
+    {
+      "start": 148.21,
+      "end": 148.71,
+      "text": "around."
+    },
+    {
+      "start": 149.12,
+      "end": 153.19,
+      "text": "But even in this simplest form it can learn to recognize handwritten digits,"
+    },
+    {
+      "start": 153.19,
+      "end": 156.52,
+      "text": "which is a pretty cool thing for a computer to be able to do."
+    },
+    {
+      "start": 157.48,
+      "end": 159.81,
+      "text": "And at the same time you'll see how it does fall"
+    },
+    {
+      "start": 159.81,
+      "end": 162.28,
+      "text": "short of a couple hopes that we might have for it."
+    },
+    {
+      "start": 163.38,
+      "end": 168.5,
+      "text": "As the name suggests neural networks are inspired by the brain, but let's break that down."
+    },
+    {
+      "start": 168.52,
+      "end": 171.66,
+      "text": "What are the neurons, and in what sense are they linked together?"
+    },
+    {
+      "start": 172.5,
+      "end": 178.02,
+      "text": "Right now when I say neuron all I want you to think about is a thing that holds a number,"
+    },
+    {
+      "start": 178.02,
+      "end": 180.44,
+      "text": "specifically a number between 0 and 1."
+    },
+    {
+      "start": 180.68,
+      "end": 182.56,
+      "text": "It's really not more than that."
+    },
+    {
+      "start": 183.78,
+      "end": 188.82,
+      "text": "For example the network starts with a bunch of neurons corresponding to"
+    },
+    {
+      "start": 188.82,
+      "end": 194.22,
+      "text": "each of the 28x28 pixels of the input image, which is 784 neurons in total."
+    },
+    {
+      "start": 194.7,
+      "end": 199.41,
+      "text": "Each one of these holds a number that represents the grayscale value of the"
+    },
+    {
+      "start": 199.41,
+      "end": 204.38,
+      "text": "corresponding pixel, ranging from 0 for black pixels up to 1 for white pixels."
+    },
+    {
+      "start": 205.3,
+      "end": 208.25,
+      "text": "This number inside the neuron is called its activation,"
+    },
+    {
+      "start": 208.25,
+      "end": 212.6,
+      "text": "and the image you might have in mind here is that each neuron is lit up when its"
+    },
+    {
+      "start": 212.6,
+      "end": 214.16,
+      "text": "activation is a high number."
+    },
+    {
+      "start": 216.72,
+      "end": 221.86,
+      "text": "So all of these 784 neurons make up the first layer of our network."
+    },
+    {
+      "start": 226.5,
+      "end": 229.43,
+      "text": "Now jumping over to the last layer, this has 10 neurons,"
+    },
+    {
+      "start": 229.43,
+      "end": 231.36,
+      "text": "each representing one of the digits."
+    },
+    {
+      "start": 232.04,
+      "end": 236.62,
+      "text": "The activation in these neurons, again some number that's between 0 and 1,"
+    },
+    {
+      "start": 236.62,
+      "end": 242.12,
+      "text": "represents how much the system thinks that a given image corresponds with a given digit."
+    },
+    {
+      "start": 243.04,
+      "end": 246.42,
+      "text": "There's also a couple layers in between called the hidden layers,"
+    },
+    {
+      "start": 246.42,
+      "end": 249.85,
+      "text": "which for the time being should just be a giant ? for"
+    },
+    {
+      "start": 249.85,
+      "end": 253.6,
+      "text": "how on earth this process of recognizing digits is going to be handled."
+    },
+    {
+      "start": 254.26,
+      "end": 257.86,
+      "text": "In this network I chose two hidden layers, each one with 16 neurons,"
+    },
+    {
+      "start": 257.86,
+      "end": 260.56,
+      "text": "and admittedly that's kind of an arbitrary choice."
+    },
+    {
+      "start": 261.02,
+      "end": 264.65,
+      "text": "To be honest I chose two layers based on how I want to motivate the structure in"
+    },
+    {
+      "start": 264.65,
+      "end": 268.2,
+      "text": "just a moment, and 16, well that was just a nice number to fit on the screen."
+    },
+    {
+      "start": 268.78,
+      "end": 272.34,
+      "text": "In practice there is a lot of room for experiment with a specific structure here."
+    },
+    {
+      "start": 273.02,
+      "end": 275.67,
+      "text": "The way the network operates, activations in one"
+    },
+    {
+      "start": 275.67,
+      "end": 278.48,
+      "text": "layer determine the activations of the next layer."
+    },
+    {
+      "start": 279.2,
+      "end": 283.81,
+      "text": "And of course the heart of the network as an information processing mechanism comes down"
+    },
+    {
+      "start": 283.81,
+      "end": 288.21,
+      "text": "to exactly how those activations from one layer bring about activations in the next"
+    },
+    {
+      "start": 288.21,
+      "end": 288.71,
+      "text": "layer."
+    },
+    {
+      "start": 289.14,
+      "end": 293.63,
+      "text": "It's meant to be loosely analogous to how in biological networks of neurons,"
+    },
+    {
+      "start": 293.63,
+      "end": 297.18,
+      "text": "some groups of neurons firing cause certain others to fire."
+    },
+    {
+      "start": 298.12,
+      "end": 301.58,
+      "text": "Now the network I'm showing here has already been trained to recognize digits,"
+    },
+    {
+      "start": 301.58,
+      "end": 303.4,
+      "text": "and let me show you what by that."
+    },
+    {
+      "start": 303.64,
+      "end": 308.29,
+      "text": "It means if you feed in an image, lighting up all 784 neurons of the input layer"
+    },
+    {
+      "start": 308.29,
+      "end": 311.55,
+      "text": "according to the brightness of each pixel in the image,"
+    },
+    {
+      "start": 311.55,
+      "end": 316.2,
+      "text": "that pattern of activations causes some very specific pattern in the next layer"
+    },
+    {
+      "start": 316.2,
+      "end": 318.94,
+      "text": "which causes some pattern in the one after it,"
+    },
+    {
+      "start": 318.94,
+      "end": 322.08,
+      "text": "which finally gives some pattern in the output layer."
+    },
+    {
+      "start": 322.56,
+      "end": 326.52,
+      "text": "And the brightest neuron of that output layer is the network's choice,"
+    },
+    {
+      "start": 326.52,
+      "end": 329.4,
+      "text": "so to speak, for what digit this image represents."
+    },
+    {
+      "start": 332.56,
+      "end": 336.34,
+      "text": "And before jumping into the math for how one layer influences the next,"
+    },
+    {
+      "start": 336.34,
+      "end": 340.06,
+      "text": "or how training works, let's just talk about why it's even reasonable"
+    },
+    {
+      "start": 340.06,
+      "end": 343.52,
+      "text": "to expect a layered structure like this to behave intelligently."
+    },
+    {
+      "start": 344.06,
+      "end": 345.22,
+      "text": "What are we expecting here?"
+    },
+    {
+      "start": 345.4,
+      "end": 347.6,
+      "text": "What is the best hope for what those middle layers might be doing?"
+    },
+    {
+      "start": 348.92,
+      "end": 353.52,
+      "text": "Well, when you or I recognize digits, we piece together various components."
+    },
+    {
+      "start": 354.2,
+      "end": 356.82,
+      "text": "A 9 has a loop up top and a line on the right."
+    },
+    {
+      "start": 357.38,
+      "end": 361.18,
+      "text": "An 8 also has a loop up top, but it's paired with another loop down low."
+    },
+    {
+      "start": 361.98,
+      "end": 366.82,
+      "text": "A 4 basically breaks down into three specific lines, and things like that."
+    },
+    {
+      "start": 367.6,
+      "end": 371.56,
+      "text": "Now in a perfect world, we might hope that each neuron in the second"
+    },
+    {
+      "start": 371.56,
+      "end": 374.99,
+      "text": "to last layer corresponds with one of these subcomponents,"
+    },
+    {
+      "start": 374.99,
+      "end": 378.48,
+      "text": "that anytime you feed in an image with, say, a loop up top,"
+    },
+    {
+      "start": 378.48,
+      "end": 382.38,
+      "text": "like a 9 or an 8, there's some specific neuron whose activation is"
+    },
+    {
+      "start": 382.38,
+      "end": 383.78,
+      "text": "going to be close to 1."
+    },
+    {
+      "start": 384.5,
+      "end": 386.91,
+      "text": "And I don't mean this specific loop of pixels,"
+    },
+    {
+      "start": 386.91,
+      "end": 391.56,
+      "text": "the hope would be that any generally loopy pattern towards the top sets off this neuron."
+    },
+    {
+      "start": 392.44,
+      "end": 396.05,
+      "text": "That way, going from the third layer to the last one just requires"
+    },
+    {
+      "start": 396.05,
+      "end": 400.04,
+      "text": "learning which combination of subcomponents corresponds to which digits."
+    },
+    {
+      "start": 401.0,
+      "end": 403.2,
+      "text": "Of course, that just kicks the problem down the road,"
+    },
+    {
+      "start": 403.2,
+      "end": 405.4,
+      "text": "because how would you recognize these subcomponents,"
+    },
+    {
+      "start": 405.4,
+      "end": 407.64,
+      "text": "or even learn what the right subcomponents should be?"
+    },
+    {
+      "start": 408.06,
+      "end": 411.22,
+      "text": "And I still haven't even talked about how one layer influences the next,"
+    },
+    {
+      "start": 411.22,
+      "end": 413.06,
+      "text": "but run with me on this one for a moment."
+    },
+    {
+      "start": 413.68,
+      "end": 416.68,
+      "text": "Recognizing a loop can also break down into subproblems."
+    },
+    {
+      "start": 417.28,
+      "end": 419.89,
+      "text": "One reasonable way to do this would be to first"
+    },
+    {
+      "start": 419.89,
+      "end": 422.78,
+      "text": "recognize the various little edges that make it up."
+    },
+    {
+      "start": 423.78,
+      "end": 428.4,
+      "text": "Similarly, a long line, like the kind you might see in the digits 1 or 4 or 7,"
+    },
+    {
+      "start": 428.4,
+      "end": 433.43,
+      "text": "is really just a long edge, or maybe you think of it as a certain pattern of several"
+    },
+    {
+      "start": 433.43,
+      "end": 434.32,
+      "text": "smaller edges."
+    },
+    {
+      "start": 435.14,
+      "end": 438.81,
+      "text": "So maybe our hope is that each neuron in the second layer of"
+    },
+    {
+      "start": 438.81,
+      "end": 442.72,
+      "text": "the network corresponds with the various relevant little edges."
+    },
+    {
+      "start": 443.54,
+      "end": 447.51,
+      "text": "Maybe when an image like this one comes in, it lights up all of the"
+    },
+    {
+      "start": 447.51,
+      "end": 451.19,
+      "text": "neurons associated with around 8 to 10 specific little edges,"
+    },
+    {
+      "start": 451.19,
+      "end": 455.16,
+      "text": "which in turn lights up the neurons associated with the upper loop"
+    },
+    {
+      "start": 455.16,
+      "end": 459.72,
+      "text": "and a long vertical line, and those light up the neuron associated with a 9."
+    },
+    {
+      "start": 460.68,
+      "end": 464.68,
+      "text": "Whether or not this is what our final network actually does is another question,"
+    },
+    {
+      "start": 464.68,
+      "end": 467.94,
+      "text": "one that I'll come back to once we see how to train the network,"
+    },
+    {
+      "start": 467.94,
+      "end": 471.99,
+      "text": "but this is a hope that we might have, a sort of goal with the layered structure"
+    },
+    {
+      "start": 471.99,
+      "end": 472.54,
+      "text": "like this."
+    },
+    {
+      "start": 473.16,
+      "end": 476.76,
+      "text": "Moreover, you can imagine how being able to detect edges and patterns"
+    },
+    {
+      "start": 476.76,
+      "end": 480.3,
+      "text": "like this would be really useful for other image recognition tasks."
+    },
+    {
+      "start": 480.88,
+      "end": 484.01,
+      "text": "And even beyond image recognition, there are all sorts of intelligent"
+    },
+    {
+      "start": 484.01,
+      "end": 487.28,
+      "text": "things you might want to do that break down into layers of abstraction."
+    },
+    {
+      "start": 488.04,
+      "end": 492.73,
+      "text": "Parsing speech, for example, involves taking raw audio and picking out distinct sounds,"
+    },
+    {
+      "start": 492.73,
+      "end": 496.5,
+      "text": "which combine to make certain syllables, which combine to form words,"
+    },
+    {
+      "start": 496.5,
+      "end": 500.06,
+      "text": "which combine to make up phrases and more abstract thoughts, etc."
+    },
+    {
+      "start": 501.1,
+      "end": 503.69,
+      "text": "But getting back to how any of this actually works,"
+    },
+    {
+      "start": 503.69,
+      "end": 507.94,
+      "text": "picture yourself right now designing how exactly the activations in one layer might"
+    },
+    {
+      "start": 507.94,
+      "end": 509.92,
+      "text": "determine the activations in the next."
+    },
+    {
+      "start": 510.86,
+      "end": 515.99,
+      "text": "The goal is to have some mechanism that could conceivably combine pixels into edges,"
+    },
+    {
+      "start": 515.99,
+      "end": 518.98,
+      "text": "or edges into patterns, or patterns into digits."
+    },
+    {
+      "start": 519.44,
+      "end": 523.27,
+      "text": "And to zoom in on one very specific example, let's say the hope"
+    },
+    {
+      "start": 523.27,
+      "end": 526.91,
+      "text": "is for one particular neuron in the second layer to pick up"
+    },
+    {
+      "start": 526.91,
+      "end": 530.62,
+      "text": "on whether or not the image has an edge in this region here."
+    },
+    {
+      "start": 531.44,
+      "end": 535.1,
+      "text": "The question at hand is what parameters should the network have?"
+    },
+    {
+      "start": 535.64,
+      "end": 539.65,
+      "text": "What dials and knobs should you be able to tweak so that it's expressive"
+    },
+    {
+      "start": 539.65,
+      "end": 543.66,
+      "text": "enough to potentially capture this pattern, or any other pixel pattern,"
+    },
+    {
+      "start": 543.66,
+      "end": 547.78,
+      "text": "or the pattern that several edges can make a loop, and other such things?"
+    },
+    {
+      "start": 548.72,
+      "end": 551.81,
+      "text": "Well, what we'll do is assign a weight to each one of the"
+    },
+    {
+      "start": 551.81,
+      "end": 555.56,
+      "text": "connections between our neuron and the neurons from the first layer."
+    },
+    {
+      "start": 556.32,
+      "end": 557.7,
+      "text": "These weights are just numbers."
+    },
+    {
+      "start": 558.54,
+      "end": 561.9,
+      "text": "Then take all of those activations from the first layer"
+    },
+    {
+      "start": 561.9,
+      "end": 565.5,
+      "text": "and compute their weighted sum according to these weights."
+    },
+    {
+      "start": 567.7,
+      "end": 571.1,
+      "text": "I find it helpful to think of these weights as being organized into a"
+    },
+    {
+      "start": 571.1,
+      "end": 574.64,
+      "text": "little grid of their own, and I'm going to use green pixels to indicate"
+    },
+    {
+      "start": 574.64,
+      "end": 577.74,
+      "text": "positive weights, and red pixels to indicate negative weights,"
+    },
+    {
+      "start": 577.74,
+      "end": 581.78,
+      "text": "where the brightness of that pixel is some loose depiction of the weight's value."
+    },
+    {
+      "start": 582.78,
+      "end": 586.53,
+      "text": "Now if we made the weights associated with almost all of the pixels zero"
+    },
+    {
+      "start": 586.53,
+      "end": 590.07,
+      "text": "except for some positive weights in this region that we care about,"
+    },
+    {
+      "start": 590.07,
+      "end": 593.87,
+      "text": "then taking the weighted sum of all the pixel values really just amounts"
+    },
+    {
+      "start": 593.87,
+      "end": 597.82,
+      "text": "to adding up the values of the pixel just in the region that we care about."
+    },
+    {
+      "start": 599.14,
+      "end": 602.39,
+      "text": "And if you really wanted to pick up on whether there's an edge here,"
+    },
+    {
+      "start": 602.39,
+      "end": 606.6,
+      "text": "what you might do is have some negative weights associated with the surrounding pixels."
+    },
+    {
+      "start": 607.48,
+      "end": 610.04,
+      "text": "Then the sum is largest when those middle pixels"
+    },
+    {
+      "start": 610.04,
+      "end": 612.7,
+      "text": "are bright but the surrounding pixels are darker."
+    },
+    {
+      "start": 614.26,
+      "end": 618.65,
+      "text": "When you compute a weighted sum like this, you might come out with any number,"
+    },
+    {
+      "start": 618.65,
+      "end": 623.54,
+      "text": "but for this network what we want is for activations to be some value between 0 and 1."
+    },
+    {
+      "start": 624.12,
+      "end": 628.25,
+      "text": "So a common thing to do is to pump this weighted sum into some function"
+    },
+    {
+      "start": 628.25,
+      "end": 632.14,
+      "text": "that squishes the real number line into the range between 0 and 1."
+    },
+    {
+      "start": 632.46,
+      "end": 635.83,
+      "text": "And a common function that does this is called the sigmoid function,"
+    },
+    {
+      "start": 635.83,
+      "end": 637.42,
+      "text": "also known as a logistic curve."
+    },
+    {
+      "start": 638.0,
+      "end": 643.35,
+      "text": "Basically very negative inputs end up close to 0, positive inputs end up close to 1,"
+    },
+    {
+      "start": 643.35,
+      "end": 646.6,
+      "text": "and it just steadily increases around the input 0."
+    },
+    {
+      "start": 649.12,
+      "end": 652.64,
+      "text": "So the activation of the neuron here is basically a"
+    },
+    {
+      "start": 652.64,
+      "end": 656.36,
+      "text": "measure of how positive the relevant weighted sum is."
+    },
+    {
+      "start": 657.54,
+      "end": 659.64,
+      "text": "But maybe it's not that you want the neuron to"
+    },
+    {
+      "start": 659.64,
+      "end": 661.88,
+      "text": "light up when the weighted sum is bigger than 0."
+    },
+    {
+      "start": 662.28,
+      "end": 666.36,
+      "text": "Maybe you only want it to be active when the sum is bigger than say 10."
+    },
+    {
+      "start": 666.84,
+      "end": 670.26,
+      "text": "That is, you want some bias for it to be inactive."
+    },
+    {
+      "start": 671.38,
+      "end": 675.47,
+      "text": "What we'll do then is just add in some other number like negative 10 to this"
+    },
+    {
+      "start": 675.47,
+      "end": 679.66,
+      "text": "weighted sum before plugging it through the sigmoid squishification function."
+    },
+    {
+      "start": 680.58,
+      "end": 682.44,
+      "text": "That additional number is called the bias."
+    },
+    {
+      "start": 683.46,
+      "end": 687.31,
+      "text": "So the weights tell you what pixel pattern this neuron in the second"
+    },
+    {
+      "start": 687.31,
+      "end": 691.22,
+      "text": "layer is picking up on, and the bias tells you how high the weighted"
+    },
+    {
+      "start": 691.22,
+      "end": 695.18,
+      "text": "sum needs to be before the neuron starts getting meaningfully active."
+    },
+    {
+      "start": 696.12,
+      "end": 697.68,
+      "text": "And that is just one neuron."
+    },
+    {
+      "start": 698.28,
+      "end": 702.48,
+      "text": "Every other neuron in this layer is going to be connected to"
+    },
+    {
+      "start": 702.48,
+      "end": 706.67,
+      "text": "all 784 pixel neurons from the first layer, and each one of"
+    },
+    {
+      "start": 706.67,
+      "end": 710.94,
+      "text": "those 784 connections has its own weight associated with it."
+    },
+    {
+      "start": 711.6,
+      "end": 714.58,
+      "text": "Also, each one has some bias, some other number that you add"
+    },
+    {
+      "start": 714.58,
+      "end": 717.6,
+      "text": "on to the weighted sum before squishing it with the sigmoid."
+    },
+    {
+      "start": 718.11,
+      "end": 719.54,
+      "text": "And that's a lot to think about!"
+    },
+    {
+      "start": 719.96,
+      "end": 726.2,
+      "text": "With this hidden layer of 16 neurons, that's a total of 784 times 16 weights,"
+    },
+    {
+      "start": 726.2,
+      "end": 727.98,
+      "text": "along with 16 biases."
+    },
+    {
+      "start": 728.84,
+      "end": 731.94,
+      "text": "And all of that is just the connections from the first layer to the second."
+    },
+    {
+      "start": 732.52,
+      "end": 734.88,
+      "text": "The connections between the other layers also have"
+    },
+    {
+      "start": 734.88,
+      "end": 737.34,
+      "text": "a bunch of weights and biases associated with them."
+    },
+    {
+      "start": 738.34,
+      "end": 743.8,
+      "text": "All said and done, this network has almost exactly 13,000 total weights and biases."
+    },
+    {
+      "start": 743.8,
+      "end": 747.06,
+      "text": "13,000 knobs and dials that can be tweaked and turned"
+    },
+    {
+      "start": 747.07,
+      "end": 749.96,
+      "text": "to make this network behave in different ways."
+    },
+    {
+      "start": 751.04,
+      "end": 754.26,
+      "text": "So when we talk about learning, what that's referring to is"
+    },
+    {
+      "start": 754.26,
+      "end": 757.65,
+      "text": "getting the computer to find a valid setting for all of these"
+    },
+    {
+      "start": 757.65,
+      "end": 761.36,
+      "text": "many many numbers so that it'll actually solve the problem at hand."
+    },
+    {
+      "start": 762.62,
+      "end": 767.19,
+      "text": "One thought experiment that is at once fun and kind of horrifying is to imagine sitting"
+    },
+    {
+      "start": 767.19,
+      "end": 770.23,
+      "text": "down and setting all of these weights and biases by hand,"
+    },
+    {
+      "start": 770.23,
+      "end": 774.32,
+      "text": "purposefully tweaking the numbers so that the second layer picks up on edges,"
+    },
+    {
+      "start": 774.32,
+      "end": 776.58,
+      "text": "the third layer picks up on patterns, etc."
+    },
+    {
+      "start": 776.98,
+      "end": 781.34,
+      "text": "I personally find this satisfying rather than just treating the network as a total black"
+    },
+    {
+      "start": 781.34,
+      "end": 784.81,
+      "text": "box, because when the network doesn't perform the way you anticipate,"
+    },
+    {
+      "start": 784.81,
+      "end": 789.02,
+      "text": "if you've built up a little bit of a relationship with what those weights and biases"
+    },
+    {
+      "start": 789.02,
+      "end": 793.09,
+      "text": "actually mean, you have a starting place for experimenting with how to change the"
+    },
+    {
+      "start": 793.09,
+      "end": 794.18,
+      "text": "structure to improve."
+    },
+    {
+      "start": 794.96,
+      "end": 798.43,
+      "text": "Or when the network does work but not for the reasons you might expect,"
+    },
+    {
+      "start": 798.43,
+      "end": 802.25,
+      "text": "digging into what the weights and biases are doing is a good way to challenge"
+    },
+    {
+      "start": 802.25,
+      "end": 805.82,
+      "text": "your assumptions and really expose the full space of possible solutions."
+    },
+    {
+      "start": 806.84,
+      "end": 809.96,
+      "text": "By the way, the actual function here is a little cumbersome to write down,"
+    },
+    {
+      "start": 809.96,
+      "end": 810.68,
+      "text": "don't you think?"
+    },
+    {
+      "start": 812.5,
+      "end": 817.14,
+      "text": "So let me show you a more notationally compact way that these connections are represented."
+    },
+    {
+      "start": 817.66,
+      "end": 820.52,
+      "text": "This is how you'd see it if you choose to read up more about neural networks."
+    },
+    {
+      "start": 820.52,
+      "end": 828.02,
+      "text": "Organize all of the activations from one layer into a column as a vector."
+    },
+    {
+      "start": 828.36,
+      "end": 830.04,
+      "text": "Then organize all of the weights as a matrix, where each row of that matrix corresponds"
+    },
+    {
+      "start": 830.04,
+      "end": 838.0,
+      "text": "to the connections between one layer and a particular neuron in the next layer."
+    },
+    {
+      "start": 838.54,
+      "end": 842.21,
+      "text": "What that means is that taking the weighted sum of the activations in"
+    },
+    {
+      "start": 842.21,
+      "end": 845.89,
+      "text": "the first layer according to these weights corresponds to one of the"
+    },
+    {
+      "start": 845.89,
+      "end": 849.88,
+      "text": "terms in the matrix vector product of everything we have on the left here."
+    },
+    {
+      "start": 854.0,
+      "end": 857.71,
+      "text": "By the way, so much of machine learning just comes down to having a good"
+    },
+    {
+      "start": 857.71,
+      "end": 861.12,
+      "text": "grasp of linear algebra, so for any of you who want a nice visual"
+    },
+    {
+      "start": 861.12,
+      "end": 864.83,
+      "text": "understanding for matrices and what matrix vector multiplication means,"
+    },
+    {
+      "start": 864.83,
+      "end": 868.6,
+      "text": "take a look at the series I did on linear algebra, especially chapter 3."
+    },
+    {
+      "start": 869.24,
+      "end": 873.59,
+      "text": "Back to our expression, instead of talking about adding the bias to each one of"
+    },
+    {
+      "start": 873.59,
+      "end": 878.0,
+      "text": "these values independently, we represent it by organizing all those biases into"
+    },
+    {
+      "start": 878.0,
+      "end": 882.3,
+      "text": "a vector, and adding the entire vector to the previous matrix vector product."
+    },
+    {
+      "start": 883.28,
+      "end": 886.81,
+      "text": "Then as a final step, I'll wrap a sigmoid around the outside here,"
+    },
+    {
+      "start": 886.81,
+      "end": 890.67,
+      "text": "and what that's supposed to represent is that you're going to apply the"
+    },
+    {
+      "start": 890.67,
+      "end": 894.74,
+      "text": "sigmoid function to each specific component of the resulting vector inside."
+    },
+    {
+      "start": 895.94,
+      "end": 900.48,
+      "text": "So once you write down this weight matrix and these vectors as their own symbols,"
+    },
+    {
+      "start": 900.48,
+      "end": 905.41,
+      "text": "you can communicate the full transition of activations from one layer to the next in an"
+    },
+    {
+      "start": 905.41,
+      "end": 910.34,
+      "text": "extremely tight and neat little expression, and this makes the relevant code both a lot"
+    },
+    {
+      "start": 910.34,
+      "end": 914.76,
+      "text": "simpler and a lot faster, since many libraries optimize the heck out of matrix"
+    },
+    {
+      "start": 914.76,
+      "end": 915.66,
+      "text": "multiplication."
+    },
+    {
+      "start": 917.82,
+      "end": 921.46,
+      "text": "Remember how earlier I said these neurons are simply things that hold numbers?"
+    },
+    {
+      "start": 922.22,
+      "end": 927.33,
+      "text": "Well of course the specific numbers that they hold depends on the image you feed in,"
+    },
+    {
+      "start": 927.33,
+      "end": 931.59,
+      "text": "so it's actually more accurate to think of each neuron as a function,"
+    },
+    {
+      "start": 931.59,
+      "end": 936.88,
+      "text": "one that takes in the outputs of all the neurons in the previous layer and spits out a"
+    },
+    {
+      "start": 936.88,
+      "end": 938.34,
+      "text": "number between 0 and 1."
+    },
+    {
+      "start": 939.2,
+      "end": 943.13,
+      "text": "Really the entire network is just a function, one that takes in"
+    },
+    {
+      "start": 943.13,
+      "end": 947.06,
+      "text": "784 numbers as an input and spits out 10 numbers as an output."
+    },
+    {
+      "start": 947.56,
+      "end": 951.46,
+      "text": "It's an absurdly complicated function, one that involves 13,000 parameters"
+    },
+    {
+      "start": 951.46,
+      "end": 955.42,
+      "text": "in the forms of these weights and biases that pick up on certain patterns,"
+    },
+    {
+      "start": 955.42,
+      "end": 959.27,
+      "text": "and which involves iterating many matrix vector products and the sigmoid"
+    },
+    {
+      "start": 959.26,
+      "end": 962.64,
+      "text": "squishification function, but it's just a function nonetheless."
+    },
+    {
+      "start": 963.4,
+      "end": 966.66,
+      "text": "And in a way it's kind of reassuring that it looks complicated."
+    },
+    {
+      "start": 967.34,
+      "end": 969.7,
+      "text": "if it were any simpler, what hope would we have"
+    },
+    {
+      "start": 969.7,
+      "end": 972.28,
+      "text": "that it could take on the challenge of recognizing digits?"
+    },
+    {
+      "start": 973.34,
+      "end": 974.7,
+      "text": "And how does it take on that challenge?"
+    },
+    {
+      "start": 975.08,
+      "end": 979.36,
+      "text": "How does this network learn the appropriate weights and biases just by looking at data?"
+    },
+    {
+      "start": 980.14,
+      "end": 983.19,
+      "text": "Well that's what I'll show in the next video, and I'll also dig a little"
+    },
+    {
+      "start": 983.19,
+      "end": 986.12,
+      "text": "more into what this particular network we're seeing is really doing."
+    },
+    {
+      "start": 987.58,
+      "end": 990.75,
+      "text": "Now is the point I suppose I should say subscribe to stay notified"
+    },
+    {
+      "start": 990.75,
+      "end": 993.15,
+      "text": "about when that video or any new videos come out,"
+    },
+    {
+      "start": 993.15,
+      "end": 997.42,
+      "text": "but realistically most of you don't actually receive notifications from YouTube, do you?"
+    },
+    {
+      "start": 998.02,
+      "end": 1001.28,
+      "text": "Maybe more honestly I should say subscribe so that the neural networks"
+    },
+    {
+      "start": 1001.28,
+      "end": 1004.58,
+      "text": "that underlie YouTube's recommendation algorithm are primed to believe"
+    },
+    {
+      "start": 1004.58,
+      "end": 1007.88,
+      "text": "that you want to see content from this channel get recommended to you."
+    },
+    {
+      "start": 1008.56,
+      "end": 1009.94,
+      "text": "Anyway, stay posted for more."
+    },
+    {
+      "start": 1010.76,
+      "end": 1013.5,
+      "text": "Thank you very much to everyone supporting these videos on Patreon."
+    },
+    {
+      "start": 1014.0,
+      "end": 1017.44,
+      "text": "I've been a little slow to progress in the probability series this summer,"
+    },
+    {
+      "start": 1017.44,
+      "end": 1019.72,
+      "text": "but I'm jumping back into it after this project,"
+    },
+    {
+      "start": 1019.72,
+      "end": 1021.9,
+      "text": "so patrons you can look out for updates there."
+    },
+    {
+      "start": 1023.6,
+      "end": 1027.09,
+      "text": "To close things off here I have with me Lisha Li who did her PhD work on the"
+    },
+    {
+      "start": 1027.09,
+      "end": 1030.72,
+      "text": "theoretical side of deep learning and who currently works at a venture capital"
+    },
+    {
+      "start": 1030.72,
+      "end": 1034.62,
+      "text": "firm called Amplify Partners who kindly provided some of the funding for this video."
+    },
+    {
+      "start": 1035.46,
+      "end": 1039.12,
+      "text": "So Lisha one thing I think we should quickly bring up is this sigmoid function."
+    },
+    {
+      "start": 1039.7,
+      "end": 1043.16,
+      "text": "As I understand it early networks use this to squish the relevant weighted"
+    },
+    {
+      "start": 1043.16,
+      "end": 1046.52,
+      "text": "sum into that interval between zero and one, kind of motivated"
+    },
+    {
+      "start": 1046.52,
+      "end": 1049.84,
+      "text": "by this biological analogy of neurons either being inactive or active."
+    },
+    {
+      "start": 1050.28,
+      "end": 1054.04,
+      "text": "Exactly. But relatively few modern networks actually use sigmoid anymore."
+    },
+    {
+      "start": 1054.32,
+      "end": 1055.76,
+      "text": "Yeah. It's kind of old school right?"
+    },
+    {
+      "start": 1055.76,
+      "end": 1058.98,
+      "text": "Yeah or rather ReLU seems to be much easier to train."
+    },
+    {
+      "start": 1059.4,
+      "end": 1062.34,
+      "text": "And ReLU, ReLU stands for rectified linear unit?"
+    },
+    {
+      "start": 1062.68,
+      "end": 1067.4,
+      "text": "Yes it's this kind of function where you're just taking a max of zero"
+    },
+    {
+      "start": 1067.4,
+      "end": 1072.05,
+      "text": "and a where a is given by what you were explaining in the video and"
+    },
+    {
+      "start": 1072.05,
+      "end": 1076.57,
+      "text": "what this was sort of motivated from I think was a partially by a"
+    },
+    {
+      "start": 1076.57,
+      "end": 1081.36,
+      "text": "biological analogy with how neurons would either be activated or not."
+    },
+    {
+      "start": 1081.36,
+      "end": 1086.02,
+      "text": "And so if it passes a certain threshold it would be the identity function but if it did"
+    },
+    {
+      "start": 1086.02,
+      "end": 1090.84,
+      "text": "not then it would just not be activated so it'd be zero so it's kind of a simplification."
+    },
+    {
+      "start": 1091.16,
+      "end": 1095.7,
+      "text": "Using sigmoids didn't help training or it was very difficult to"
+    },
+    {
+      "start": 1095.69,
+      "end": 1100.23,
+      "text": "train at some point and people just tried ReLU and it happened"
+    },
+    {
+      "start": 1100.23,
+      "end": 1104.62,
+      "text": "to work very well for these incredibly deep neural networks."
+    },
+    {
+      "start": 1105.1,
+      "end": 1105.64,
+      "text": "All right thank you Lisha."
+    }
+  ]
+}

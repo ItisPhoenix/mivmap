@@ -1,0 +1,101 @@
+"""
+Central configuration.
+
+Every secret (the configured LLM key, optional Groq/Hugging Face/Notion
+keys) lives in the `.env` file at the *project root* (one level above
+`backend/`). It is loaded once here with python-dotenv, so anywhere in the
+backend `os.getenv("LLM_API_KEY")` works; modules read it through `settings`.
+"""
+from __future__ import annotations
+
+import importlib.util
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BACKEND_DIR.parent
+
+# Project-root .env first, then backend/.env (lets people keep either layout).
+load_dotenv(PROJECT_ROOT / ".env")
+load_dotenv(BACKEND_DIR / ".env")
+
+
+def _env(name: str, default: str = "") -> str:
+    return (os.getenv(name) or default).strip()
+
+
+@dataclass(frozen=True)
+class Settings:
+    groq_api_key: str = field(default_factory=lambda: _env("GROQ_API_KEY"))
+    groq_model: str = field(default_factory=lambda: _env("GROQ_MODEL", "llama-3.3-70b-versatile"))
+    groq_fallback_model: str = field(default_factory=lambda: _env("GROQ_FALLBACK_MODEL", "llama-3.1-8b-instant"))
+    # Fast model for the single map-label call and the node chatbot. Empty = auto-pick the
+    # fastest live model (llama-3.1-8b-instant, else gpt-oss-20b with low reasoning effort).
+    groq_label_model: str = field(default_factory=lambda: _env("GROQ_LABEL_MODEL"))
+
+    # Generic OpenAI-compatible provider. Primary LLM when configured.
+    # Works with any provider that implements the OpenAI chat-completions API
+    # (OpenAI itself, NVIDIA NIM, Kilo gateway, Together, vLLM, Ollama, etc.).
+    llm_api_key: str = field(default_factory=lambda: _env("LLM_API_KEY"))
+    llm_model: str = field(default_factory=lambda: _env("LLM_MODEL"))
+    llm_base_url: str = field(default_factory=lambda: _env("LLM_BASE_URL"))
+    label_timeout: float = field(default_factory=lambda: float(_env("LABEL_TIMEOUT", "1.2")))
+    chat_timeout: float = field(default_factory=lambda: float(_env("CHAT_TIMEOUT", "12.0")))
+
+    # English-only maps: non-English transcripts are translated once per video with NLLB-200
+    # (CTranslate2 int8; run scripts/convert_nllb.py once). English videos never touch the model.
+    nllb_enabled: bool = field(default_factory=lambda: _env("NLLB_ENABLED", "1").lower() not in ("0", "false", "no", "off"))
+    nllb_model_path: Path = field(
+        default_factory=lambda: Path(_env("NLLB_MODEL_PATH") or BACKEND_DIR / "data" / "models" / "nllb-200-distilled-600M-ct2-int8")
+    )
+
+    hf_token: str = field(default_factory=lambda: _env("HF_TOKEN"))
+    hf_model: str = field(default_factory=lambda: _env("HF_MODEL", "Qwen/Qwen2.5-7B-Instruct"))
+    hf_local_model: str = field(default_factory=lambda: _env("HF_LOCAL_MODEL"))
+
+    embedding_model: str = field(
+        default_factory=lambda: _env("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+    )
+    whisper_model: str = field(default_factory=lambda: _env("WHISPER_MODEL", "base"))
+
+    host: str = field(default_factory=lambda: _env("HOST", "127.0.0.1"))
+    port: int = field(default_factory=lambda: int(_env("PORT", "8765")))
+    # Additional exact chrome-extension:// origins. Never a wildcard: invalid
+    # entries are dropped by app.origins. Empty by default (see .env.example).
+    cors_origins: tuple[str, ...] = field(
+        default_factory=lambda: tuple(o.strip() for o in _env("CORS_ORIGINS", "").split(",") if o.strip())
+    )
+
+    notion_token: str = field(default_factory=lambda: _env("NOTION_TOKEN"))
+    notion_parent_page_id: str = field(default_factory=lambda: _env("NOTION_PARENT_PAGE_ID"))
+
+    data_dir: Path = BACKEND_DIR / "data"
+
+    @property
+    def groq_enabled(self) -> bool:
+        return bool(self.groq_api_key) and self.groq_api_key != "your_api_key_here"
+
+    @property
+    def llm_enabled(self) -> bool:
+        return bool(self.llm_api_key) and self.llm_api_key not in ("", "your_api_key_here")
+
+    @property
+    def nvidia_enabled(self) -> bool:
+        """Backward-compatible alias for older .env files that still set NVIDIA_*."""
+        return bool(self.llm_api_key or _env("NVIDIA_API_KEY")) and (self.llm_api_key or _env("NVIDIA_API_KEY")) not in ("", "your_api_key_here")
+
+
+settings = Settings()
+for sub in ("", "cache", "cache/translated", "media"):
+    (settings.data_dir / sub).mkdir(parents=True, exist_ok=True)
+
+
+def has_module(name: str) -> bool:
+    """True when an optional dependency is importable (checked without importing it)."""
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, ValueError):
+        return False
