@@ -179,6 +179,42 @@ def smart_title(phrase: str) -> str:
 UNICODE_WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)
 SUPPORTED_TEACHING_LANGUAGES = frozenset({"en", "hi"})
 
+# Natural language is identified by its *grammar*, not by the fraction of
+# letters in a script. A mostly-English explanation with a few Hindi nouns has
+# English function words and no Hindi grammar; a natural Hinglish explanation
+# keeps Hindi postpositions/auxiliaries while borrowing English technical nouns.
+HINDI_GRAMMAR_WORDS = frozenset({
+    # postpositions / auxiliaries / conjunctions
+    "है", "हैं", "था", "थे", "थी", "हो", "होना", "होती", "होते", "हुआ", "हुई", "हुए",
+    "से", "को", "में", "के", "की", "का", "पर", "तक", "और", "या", "कि", "क्योंकि",
+    "लेकिन", "तो", "भी", "नहीं", "न", "यह", "ये", "वह", "वे", "यहाँ", "वहाँ",
+    "जो", "जिस", "जिन", "क्या", "कैसे", "कब", "कहाँ", "जब", "तब", "फिर", "पहले",
+    "एक", "दो", "कई", "बहुत", "सभी", "दूसरे", "दूसरा", "दोनों", "अपने", "अपनी",
+    "रहा", "रही", "रहे", "लिए", "वाला", "वाली", "वाले", "जैसे", "यानी", "अर्थात",
+    "मतलब", "ही", "तथा", "अंदर", "बाहर", "बीच", "कारण", "इसे", "उसे", "उन्हें",
+    # common Hindi verb forms (strong grammatical signal even with English nouns)
+    "कर", "करता", "करती", "करते", "करना", "करने", "किया", "जाता", "जाती", "जाते",
+    "गया", "गई", "जोड़ता", "जोड़ती", "जोड़ने", "जुड़ता", "जुड़ती", "जुड़ने",
+    "भेजता", "भेजती", "भेजने", "लेता",
+    "देता", "मिलता", "चलता", "आता", "रखता", "दिखाता", "समझाता", "बताता", "पढ़ता",
+    "लिखता", "बनाता", "सकता", "सकती", "चाहिए", "पहचानें", "समझें", "देखें",
+})
+ENGLISH_GRAMMAR_WORDS = frozenset({
+    "a", "an", "the", "of", "to", "in", "on", "at", "for", "from", "by", "with",
+    "and", "or", "but", "is", "are", "was", "were", "be", "been", "being", "am",
+    "this", "that", "these", "those", "it", "its", "as", "into", "through",
+    "between", "each", "every", "which", "who", "what", "when", "where", "how",
+    "can", "will", "would", "should", "may", "might", "must", "do", "does", "did",
+    "not", "no", "if", "then", "than", "so", "such", "because", "while", "about",
+    "over", "under", "out", "up", "down", "more", "most", "other", "another",
+    "own", "same", "each", "both", "few", "many", "much", "only", "also", "here",
+    "there", "these", "those",
+})
+
+
+def has_devanagari(text: str) -> bool:
+    return any("\u0900" <= ch <= "\u097f" for ch in str(text or ""))
+
 
 def normalize_language(code: str | None) -> str:
     """Normalise BCP-47 codes to the base language (hi-IN -> hi, en-US -> en)."""
@@ -190,7 +226,9 @@ def unicode_tokens(text: str) -> list[str]:
     """Word tokens that preserve Devanagari marks and every other Unicode script."""
     # \w excludes combining marks (Devanagari matras), so include the Devanagari
     # block explicitly. lower() keeps scripts intact where casefold() decomposes them.
-    cleaned = re.sub(r"[^\w\u0900-\u097f]+", " ", str(text or "").lower()).strip()
+    # U+0964/U+0965 are the danda sentence markers; they live inside the
+    # Devanagari block but are punctuation, not part of a word token.
+    cleaned = re.sub(r"[^\w\u0900-\u0963\u0966-\u097f]+", " ", str(text or "").lower()).strip()
     return cleaned.split() if cleaned else []
 
 
@@ -230,7 +268,14 @@ def is_technical_only(text: str) -> bool:
 
 
 def field_language_ok(text: str, language: str) -> bool:
-    """Check one learner-facing field against the requested teaching language."""
+    """Check one learner-facing field against the requested teaching language.
+
+    A script-percentage threshold is not enough: "a राउटर is a device that
+    forwards packets" is English with one Hindi noun, while "राउटर पैकेट को
+    एक नेटवर्क से दूसरे नेटवर्क तक ले जाता है" is Hindi grammar carrying English
+    technical vocabulary. We therefore require Hindi grammatical markers and
+    require them to dominate English grammatical markers.
+    """
     lang = normalize_language(language)
     if lang not in SUPPORTED_TEACHING_LANGUAGES:
         return False
@@ -240,8 +285,22 @@ def field_language_ok(text: str, language: str) -> bool:
     letters = dev + latin + other
     if not letters:
         return False
+    tokens = unicode_tokens(text)
+    if not tokens:
+        return False
     if lang == "hi":
-        return dev > 0 and dev / letters >= 0.2
+        if dev == 0:
+            return False
+        hindi_markers = sum(t in HINDI_GRAMMAR_WORDS for t in tokens)
+        english_markers = sum(t in ENGLISH_GRAMMAR_WORDS for t in tokens)
+        ratio = dev / letters
+        # Natural Hindi or Hinglish: Hindi grammar present and not outweighed by
+        # English grammar. Short pure-Devanagari labels/titles need no full prose.
+        if hindi_markers >= 2 and hindi_markers >= english_markers and ratio >= 0.15:
+            return True
+        if ratio >= 0.55 and english_markers == 0 and dev >= 4:
+            return True
+        return False
     return latin > 0 and latin / letters >= 0.8
 
 

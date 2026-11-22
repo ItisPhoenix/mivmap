@@ -190,7 +190,10 @@ def _definition(topic: str, sentences: list[str], sims: np.ndarray) -> tuple[str
         # (copula right after the alias); otherwise the whole sentence, but only when
         # it names the concept — never an unrelated fragment.
         after_term = _short(clause[m.end():] if explicit else sentence)
-        if not _identifies(after_term, aliases):
+        # An explicit copula sits AFTER the term, so the defining clause
+        # naturally omits the alias; judge identification on the whole
+        # sentence in that case, not on the clause that follows it.
+        if not _identifies(sentence if explicit else after_term, aliases):
             continue
         if explicit and len(after_term.split()) < 3:
             continue

@@ -39,15 +39,15 @@ HTTP_REQUIRED_TOPICS = {
 }
 
 NETWORKING_REQUIRED_TOPICS = {
-    "LAN": ["lan", "local area network"],
+    "LAN": ["lan", "local area network", "लैन", "लोकल नेटवर्क"],
     "PAN": ["pan", "personal area network"],
     "MAN": ["man", "metropolitan area network"],
-    "WAN": ["wan", "wide area network"],
+    "WAN": ["wan", "wide area network", "वान", "वैन", "वाइड एरिया नेटवर्क"],
     "ARPANET": ["arpanet"],
-    "TCP/IP": ["tcp/ip", "tcp and ip", "transmission control protocol"],
-    "OSI": ["osi", "open systems interconnection"],
+    "TCP/IP": ["tcp/ip", "tcp and ip", "transmission control protocol", "टीसीपी"],
+    "OSI": ["osi", "open systems interconnection", "ओएसआई"],
     "ISP tiers": ["tier", "isp", "internet service provider"],
-    "fibre infrastructure": ["fibre", "fiber", "optical fibre", "undersea cable"],
+    "fibre infrastructure": ["fibre", "fiber", "optical fibre", "undersea cable", "फाइबर"],
     "CDNs": ["cdn", "content delivery network"],
 }
 
@@ -159,10 +159,20 @@ def analyze_map(mindmap: dict) -> QualityReport:
     dupes = sorted({x for x in norms if norms.count(x) > 1})
     r.check("concepts_unique", not dupes, {"count": len(dupes), "examples": dupes[:5]})
 
+    transcript_text = " ".join(str(e.get("text") or "") for e in _domain_transcript[:400]).lower()
     corpus = " ".join((_s(n.get("topic")) + " " + _s(n.get("text"))).lower() for n in concepts)
+    # A syllabus topic is only required when the video actually mentions it.
+    # Demanding ARPANET/CDN concepts from a video that never says those words
+    # makes the quality gate reject otherwise complete maps.
+    expected_topics = ({name: aliases for name, aliases in (required_topics or {}).items()
+                        if any(a.lower() in transcript_text for a in aliases)}
+                       if http_evidence else {})
     if http_evidence:
-        missing = [name for name, aliases in required_topics.items() if not any(a in corpus for a in aliases)]
-        r.check("http_topic_coverage", not missing, {"missing": missing, "covered": len(required_topics) - len(missing), "total": len(required_topics)})
+        missing = [name for name, aliases in expected_topics.items()
+                   if not any(a in corpus for a in aliases)]
+        r.check("http_topic_coverage", not missing,
+                {"missing": missing, "covered": len(expected_topics) - len(missing),
+                 "total": len(expected_topics)})
 
     concept_titles = " ".join(
         (_s(n.get("topic")) + " " + _s(n.get("text")) + " " + _s(n.get("explain")) + " " + _s(n.get("mechanism"))
@@ -170,7 +180,7 @@ def analyze_map(mindmap: dict) -> QualityReport:
         for n in concepts
     )
     if http_evidence:
-        absent = [name for name, aliases in required_topics.items() if not any(a in concept_titles for a in aliases)]
+        absent = [name for name, aliases in expected_topics.items() if not any(a in concept_titles for a in aliases)]
         r.check("essential_concepts_present", not absent, {"absent": absent})
 
     misaligned = []

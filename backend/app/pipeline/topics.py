@@ -15,7 +15,18 @@ import re
 from dataclasses import dataclass
 
 from .concepts import Concept
-from .text_utils import unicode_norm
+from .text_utils import unicode_norm, unicode_tokens
+
+# Devanagari combining marks (matras) are not `\\w` in Python, so a plain `\\b`
+# can match inside a Hindi word. These lookarounds keep short terms whole-word
+# across both Latin and Devanagari text.
+_WORD_START = r"(?<![A-Za-z0-9\u0900-\u097f])"
+_WORD_END = r"(?![A-Za-z0-9\u0900-\u097f])"
+
+
+def hw(term: str) -> str:
+    """Whole-word pattern for a Devanagari / Hinglish term."""
+    return _WORD_START + re.escape(term) + _WORD_END
 
 # (canonical label, aliases -> any one cue is enough)
 HTTP_TOPICS = [
@@ -35,16 +46,32 @@ HTTP_TOPICS = [
 
 # Networking / "history of the Internet" lectures (e.g. Networking for Hackers #2).
 NETWORKING_TOPICS = [
-    ("LAN", [r"\blan\b", r"local area network"]),
-    ("PAN", [r"\bpan\b", r"personal area network"]),
-    ("MAN", [r"\bman\b", r"metropolitan area network"]),
-    ("WAN", [r"\bwan\b", r"wide area network"]),
-    ("ARPANET", [r"arpanet", r"advanced research projects agency network"]),
-    ("TCP/IP", [r"tcp/ip", r"tcp and ip", r"transmission control protocol", r"internet protocol suite"]),
-    ("OSI model", [r"\bosi\b", r"open systems interconnection", r"seven.layer model"]),
-    ("ISP tiers", [r"tier[\s-]?[123]", r"internet service provider", r"\bisps?\b"]),
-    ("Fibre infrastructure", [r"\bfibre\b", r"\bfiber\b", r"optical (?:fibre|fiber)", r"undersea cable", r"submarine cable"]),
-    ("CDNs", [r"\bcdns?\b", r"content delivery network", r"content distribution network"]),
+    ("LAN", [r"\blan\b", r"local area network", hw("लैन"), hw("लोकल एरिया नेटवर्क"),
+             hw("लोकल नेटवर्क")]),
+    ("PAN", [r"\bpan\b", r"personal area network", hw("पैन"), hw("पर्सनल एरिया नेटवर्क"),
+             hw("व्यक्तिगत नेटवर्क")]),
+    ("MAN", [r"\bman\b", r"metropolitan area network", hw("मैन"),
+             hw("मेट्रोपॉलिटन एरिया नेटवर्क"), hw("महानगरीय नेटवर्क")]),
+    ("WAN", [r"\bwan\b", r"wide area network", r"वाइड\s+एरिया\s+नेटवर्क",
+             hw("वान"), hw("वैन")]),
+    ("ARPANET", [r"arpanet", r"advanced research projects agency network", hw("अरपानेट")]),
+    ("TCP/IP", [r"tcp/ip", r"tcp and ip", r"transmission control protocol",
+                r"internet protocol suite", r"टीसीपी\s*/\s*आईपी", hw("टीसीपी")]),
+    ("OSI model", [r"\bosi\b", r"open systems interconnection", r"seven.layer model",
+                   r"ओएसआई\s+(?:मॉडल|मोडल)", hw("ओएसआई")]),
+    ("ISP tiers", [r"tier[\s-]?[123]", r"internet service provider", r"\bisps?\b",
+                   r"इंटरनेट\s+सर्विस\s+प्रोवाइडर", hw("आईएसपी"), hw("इएसपी")]),
+    ("Fibre infrastructure", [r"\bfibre\b", r"\bfiber\b", r"optical (?:fibre|fiber)",
+                              r"undersea cable", r"submarine cable",
+                              r"फाइबर\s+(?:केबल|ऑप्टिकल)?", hw("फाइबर"), hw("फाइबर केबल"),
+                              hw("ऑप्टिकल फाइबर")]),
+    ("CDNs", [r"\bcdns?\b", r"content delivery network", r"content distribution network",
+              hw("सीडीएन")]),
+    ("Router", [r"\brouters?\b", hw("राउटर"), hw("राऊटर")]),
+    # "internet" / "इंटरनेट" is recovered by HINDI_TERM_HINTS and the domain
+    # anchor rather than a separate essential topic: a generic "Internet" node
+    # would duplicate the worked examples of the more specific topics.
+    ("Cell tower", [r"cell\s+tower", r"base\s+station", hw("टावर"), hw("सेलुलर टावर")]),
 ]
 
 # Domain anchors prevent generic cue words in one lexicon (e.g. "get", "body",
@@ -53,7 +80,12 @@ DOMAIN_ANCHORS = {
     "networking": re.compile(
         r"\b(?:lan|wan|man|pan|isp|isps|arpanet|osi|cdn|cdns|fibre|fiber|"
         r"internet service provider|content delivery network|wide area network|"
-        r"local area network|metropolitan area network|personal area network)\b", re.I),
+        r"local area network|metropolitan area network|personal area network|"
+        r"router|internet|tcp/ip|osi model)\b"
+        r"|" + "|".join(hw(t) for t in (
+            "लैन", "वान", "वैन", "पैन", "मैन", "राउटर", "राऊटर", "फाइबर",
+            "इंटरनेट", "नेटवर्क", "नेटवर्कों", "टावर", "सेलुलर", "ओएसआई",
+            "टीसीपी", "आईएसपी", "सीडीएन")), re.I),
     "http": re.compile(
         r"\b(?:http|https|hypertext transfer protocol)\b", re.I),
 }
@@ -77,15 +109,33 @@ def _norm(text: str) -> str:
     return unicode_norm(text)
 
 
+def topic_regex(patterns: list[str]) -> re.Pattern:
+    """Compile one lexicon entry's cues into a single Unicode-aware matcher."""
+    return re.compile("|".join(f"(?:{p})" for p in patterns), re.I)
+
+
+def _aliases(label: str, matched_text: str) -> tuple[str, ...]:
+    """Aliases from the canonical label plus spoken terms in the matched block."""
+    out: list[str] = []
+    for token in unicode_tokens(label):
+        if len(token) >= 2 and token not in {"and", "the", "for", "model", "network", "of", "areas"}:
+            out.append(token)
+    for token in unicode_tokens(matched_text):
+        if len(token) >= 3 and any("\u0900" <= ch <= "\u097f" for ch in token):
+            out.append(token)
+    return tuple(dict.fromkeys(out))
+
+
 def _hits(blocks, topics: list[tuple[str, list[str]]]) -> list[TopicHit]:
     hits: list[TopicHit] = []
     for label, patterns in topics:
-        rx = re.compile("|".join(f"(?:{p})" for p in patterns), re.I)
+        rx = topic_regex(patterns)
         matched = next((b for b in blocks
                     if rx.search(b.get("text", "") if isinstance(b, dict) else b.text)), None)
         if matched is not None:
             start = matched.get("start", 0) if isinstance(matched, dict) else matched.start
-            hits.append(TopicHit(label, tuple(re.findall(r"[a-z][a-z0-9/2-]+", label.lower())), start))
+            text = matched.get("text", "") if isinstance(matched, dict) else matched.text
+            hits.append(TopicHit(label, _aliases(label, str(text or "")), start))
     return hits
 
 

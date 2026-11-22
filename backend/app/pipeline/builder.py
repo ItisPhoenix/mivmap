@@ -37,7 +37,8 @@ from .concepts import Concept, FILLER_CONCEPT_LABELS, VAGUE_LABELS, ConceptGraph
 from .embeddings import Embedder, backend_name, cosine_matrix
 from .segmentation import Segment, segment_transcript
 from .study_notes import build_study_note
-from .topics import ESSENTIAL_LABELS, HTTP_TOPICS, active_topics, detect_domain, supplement_concepts
+from .topics import (ESSENTIAL_LABELS, HTTP_TOPICS, active_topics, detect_domain,
+                     supplement_concepts, topic_regex)
 from .text_utils import (FILLER_WORDS, VERB_FORMS, fmt_time, parse_description_chapters,
                          smart_title, truncate, unicode_norm)
 from .terminology import HINDI_TERM_HINTS, misleading_detail
@@ -162,20 +163,24 @@ def ensure_essential_topics(mindmap: dict, entries: list[TranscriptEntry]) -> No
     is_deep = (mindmap.get("meta") or {}).get("mode") == "deep"
     present = {_norm(c.get("topic") or c.get("text") or "") for s in sections for c in s.get("children", [])
                if c.get("type") == "concept"}
-    for label, _patterns in topics:
-        aliases = [w for w in re.findall(r"[a-z][a-z0-9/]*", label.lower())
-                   if w not in {"and", "the", "for", "model", "network"}]
-        aliases += [w[:-1] for w in aliases if len(w) > 3 and w.endswith("s")]
+    for label, patterns in topics:
+        # Use the lexicon's own cues (English + Devanagari/Hinglish) instead of
+        # reconstructing English-only aliases from the canonical label.
+        rx = topic_regex(patterns)
         best = None
         for e in entries:
             text = e.text.strip()
-            if len(text) < 35:
+            if len(text) < 25:
                 continue
-            hits = sum(1 for a in aliases if re.search(r"(?<![a-z])" + re.escape(a) + r"(?![a-z])", text, re.I))
-            score = hits * 3 + (1 if COPULA_RE.search(text) else 0) + min(len(text) // 60, 3)
+            matches = rx.findall(text)
+            if not matches:
+                continue
+            cues = len({m if isinstance(m, str) else m[0] for m in matches})
+            defines = bool(COPULA_RE.search(text) or HINDI_COPULA_RE.search(text))
+            score = min(cues, 4) * 3 + (1 if defines else 0) + min(len(text) // 60, 3)
             # Strongest evidence wins; earliest timestamp breaks equal scores.
             rank = (score, -float(e.start))
-            if hits and (best is None or rank > (best[0], -float(best[1].start))):
+            if best is None or rank > (best[0], -float(best[1].start)):
                 best = (score, e)
         if not best:
             continue
@@ -195,15 +200,20 @@ def ensure_essential_topics(mindmap: dict, entries: list[TranscriptEntry]) -> No
                     if node.get("type") != "concept" or _norm(node.get("topic") or node.get("text") or "") != _norm(label):
                         continue
                     evidence = _norm((node.get("evidence") or [{}])[0].get("text", "") or node.get("source", ""))
-                    if any(w in evidence for w in _norm(label).split()):
-                        break
-                    node["start"] = round(e.start, 2)
-                    node["end"] = round(e.end, 2)
-                    node["source"] = truncate(e.text, 300)
-                    node["evidence"] = [{"start": round(e.start, 2), "end": round(e.end, 2), "text": truncate(e.text, 300)}]
-                    node["faith"] = 1.0
-                    node.update({"explain": "", "mechanism": "", "example": "", "exercise": "", "diagram": "",
-                                 "available": False, "generatedBy": "unavailable"})
+                    aligned = any(w in evidence for w in _norm(label).split())
+                    # A supplemental topic may already be present but still lack a
+                    # study note (supplement_concepts adds the node). Revision maps
+                    # must never surface an unavailable concept because of that.
+                    if not is_deep and node.get("available") is True:
+                        continue
+                    if not aligned:
+                        node["start"] = round(e.start, 2)
+                        node["end"] = round(e.end, 2)
+                        node["source"] = truncate(e.text, 300)
+                        node["evidence"] = [{"start": round(e.start, 2), "end": round(e.end, 2), "text": truncate(e.text, 300)}]
+                        node["faith"] = 1.0
+                        node.update({"explain": "", "mechanism": "", "example": "", "exercise": "", "diagram": "",
+                                     "available": False, "generatedBy": "unavailable"})
                     if not is_deep:
                         node.update(build_study_note(label, [{"start": e.start, "end": e.end, "text": e.text}], context=context))
             continue
@@ -336,6 +346,21 @@ def finalize_concepts(mindmap: dict) -> None:
         sims = cosine_matrix(allv[: len(texts)], allv[len(texts):])
         for i, (node, _, _) in enumerate(faithful):
             node["faith"] = round(min(0.90, max(0.0, float(sims[i, i]))), 2)
+
+    # 2b) Revision maps must never surface a concept with empty teaching. A
+    # supplemental topic can arrive with evidence but without a study note;
+    # build one from that same grounded evidence instead of leaving it blank.
+    if not is_deep:
+        for node, _, _ in faithful:
+            if node.get("available") is True:
+                continue
+            topic = node.get("topic") or node.get("text") or ""
+            evidence = node.get("evidence") or []
+            if not evidence and node.get("source"):
+                evidence = [{"start": node.get("start"), "end": node.get("end"),
+                             "text": node.get("source", "")}]
+            if evidence:
+                node.update(build_study_note(topic, evidence))
 
     # 3) Fail closed: in Deep Mode, keep only concepts with a validated lesson.
     essential_lower = {e.lower() for e in ESSENTIAL_LABELS}
@@ -506,8 +531,12 @@ def build_skeleton(request: dict, progress: ProgressFn | None = None) -> dict:
     graph = extract_concepts(segments, max_concepts=concept_budget)
     # Devanagari captions produce no English noun chunks / stop-word candidates.
     # Recover the technical terms actually spoken, keeping original text + time.
-    if not graph.concepts and any("\u0900" <= ch <= "\u097f" for e in transcript.entries for ch in e.text):
-        graph.concepts = _hindi_concepts(transcript.entries, segments)
+    # Hinglish may yield *some* English candidates, so this is not an all-or-nothing
+    # fallback: missing Hindi terms are added alongside whatever was extracted.
+    if any("\u0900" <= ch <= "\u097f" for e in transcript.entries for ch in e.text):
+        hindi = _hindi_concepts(transcript.entries, segments)
+        known = {_norm(c.label) for c in graph.concepts}
+        graph.concepts += [c for c in hindi if _norm(c.label) not in known]
     all_blocks = [block for seg in segments for block in seg.blocks]
     detected_domain, topic_hits = detect_domain(all_blocks[:60])
     if topic_hits:
@@ -810,6 +839,10 @@ def summary_points(grounding: _Grounder, k: int) -> list[TranscriptEntry]:
 # The LLM rewrites them later; when it cannot, these are what the student reads.
 # ---------------------------------------------------------------------------
 COPULA_RE = re.compile(r"^(?:is|are|was|were|means|mean|refers to|refer to|is called|are called|is defined as|are defined as|stands for|describes)\s+", re.I)
+# Hindi/Hinglish definition cues signal stronger evidence than a bare mention.
+HINDI_COPULA_RE = re.compile(
+    r"(?:मतलब|यानी|अर्थात|कहलाता|कहलाती|कहलाते|होता है|होती है|है जो|से जुड़ता|से जुड़ती|"
+    r"को जोड़ता|को जोड़ती|द्वारा|के लिए|की तरह|वाला एक|वाली एक)", re.I)
 LEAD_RE = re.compile(r"^(?:so|and|but|now|okay|ok|well|basically|actually|right|also|then|because)\b[,\s]+", re.I)
 ARTICLE_RE = re.compile(r"^(?:a|an|the)\s+", re.I)
 CLAUSE_RE = re.compile(r",|;|\s(?:which|because|so that|whereas|while|although)\s|\s[-–—]\s")

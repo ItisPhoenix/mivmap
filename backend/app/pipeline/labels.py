@@ -29,13 +29,15 @@ import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from typing import Any
 
 from ..collab.ops import apply_op
 from ..config import settings
 from . import llm
 from .builder import TAGS, make_node, new_id, score_faithfulness
 from .lessons import LESSON_FIELDS, overlap, validate_deep_teaching, validate_lesson
-from .terminology import (acronym_expansion, apply_accuracy_corrections, norm as term_norm,
+from .terminology import (acronym_expansion, apply_accuracy_corrections, canonical_topic,
+                          norm as term_norm,
                          TECHNICAL_CORRECTIONS)
 from .topics import ESSENTIAL_LABELS, HTTP_TOPICS
 from .embeddings import Embedder
@@ -265,6 +267,26 @@ TAG_ALIASES = {
 }
 
 
+CAPTION_DISCOURSE = re.compile(
+    r"\b(?:we|you|they|it|this|that|there|here|what|why|how|would|could|should|"
+    r"going to|let's|i think|maybe|right now|okay|yesterday|today|whatever|"
+    r"speaking|showing|screen|content|thing|things)\b", re.I)
+VAGUE_CONCEPT_LABELS = {
+    "study", "studying", "communicate", "communication", "learn", "learning",
+    "understanding", "introduction", "overview", "content", "things", "thing",
+}
+
+
+def clean_concept_label(text: str, language: str = "en") -> str | None:
+    """Concept names must be short topics, not rewritten caption sentences."""
+    label = clean_label(text, 110, 16, language)
+    if not label or len(label.split()) > 6 or CAPTION_DISCOURSE.search(label):
+        return None
+    if label.strip().lower() in VAGUE_CONCEPT_LABELS:
+        return None
+    return label
+
+
 def clean_label(text: str, max_chars: int, max_words: int,
                 teaching_language: str = "en") -> str | None:
     text = TIME_RE.sub(" ", text.replace("**", "").replace("`", ""))
@@ -355,7 +377,7 @@ def parse_labels(text: str, teaching_language: str = "en") -> Parsed:
                 last_concept = key
                 # The fast model often emits C|Term: meaning|source-sentence.
                 label_text = parts[1] if len(parts) >= 3 and parts[1] and ":" in parts[1] else ": ".join(p for p in parts[1:] if p)
-                label = clean_label(label_text, 110, 16, lang)
+                label = clean_concept_label(label_text, lang)
                 if label and key not in out.concepts:
                     out.concepts[key] = label
                 elif not label:
@@ -520,13 +542,57 @@ def _llm_enrich(mindmap: dict, concepts: dict, details: dict) -> dict:
         result["generatedBy"].setdefault(item["id"], "extractive-transcript")
     return result
 
-def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
+def parse_lesson_entries(data: Any, cid: str) -> dict[str, dict]:
+    """Normalise the provider's lesson response into {concept_id: lesson}.
+
+    Providers return a one-item list, a list of objects with their own id, a
+    dict keyed by arbitrary ids, or a flat lesson object. All are accepted;
+    nothing is filed under a concept that did not return a lesson.
+    """
+    entries: dict[str, dict] = {}
+    cid = str(cid).lower()
+    if isinstance(data, list):
+        for obj in data:
+            if isinstance(obj, str):  # some gateways return JSON-encoded strings
+                try:
+                    obj = json.loads(obj)
+                except (TypeError, ValueError):
+                    continue
+            if isinstance(obj, list):
+                candidates = [x for x in obj if isinstance(x, dict)]
+            elif isinstance(obj, dict):
+                candidates = [obj]
+            else:
+                candidates = []
+            for lesson_obj in candidates:
+                entries[str(lesson_obj.get("id") or cid).lower()] = lesson_obj
+    elif isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, dict) and any(f in value for f in LESSON_FIELDS):
+                entries[str(key).lower()] = value
+        if isinstance(data.get("id"), str):
+            entries.setdefault(data["id"].lower(), data)
+        flat_shaped = any(isinstance(data.get(f), dict) for f in LESSON_FIELDS)
+        if not entries and not flat_shaped and any(f in data for f in LESSON_FIELDS):
+            entries[cid] = data
+        if not entries:
+            for field in LESSON_FIELDS + ("provenance",):
+                flat = data.get(field) or {}
+                if isinstance(flat, dict):
+                    for key, value in flat.items():
+                        entries.setdefault(str(key).lower(), {})[field] = value
+    return entries
+
+
+def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], list[dict]]:
     """Generate, validate and checkpoint one study-ready lesson per concept.
 
-    Returns (accepted_lessons, failed_concept_labels). Every accepted lesson is
-    stamped with three-way provenance, the correct acronym expansion (when the
-    concept is an acronym) and externally sourced accuracy notes. Cache hits
-    are reused; only missing concepts call the LLM, with bounded backoff.
+    Returns (accepted_lessons, failed_concept_labels, rejection_reasons). Every
+    accepted lesson is stamped with three-way provenance, the correct acronym
+    expansion (when the concept is an acronym) and externally sourced accuracy
+    notes. Cache hits are reused; only missing concepts call the LLM, with
+    bounded backoff. Rejection reasons are returned for honest diagnostics
+    rather than silently marking a concept unavailable.
     """
     from .lesson_cache import lesson_key, load as load_lesson, save as save_lesson
 
@@ -538,7 +604,8 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
         node = c.node
         evidence = node.get("evidence") or [{"start": node.get("start"), "end": node.get("end"), "text": node.get("source", "")}]
         ev = [{"start": e.get("start") or 0, "end": e.get("end"), "text": (e.get("text") or "")[:320]} for e in evidence[:4]]
-        topic = node.get("topic") or node.get("text", "")
+        raw_topic = node.get("topic") or node.get("text", "")
+        topic = canonical_topic(raw_topic)
         model = settings.llm_model or settings.groq_model
         base = settings.llm_base_url or "configured"
         key = lesson_key(topic, ev, model, base, teaching_language)
@@ -618,6 +685,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
 
     accepted: dict[str, dict] = {}
     failed: list[str] = []
+    rejections: list[dict] = []
     max_attempts = 4
     base_delay = 2.0
     max_delay = 45.0
@@ -634,6 +702,9 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
                 continue
 
         lesson = None
+        call_errors: list[str] = []
+        parse_notes: list[str] = []
+        last_errors: list[str] = []
         for attempt in range(max_attempts):
             data = None
             try:
@@ -648,23 +719,21 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
                     max_tokens=2400, temperature=0.25,
                 )
             except Exception as exc:  # noqa: BLE001
+                call_errors.append(f"attempt {attempt + 1}: {type(exc).__name__}: {str(exc)[:160]}")
                 log.warning("Deep lesson call failed for %s: %s", item["id"], exc)
-            entries: dict = {}
-            if isinstance(data, list) and len(data) == 1 and isinstance(data[0], dict):
-                entries = {str(item["id"]).lower(): data[0]}
-            if isinstance(data, dict):
-                entries = {k.lower(): v for k, v in data.items() if isinstance(v, dict) and k.lower().startswith("c")}
-                if not entries and isinstance(data.get("id"), str):
-                    entries = {data["id"].lower(): data}
-                if not entries:
-                    for field in LESSON_FIELDS + ("provenance",):
-                        flat = data.get(field) or {}
-                        if isinstance(flat, dict):
-                            for k, v in flat.items():
-                                entries.setdefault(str(k).lower(), {})[field] = v
+            cid = str(item["id"]).lower()
+            entries = parse_lesson_entries(data, cid)
+            if not entries:
+                kind = type(data).__name__ if data is not None else "None"
+                parse_notes.append(f"attempt {attempt + 1}: no lesson object parsed from {kind} response")
             ev_text = " ".join(e.get("text", "") for e in item["evidence"])
-            for cid, obj in entries.items():
+            # Validate the object for this concept first; other returned objects
+            # are only a fallback and must never be filed under the wrong topic.
+            candidates = ([entries[cid]] if cid in entries else []) + [
+                v for k, v in entries.items() if k != cid]
+            for obj in candidates:
                 ok, errors = validate_lesson(obj, ev_text, item["topic"], item["evidence"], teaching_language)
+                last_errors = list(errors)
                 if ok:
                     stamped = finish(obj, item)
                     ok2, errors2 = validate_deep_teaching(stamped, item["topic"], teaching_language)
@@ -672,6 +741,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
                         lesson = stamped
                         break
                     errors = errors2
+                    last_errors = list(errors2)
                 log.info("deep lesson rejected %s: %s", cid, "; ".join(errors[:3]))
             if lesson is not None:
                 break
@@ -684,13 +754,24 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
 
         if lesson is None:
             failed.append(item["label"])
+            rejections.append({
+                "topic": item["topic"],
+                "label": item["label"],
+                "teachingLanguage": teaching_language,
+                "attempts": max_attempts,
+                "errors": last_errors[:8],
+                "parseNotes": parse_notes[:4],
+                "callErrors": call_errors[:4],
+            })
+            log.warning("Deep lesson rejection detail %s: validation=%s parse=%s calls=%s",
+                        item["topic"], last_errors[:5], parse_notes[:2], call_errors[:2])
             continue
         accepted[item["id"]] = lesson
         try:
             save_lesson(item["key"], {"lesson": lesson, "topic": item["topic"]})
         except Exception as exc:  # noqa: BLE001
             log.warning("lesson checkpoint failed for %s: %s", item["id"], exc)
-    return accepted, failed
+    return accepted, failed, rejections
 
 
 
@@ -830,7 +911,12 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
     deep_status = "n/a"
     if is_deep and concepts and llm.fast_available() and not test_provider:
         try:
-            lessons, failed_lessons = _llm_deep_lessons(mindmap, concepts)
+            deep_result = _llm_deep_lessons(mindmap, concepts)
+            if len(deep_result) == 3:
+                lessons, failed_lessons, lesson_rejections = deep_result
+            else:  # older callers/tests returning (accepted, failed)
+                lessons, failed_lessons = deep_result
+                lesson_rejections = []
             if not hasattr(merged, "lessons"):
                 merged.lessons = {}
             if not hasattr(merged, "available"):
@@ -849,6 +935,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
                     merged.available[cid] = False  # fail closed: no fabricated teaching
                     merged.unavailable[cid] = "Lesson generation failed; concept kept with explicit unavailable status."
             stats["lesson_failures"] = failed_lessons
+            stats["deepRejectionReasons"] = lesson_rejections
             stats["lessonsAccepted"] = len(lessons)
             stats["lessonsRejected"] = len(failed_lessons)
             stats["lessonsAttempted"] = len(lessons) + len(failed_lessons)
@@ -857,6 +944,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
             deep_status = "ok" if not failed_lessons else f"incomplete: {len(failed_lessons)} concepts rejected"
             if failed_lessons:
                 log.warning("Deep lessons failed for: %s", ", ".join(failed_lessons))
+                log.warning("Deep lesson rejection reasons: %s", json.dumps(lesson_rejections, ensure_ascii=False)[:4000])
             stats["calls"] += 1
         except Exception as exc:  # noqa: BLE001
             deep_status = "failed: provider or validation error"
@@ -917,6 +1005,8 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
     if is_deep:
         meta["deepStatus"] = deep_status
         meta["provider"] = llm.provider_name()
+        if stats.get("deepRejectionReasons"):
+            meta["deepRejectionReasons"] = stats["deepRejectionReasons"]
     if stats["calls"] or stats["cached_sections"]:
         meta["llm"] = llm.fast_name()
     return {"ops": ops, "meta": meta, "stats": stats}
@@ -1207,7 +1297,7 @@ def apply_outcome(mindmap: dict, outcome: dict) -> dict:
         k: stats.get(k) for k in (
             "calls", "prompt_tokens", "completion_tokens", "llm_ms", "applied", "candidates",
             "lessonsAttempted", "lessonsAccepted", "lessonsRejected", "lesson_failures",
-            "provider", "teachingLanguage",
+            "deepRejectionReasons", "provider", "teachingLanguage",
         )
     }
     mindmap["meta"]["generationMs"] = stats.get("ms")

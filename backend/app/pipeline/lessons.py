@@ -35,8 +35,10 @@ ACTION_VERBS = re.compile(
     r"\b(?:write|draw|explain|predict|trace|identify|list|compare|build|try|which|what|would|should|choose|select|"
     r"implement|sketch|describe|calculate|check|test|run|create)\b"
     # Hindi teaching: common imperative forms used in a practical exercise.
-    r"|(?:बनाएँ|बनाएं|खींचें|समझाएँ|समझाएं|दिखाएँ|दिखाएं|पहचानें|सूची|तुलना|गणना|वर्णन|जाँचें|जांचें|"
-    r"देखें|लिखें|चित्र|आज़माएँ|आजमाएं|निर्धारित|पता\s*लगाएँ|पता\s*लगाएं)",
+    r"|(?:बनाएँ|बनाएं|बनाइए|खींचें|खींचिए|समझाएँ|समझाएं|समझाइए|दिखाएँ|दिखाएं|दिखाइए|"
+    r"पहचानें|पहचानिए|सूची|तुलना|गणना|वर्णन|जाँचें|जांचें|जाँचिए|देखें|देखिए|लिखें|लिखिए|"
+    r"चित्र|आज़माएँ|आजमाएं|आज़माइए|निर्धारित|पता\s*लगाएँ|पता\s*लगाएं|कीजिए|कीजिये|"
+    r"करें|करिए|बताइए|बताएँ|पढ़ें|नाम\s*दें|उदाहरण\s*दें)",
     re.I,
 )
 
@@ -61,9 +63,15 @@ def _topic_terms(topic: str) -> set[str]:
     for w in list(terms):
         terms.update(ACRONYM_WORDS.get(w, []))
     # Hindi teaching keeps English acronyms but may also use the spoken Hindi
-    # technical term; both must satisfy topic-specific validation.
+    # technical term. Compare whole-topic and multi-word canonical phrases too:
+    # "Fibre cable" -> "फाइबर", "Internet (network of networks)" -> "इंटरनेट".
+    whole = unicode_norm(topic)
+    normalized_terms = {unicode_norm(t) for t in terms}
+    whole_parts = set(whole.split())
     for hint, canonical in HINDI_TERM_HINTS.items():
-        if unicode_norm(canonical) in {unicode_norm(t) for t in terms}:
+        cnorm = unicode_norm(canonical)
+        cparts = set(cnorm.split())
+        if (cnorm == whole or cnorm in normalized_terms or (cparts and cparts <= whole_parts)):
             terms.add(hint.lower())
     return terms
 

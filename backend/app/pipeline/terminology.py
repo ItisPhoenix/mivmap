@@ -58,6 +58,9 @@ REJECTED_LABELS = {
     "geographical categories", "provider network", "sign of internet",
     "extra infrastructure", "entire content", "previous videos compared",
     "upcoming videos", "connection at that time", "that time",
+    # single-word discourse scraps that are not study topics
+    "study", "studying", "communicate", "communication", "learn", "learning",
+    "understanding", "introduction", "overview", "content", "screen",
 }
 
 # Single/two-word labels that need a qualifying technical noun to mean anything.
@@ -86,7 +89,7 @@ HINDI_TERM_HINTS: dict[str, str] = {
 
 def norm(text: str) -> str:
     # Keep Devanagari and other scripts; only punctuation/separators are dropped.
-    return re.sub(r"[^\w\u0900-\u097f]+", " ", str(text or "").lower()).strip()
+    return re.sub(r"[^\w\u0900-\u0963\u0966-\u097f]+", " ", str(text or "").lower()).strip()
 
 
 def normalize_label(label: str, context: str = "") -> str:
@@ -132,6 +135,27 @@ def normalize_label(label: str, context: str = "") -> str:
     if norm(mapped) in BARE_GENERIC_LABELS and norm(mapped) not in TERM_NORMALIZATIONS:
         return ""
     return mapped
+
+
+def canonical_topic(label: str) -> str:
+    """Return a study-able topic name for a possibly caption-like label.
+
+    Devanagari captions sometimes survive label rewriting as whole sentences
+    ("राउटर पैकेट को एक नेटवर्क से दूसरे नेटवर्क तक ले जाता है। ..."). Such a
+    string cannot be named in a lesson definition or its steps. Recover the
+    canonical technical topic purely from the transcript's own words; never
+    invent a new subject.
+    """
+    raw = str(label or "").strip()
+    if not raw:
+        return raw
+    for hint, canonical in HINDI_TERM_HINTS.items():
+        if hint in raw:
+            return canonical
+    mapped = normalize_label(raw)
+    if mapped and (len(mapped) <= 60 or "।" not in mapped and "…" not in mapped):
+        return mapped
+    return raw
 
 
 def is_meaningful_label(label: str) -> bool:
@@ -208,9 +232,24 @@ REFERENCE_URLS: dict[str, tuple[str, str]] = {
     "3GPP TS 23.002: Network architecture": (
         "3GPP TS 23.002 - Network architecture (3GPP specification archive)",
         "https://www.3gpp.org/ftp/Specs/archive/23_series/23.002/"),
+    "IEEE 802 LAN/MAN Standards Committee": (
+        "IEEE 802 LAN/MAN Standards Committee - standards for local, metropolitan and other area networks",
+        "https://www.ieee802.org/"),
+    "IEEE 802.15: Wireless Personal Area Networks": (
+        "IEEE 802.15 Working Group for Wireless Personal Area Networks (WPANs)",
+        "https://www.ieee802.org/15/"),
+    "TechTarget: WAN (wide area network)": (
+        "WAN (wide area network) - TechTarget Networking Glossary",
+        "https://www.techtarget.com/searchnetworking/definition/WAN-wide-area-network"),
     "TeleGeography: Submarine Cable Map": (
         "TeleGeography Submarine Cable Map - global submarine cable routes",
         "https://www.submarinecablemap.com/"),
+    "TeleGeography: Strait of Hormuz cable infrastructure": (
+        "Navigating Hostile Waters: Submarine Cable Infrastructure and the Strait of Hormuz",
+        "https://resources.telegeography.com/submarine-cable-infrastructure-strait-hormuz"),
+    "TeleGeography: submarine cable traffic fact-check": (
+        "Do Submarine Cables Account For Over 99% of Intercontinental Data Traffic?",
+        "https://resources.telegeography.com/2023-mythbusting-part-3"),
     "ITU-T X.200: OSI Basic Reference Model": (
         "ITU-T Recommendation X.200 - Information technology, Open Systems Interconnection, Basic Reference Model",
         "https://www.itu.int/rec/T-REC-X.200/en"),
@@ -238,9 +277,11 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
     "wan": {
         "notes": [
             _note("A WAN is described as 'a type of internet' and the Internet as the collection of all WANs.",
-                  "A WAN (Wide Area Network) is a network classified by geographic scale. The Internet is one specific global internetwork that uses TCP/IP to interconnect many networks. The word 'internet' is a shortening of 'internetwork', not 'International Network'; a private WAN is not automatically part of the Internet.",
-                  "RFC 1122: internet is a network of networks",
-                  required=True),
+                  "A WAN (Wide Area Network) is a geographically distributed telecommunications network that interconnects multiple local area networks; it is a category defined by scale, not a type of the Internet. The Internet is one specific global internetwork that uses TCP/IP; a private WAN is not automatically part of it.",
+                  "TechTarget: WAN (wide area network)", required=True),
+            _note("The word 'Internet' is said to come from 'International Network'.",
+                  "'Internet' is a contraction of 'internetwork' (a network of networks), not of 'International Network'. RFC 1122 states the architectural assumption directly: 'The Internet is a network of networks.'",
+                  "RFC 1122: internet is a network of networks"),
         ],
         # Targeted text fixes applied only to AI teaching fields, never to evidence.
         "replacements": [
@@ -294,15 +335,18 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
     "submarine fibre cables": {
         "notes": [
             _note("The video discusses fibre cables laid on the seabed near the Strait of Hormuz.",
-                  "Submarine fibre-optic cables carry the overwhelming majority of intercontinental data traffic; satellites carry only a small share. Because cables are physically routed through narrow seas, a single chokepoint can affect several systems at once, which is why route diversity matters.",
-                  "TeleGeography: Submarine Cable Map"),
+                  "Cable routes are physically concentrated in narrow seas: TeleGeography documents that cables through the Strait of Hormuz are tightly clustered, so a single local incident can affect several systems at once and route diversity matters. The cable map shows the routes themselves; it is not proof of a traffic percentage.",
+                  "TeleGeography: Strait of Hormuz cable infrastructure"),
+            _note("The share of intercontinental traffic carried by submarine cables.",
+                  "TeleGeography's fact-check confirms the commonly quoted claim that submarine cables carry over 99% of intercontinental data traffic, while noting that a precise calculation is not possible without intercontinental satellite-traffic data. Treat the figure as a qualified industry estimate, not a measured global statistic.",
+                  "TeleGeography: submarine cable traffic fact-check"),
         ],
         "replacements": [],
     },
     "osi model": {
         "notes": [
             _note("The video says 'nothing was defined in the OSI protocols' and that OSI was only used in 4.3BSD.",
-                  "The OSI Reference Model (ITU-T X.200 / ISO/IEC 7498-1) defines seven abstraction layers and their responsibilities; the OSI programme also specified concrete protocols (for example X.25). The model is a reference/teaching framework, whereas TCP/IP is the protocol suite implemented in practice. The 4.3BSD detail is a video-specific historical claim and is not relied on here.",
+                  "ITU-T Recommendation X.200 defines the Open Systems Interconnection Basic Reference Model: seven abstraction layers with distinct responsibilities. It is a reference/teaching framework, whereas TCP/IP is the protocol suite implemented in practice. The 4.3BSD detail is a video-specific historical claim and is not relied on here.",
                   "ITU-T X.200: OSI Basic Reference Model", required=True),
         ],
         "replacements": [
@@ -334,32 +378,32 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
     "local access network (last mile)": {
         "notes": [
             _note("The video describes fibre being extended from the provider's network into different localities.",
-                  "This is the access or 'last mile' part of the network: the provider's backbone reaches a local area and fibre equipment is then extended locality by locality to subscribers. It is distinct from a LAN, which is a local network inside one building or campus.",
-                  "RFC 1122: internet is a network of networks"),
+                  "This describes an access ('last mile') network reaching subscribers locality by locality. It should not be conflated with a LAN: IEEE 802's LAN/MAN scope is a local or metropolitan area network, typically one building, campus or city, not the subscriber access span described here.",
+                  "IEEE 802 LAN/MAN Standards Committee"),
         ],
         "replacements": [],
     },
     "lan": {
         "notes": [
             _note("None - the video defines LAN directly.",
-                  "The geographical scale sequence is PAN (a person), LAN (a building or campus), MAN (a city) and WAN (multiple cities, countries or continents). These are different categories, not synonyms.",
-                  "RFC 1122: internet is a network of networks"),
+                  "LAN and MAN are distinct network-scope categories: IEEE 802 develops standards for local and metropolitan area networks. A LAN covers one building or campus; a MAN covers a city. They are not synonyms.",
+                  "IEEE 802 LAN/MAN Standards Committee"),
         ],
         "replacements": [],
     },
     "pan": {
         "notes": [
             _note("None - the video names PAN as the first geographical category.",
-                  "PAN (Personal Area Network) covers roughly the space around one person (a few metres), for example Bluetooth earbuds paired to a phone. It is smaller than a LAN, which covers a building or campus.",
-                  "RFC 1122: internet is a network of networks"),
+                  "For the wireless case, IEEE 802.15 standardises Wireless Personal Area Networks (WPANs), which cover the space immediately around a person (a few metres) - for example Bluetooth earbuds paired to a phone. This is a different scope from a LAN covering a building or campus.",
+                  "IEEE 802.15: Wireless Personal Area Networks"),
         ],
         "replacements": [],
     },
     "man": {
         "notes": [
             _note("None - the video names MAN as a geographical category.",
-                  "MAN (Metropolitan Area Network) covers a city or metropolitan region, sitting between a LAN (one building or campus) and a WAN (multiple cities or countries). It is a distinct category, not another name for a WAN.",
-                  "RFC 1122: internet is a network of networks"),
+                  "MAN (Metropolitan Area Network) covers a city or metropolitan region. It is one of the network scopes addressed by the IEEE 802 LAN/MAN Standards Committee and is distinct from both a LAN (one building or campus) and a WAN (multiple cities or countries).",
+                  "IEEE 802 LAN/MAN Standards Committee"),
         ],
         "replacements": [],
     },
