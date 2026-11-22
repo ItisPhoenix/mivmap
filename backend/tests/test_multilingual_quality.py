@@ -1,6 +1,7 @@
 """Regressions for PR #1 final multilingual remediation (topics, language, lessons, citations)."""
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -183,13 +184,25 @@ def test_hindi_hints_added_for_multiword_topics_and_hindi_verbs():
 
 
 def test_provider_response_shapes_are_parsed():
-    lesson = {"explain": "यह एक नेटवर्क है।"}
+    lesson = {
+        "explain": "यह एक नेटवर्क है।",
+        "knowledge_check": {
+            "question": "LAN क्या है?",
+            "answer": "स्थानीय नेटवर्क।",
+            "explanation": "यह पास के उपकरणों को जोड़ता है।",
+        },
+    }
     assert labels.parse_lesson_entries([lesson], "c1") == {"c1": lesson}
     assert labels.parse_lesson_entries([{"id": "c1", **lesson}], "other")["c1"]["explain"] == lesson["explain"]
     assert labels.parse_lesson_entries({"lesson1": lesson}, "c1") == {"lesson1": lesson}
     assert labels.parse_lesson_entries(lesson, "c1") == {"c1": lesson}
-    assert labels.parse_lesson_entries({"explain": {"c1": "यह एक नेटवर्क है।"}}, "c1") == {
-        "c1": {"explain": "यह एक नेटवर्क है।"}}
+    assert labels.parse_lesson_entries({"id": "c1", "lesson": lesson}, "other") == {"c1": lesson}
+    assert labels.parse_lesson_entries(json.dumps(lesson, ensure_ascii=False), "c1") == {"c1": lesson}
+    assert labels.parse_lesson_entries(
+        {"explain": {"c1": "यह एक नेटवर्क है।"},
+         "knowledge_check": {"c1": lesson["knowledge_check"]}},
+        "c1",
+    ) == {"c1": {"explain": "यह एक नेटवर्क है।", "knowledge_check": lesson["knowledge_check"]}}
 
 
 def test_rewritten_caption_sentences_are_not_accepted_as_concept_names():
@@ -245,3 +258,101 @@ def test_submarine_and_osi_citations_match_claims():
     osi = accuracy_notes_for("osi model")[0]
     assert osi["basis"] == "ITU-T X.200: OSI Basic Reference Model"
     assert "X.25" not in osi["correction"]
+
+
+def test_hindi_language_gate_rejects_script_only_noun_piles():
+    # Devanagari characters alone do not establish that learner-facing prose is Hindi.
+    assert not field_language_ok("राउटर नेटवर्क पैकेट उपकरण डेटा प्रवाह व्यवस्था", "hi")
+    assert field_language_ok("राउटर पैकेट को आगे भेजता है।", "hi")
+    # A short technical title may be a noun phrase; prose fields may not use this exception.
+    assert not field_language_ok("लैन नेटवर्क", "hi")
+    assert field_language_ok("लैन नेटवर्क", "hi", allow_short_label=True)
+    assert check_teaching_languages(_lesson(), "hi") == []
+
+
+def test_deep_lesson_retry_includes_validation_feedback(monkeypatch):
+    from app.pipeline import lesson_cache
+
+    monkeypatch.setattr(lesson_cache, "load", lambda _key: None)
+    monkeypatch.setattr(lesson_cache, "save", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(labels.time, "sleep", lambda _seconds: None)
+    calls = []
+
+    valid_lesson = {
+        "title": "LAN",
+        "explain": (
+            "A LAN connects computers and nearby devices inside a limited area, such as a home or office. "
+            "It lets connected devices communicate locally through switches or wireless access points."
+        ),
+        "intuition": (
+            "Picture a LAN as the private corridors of one building: devices can pass messages directly "
+            "without travelling out to the public street."
+        ),
+        "why_it_matters": (
+            "This matters because nearby devices can share printers, files, and services quickly, "
+            "even when the internet connection is unavailable."
+        ),
+        "steps": [
+            "First, connect each device that belongs to the LAN to a switch or wireless access point.",
+            "Next, configure each device with a valid local IP address so it can identify its peers.",
+            "Finally, send a test message between two devices and confirm it stays on the local network.",
+        ],
+        "worked_example": (
+            "In a small office, two laptops and a printer connect to the same switch. The laptops can "
+            "print and share a folder over the LAN without sending local traffic to an outside service."
+        ),
+        "diagram": "[Laptop A] --- [Switch] --- [Printer]\n[Laptop B] ---/",
+        "misconception": (
+            "A common misconception is that a LAN must have internet access. Devices can still "
+            "communicate with one another locally when the router's internet connection is down."
+        ),
+        "exercise": (
+            "Draw a LAN for your home, label each connected device, and mark which devices can share "
+            "a printer without internet access."
+        ),
+        "knowledge_check": {
+            "question": "How do devices communicate on a LAN?",
+            "answer": "Devices communicate locally.",
+            "explanation": (
+                "A LAN connects nearby devices through local equipment, allowing them to communicate "
+                "locally without internet access."
+            ),
+        },
+    }
+
+    def fake_chat_json(_system, user, **_kwargs):
+        request = json.loads(user)[0]
+        calls.append(request)
+        if len(calls) == 1:
+            return {"c1": {"explain": "Too short."}}
+        return {"c1": valid_lesson}
+
+    monkeypatch.setattr(labels.llm, "chat_json", fake_chat_json)
+    monkeypatch.setattr(
+        labels.llm, "chat_json_diagnostics",
+        lambda: {"provider": "test-provider", "status": 200, "retry_after": None,
+                 "error": None, "error_kind": None},
+    )
+    node = {
+        "id": "c1",
+        "text": "LAN",
+        "topic": "LAN",
+        "start": 10.0,
+        "end": 14.0,
+        "source": "The office network links nearby computers and a printer.",
+        "evidence": [{
+            "start": 10.0,
+            "end": 14.0,
+            "text": "The office network links nearby computers and a printer.",
+        }],
+    }
+    concepts = {"c1": labels.ConceptCand("c1", "s1", node)}
+    accepted, failed, rejections = labels._llm_deep_lessons(
+        {"meta": {"teachingLanguage": "en", "sourceLanguage": "en"}}, concepts
+    )
+
+    assert not failed, rejections
+    assert "c1" in accepted
+    assert len(calls) == 2
+    assert "definition too short" in calls[1]["repairFeedback"]["previousErrors"]
+
