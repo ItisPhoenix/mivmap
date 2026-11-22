@@ -56,8 +56,24 @@ class Settings:
     hf_model: str = field(default_factory=lambda: _env("HF_MODEL", "Qwen/Qwen2.5-7B-Instruct"))
     hf_local_model: str = field(default_factory=lambda: _env("HF_LOCAL_MODEL"))
 
-    embedding_model: str = field(
-        default_factory=lambda: _env("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+    # --- Embeddings (provider-neutral, environment driven) -------------------
+    # Remote mode: EMBEDDING_BASE_URL + EMBEDDING_MODEL (+ optional EMBEDDING_API_KEY).
+    # EMBEDDING_BASE_URL is the service root; a trailing /v1 is accepted and the
+    # embedding path is appended exactly once. Endpoints accepting a JSON input
+    # array or a single text prompt are supported; nothing here names a vendor,
+    # host or model. The remote model id is NEVER handed to a local
+    # SentenceTransformer instance.
+    embedding_base_url: str = field(default_factory=lambda: _env("EMBEDDING_BASE_URL"))
+    embedding_model: str = field(default_factory=lambda: _env("EMBEDDING_MODEL"))
+    embedding_api_key: str = field(default_factory=lambda: _env("EMBEDDING_API_KEY"))
+    # Local mode: only used when no remote endpoint is configured. Empty means
+    # discover an unambiguous, already cached compatible model; never download.
+    embedding_local_model: str = field(default_factory=lambda: _env("EMBEDDING_LOCAL_MODEL"))
+    embedding_timeout: float = field(default_factory=lambda: float(_env("EMBEDDING_TIMEOUT", "60.0")))
+    embedding_batch_size: int = field(default_factory=lambda: max(1, int(_env("EMBEDDING_BATCH_SIZE", "8"))))
+    embedding_cache_dir: Path = field(
+        default_factory=lambda: Path(_env("EMBEDDING_CACHE_DIR")
+                                     or str(BACKEND_DIR / "data" / "cache" / "embeddings"))
     )
     whisper_model: str = field(default_factory=lambda: _env("WHISPER_MODEL", "base"))
 

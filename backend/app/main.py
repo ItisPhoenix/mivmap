@@ -53,7 +53,7 @@ from .jobs import Job, cache_get, cache_get_raw, cache_key, cache_put, jobs
 from .origins import ALLOWED_ORIGINS
 from .pipeline import labels, llm, multimodal, translate
 from .pipeline.builder import DEFAULT_MODE, build_skeleton, finalize_concepts
-from .pipeline.embeddings import backend_name
+from .pipeline.embeddings import backend_name, embedding_mode
 from .pipeline.transcript import TranscriptUnavailable, get_transcript
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -85,8 +85,7 @@ def warm_up() -> None:
         try:
             from .pipeline import embeddings
 
-            if embeddings.has_module("sentence_transformers"):
-                embeddings._bert_model()
+            embeddings.warmup()
             # a small but realistic lecture, so every stage (TF-IDF, LSA, concept graph,
             # PageRank, communities, LDA, grounding) runs once before the first real click
             for mode in ("academic", "revision"):
@@ -278,11 +277,12 @@ def health() -> dict:
     return {
         "ok": True,
         "version": app.version,
-        "llm": llm.provider_name(),
+        # Capability labels only: no endpoint, model identifiers or keys in public health.
+        "llm": llm.provider_name().split(":", 1)[0],
         "openai_compatible": settings.llm_enabled,
         "groq": settings.groq_enabled,
-        "embeddings": backend_name(),
-        "translation": translate.status(),
+        "embeddings": embedding_mode(),
+        "translation": "available" if translate.status() not in ("disabled", "unavailable", "loading") else translate.status(),
         "whisper": has_module("faster_whisper") or has_module("whisper"),
         "keyframes": multimodal.available(),
         "spacy": has_module("spacy"),

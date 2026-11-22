@@ -58,6 +58,29 @@ This works with OpenAI, NVIDIA NIM, Kilo gateway, Together, a local vLLM/Ollama 
 
 Optional heavier extras: `pip install -r requirements-ml.txt`, then `python -m spacy download en_core_web_sm`. Translation of non-English videos needs a one-time NLLB-200 conversion (`python scripts/convert_nllb.py`); English videos skip it.
 
+#### Embeddings
+
+Embeddings are selected only from your private `.env`; no host, provider or model is compiled in.
+
+1. **Remote** - set `EMBEDDING_BASE_URL` and `EMBEDDING_MODEL` (plus `EMBEDDING_API_KEY` if your endpoint requires it). `EMBEDDING_BASE_URL` is the service root; a trailing `/v1` is also accepted and the embedding path is appended exactly once. `EMBEDDING_TIMEOUT` is the HTTPX per-phase timeout in seconds: the same value applies to connection setup, reading the response, writing the request and waiting for a pooled connection. It is not a total deadline for the entire request. The configured endpoint is used exclusively: authentication failures and connection/DNS/timeout/5xx failures abort immediately; only an incompatible route or request format makes the client try the next supported wire format. Errors are explicit and never switch providers. See `.env.example` for the full variable list.
+2. **Local** - with no endpoint configured, set `EMBEDDING_LOCAL_MODEL` to an already installed model id/path (absolute or relative, including Windows drive paths), or leave it empty to reuse a single cached compatible model. Automatic discovery inspects `HF_HUB_CACHE`, `HUGGINGFACE_HUB_CACHE`, `HF_HOME/hub` and the default `~/.cache/huggingface/hub`; it considers a cached model only when a snapshot contains a sentence-transformers marker file (`modules.json`, `config_sentence_transformers.json` or `sentence_bert_config.json`), so unrelated cached models are ignored. Any organisation namespace is supported. If more than one compatible model is found, none is selected automatically; set `EMBEDDING_LOCAL_MODEL` explicitly. Weights are never downloaded automatically.
+3. **Fallback** - if no local model is usable, the backend uses its built-in TF-IDF/LSA vectors, fitted once from the original corpus and reused for every call. Once vectors have been produced, a late local failure raises an explicit error instead of switching vector spaces.
+
+Vectors from stateless backends are cached on disk by endpoint/model identity using the exact submitted text; a per-identity dimension record drops stale entries. The corpus-dependent fallback is never cached. `GET /api/health` reports only the embedding capability (`remote`, `local` or `fallback`) and never an endpoint, model identifier or key.
+
+#### Tests (offline by default)
+
+The default backend suite needs no `.env`, credentials, cached model weights or network access. It installs a deterministic TF-IDF/LSA provider (one fixed space shared by every encoder) and blocks outbound HTTP. `useLLM=False` does not disable embeddings; it only skips the LLM label call.
+
+Genuine provider tests are opt-in and skipped otherwise:
+
+```bash
+# real remote endpoint/model from your private .env (nothing is printed)
+MIVMAP_TEST_REMOTE_EMBEDDINGS=1 python -m pytest tests/test_embedding_integration.py -q
+# real local inference, weights must already be cached
+MIVMAP_TEST_LOCAL_MODEL=<cached-model-id-or-path> python -m pytest tests/test_embedding_integration.py -q
+```
+
 ### 2. Extension (Brave tested; Chrome/Edge should work with Manifest V3)
 
 1. Open `chrome://extensions` (or `brave://extensions`) and enable **Developer mode**.
