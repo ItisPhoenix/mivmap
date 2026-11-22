@@ -17,18 +17,19 @@ from typing import Any
 
 from ..config import settings
 
-PROMPT_VERSION = "deep-lesson-v1"
+PROMPT_VERSION = "deep-lesson-v3-study-ready"
 
 
 def _norm(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(text or "").lower()).strip()
 
 
-def lesson_key(topic: str, evidence: list[dict], model: str, base_url: str) -> str:
+def lesson_key(topic: str, evidence: list[dict], model: str, base_url: str,
+               teaching_language: str = "en") -> str:
     evidence_text = "|".join(
         f"{round(float(e.get('start') or 0), 1)}:{_norm(e.get('text', ''))}" for e in evidence
     )
-    raw = f"{PROMPT_VERSION}|{model}|{base_url}|{_norm(topic)}|{evidence_text}"
+    raw = f"{PROMPT_VERSION}|{model}|{base_url}|{teaching_language}|{_norm(topic)}|{evidence_text}"
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:24]
 
 

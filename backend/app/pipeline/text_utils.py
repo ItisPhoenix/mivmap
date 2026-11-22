@@ -178,6 +178,9 @@ def extract_json(text: str) -> Any:
     if not text:
         raise ValueError("empty LLM response")
     text = text.strip()
+    # Some gateways wrap the answer in a reasoning block; it is not part of the JSON.
+    text = re.sub(r"<(?:think|thinking|reasoning)>.*?</(?:think|thinking|reasoning)>",
+                  "", text, flags=re.S | re.I).strip()
     fence = re.search(r"```(?:json)?\s*(.*?)```", text, re.S)
     if fence:
         text = fence.group(1).strip()
@@ -185,31 +188,37 @@ def extract_json(text: str) -> Any:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
-    starts = [i for i in (text.find("{"), text.find("[")) if i >= 0]
+    # Try every candidate opener: a reasoning sentence before the answer can
+    # contain a lone "{" that would otherwise abort the scan with unbalanced JSON.
+    starts = sorted(i for i in (text.find("{"), text.find("[")) if i >= 0)
+    starts += [m.start() for m in re.finditer(r"[\[{]", text) if m.start() not in starts]
     if not starts:
         raise ValueError("no JSON found in LLM response")
-    start = min(starts)
-    opener = text[start]
-    closer = "}" if opener == "{" else "]"
-    depth, in_str, esc = 0, False, False
-    for i in range(start, len(text)):
-        ch = text[i]
-        if in_str:
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == '"':
-                in_str = False
-            continue
-        if ch == '"':
-            in_str = True
-        elif ch == opener:
-            depth += 1
-        elif ch == closer:
-            depth -= 1
-            if depth == 0:
-                return json.loads(text[start : i + 1])
+    for start in starts:
+        opener = text[start]
+        closer = "}" if opener == "{" else "]"
+        depth, in_str, esc = 0, False, False
+        for i in range(start, len(text)):
+            ch = text[i]
+            if in_str:
+                if esc:
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    in_str = False
+                continue
+            if ch == '"':
+                in_str = True
+            elif ch == opener:
+                depth += 1
+            elif ch == closer:
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(text[start : i + 1])
+                    except json.JSONDecodeError:
+                        break
     raise ValueError("unbalanced JSON in LLM response")
 
 
