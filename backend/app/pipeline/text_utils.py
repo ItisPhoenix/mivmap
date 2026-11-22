@@ -173,6 +173,107 @@ def smart_title(phrase: str) -> str:
     return " ".join(out)
 
 
+# ---------------------------------------------------------------------------
+# Unicode-aware helpers shared by multilingual validation and similarity checks.
+# ---------------------------------------------------------------------------
+UNICODE_WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)
+SUPPORTED_TEACHING_LANGUAGES = frozenset({"en", "hi"})
+
+
+def normalize_language(code: str | None) -> str:
+    """Normalise BCP-47 codes to the base language (hi-IN -> hi, en-US -> en)."""
+    base = str(code or "en").strip().lower().replace("_", "-").split("-")[0]
+    return base or "en"
+
+
+def unicode_tokens(text: str) -> list[str]:
+    """Word tokens that preserve Devanagari marks and every other Unicode script."""
+    # \w excludes combining marks (Devanagari matras), so include the Devanagari
+    # block explicitly. lower() keeps scripts intact where casefold() decomposes them.
+    cleaned = re.sub(r"[^\w\u0900-\u097f]+", " ", str(text or "").lower()).strip()
+    return cleaned.split() if cleaned else []
+
+
+def unicode_norm(text: str) -> str:
+    """Normalised text for similarity/overlap checks; never strips non-Latin scripts."""
+    return " ".join(unicode_tokens(text))
+
+
+def script_counts(text: str) -> tuple[int, int, int]:
+    """(Devanagari, Latin, other) letter counts."""
+    dev = latin = other = 0
+    for ch in str(text or ""):
+        if not ch.isalpha():
+            continue
+        if "\u0900" <= ch <= "\u097f":
+            dev += 1
+        elif ch.isascii():
+            latin += 1
+        else:
+            other += 1
+    return dev, latin, other
+
+
+def is_technical_only(text: str) -> bool:
+    """True when a field is just acronyms/canonical terms (no prose to translate)."""
+    from .terminology import ACRONYM_EXPANSIONS
+
+    tokens = unicode_tokens(text)
+    if not tokens:
+        return False
+    known = {"lan", "pan", "man", "wan", "isp", "isps", "cdn", "cdns", "osi", "arpanet",
+             "tcp", "ip", "udp", "ont", "http", "https", "url", "uri", "wifi", "wi",
+             "fi", "fibre", "fiber", "router", "internet", "network", "ethernet"}
+    for expansion in ACRONYM_EXPANSIONS.values():
+        known.update(unicode_tokens(expansion))
+    return all(t.isdigit() or t in known for t in tokens)
+
+
+def field_language_ok(text: str, language: str) -> bool:
+    """Check one learner-facing field against the requested teaching language."""
+    lang = normalize_language(language)
+    if lang not in SUPPORTED_TEACHING_LANGUAGES:
+        return False
+    if is_technical_only(text):
+        return True
+    dev, latin, other = script_counts(text)
+    letters = dev + latin + other
+    if not letters:
+        return False
+    if lang == "hi":
+        return dev > 0 and dev / letters >= 0.2
+    return latin > 0 and latin / letters >= 0.8
+
+
+def check_teaching_languages(lesson: dict[str, Any], language: str) -> list[str]:
+    """Validate every learner-facing teaching field with one shared rule set.
+
+    Diagrams, provenance, evidence, quotations and technical acronyms are exempt
+    from ordinary-language script requirements.
+    """
+    lang = normalize_language(language)
+    if lang not in SUPPORTED_TEACHING_LANGUAGES:
+        return [f"unsupported teaching language for validation: {language}"]
+    errors: list[str] = []
+    fields: list[tuple[str, Any]] = [
+        (name, lesson.get(name)) for name in
+        ("title", "explain", "intuition", "why_it_matters", "worked_example", "misconception", "exercise")
+    ]
+    steps = lesson.get("steps")
+    if isinstance(steps, list):
+        fields.extend((f"steps[{i}]", step) for i, step in enumerate(steps))
+    check = lesson.get("knowledge_check")
+    if isinstance(check, dict):
+        fields.extend((f"knowledge_check.{key}", check.get(key))
+                      for key in ("question", "answer", "explanation"))
+    for name, value in fields:
+        if not isinstance(value, str) or not value.strip():
+            continue
+        if not field_language_ok(value, lang):
+            errors.append(f"{name} not written in the teaching language")
+    return errors
+
+
 def extract_json(text: str) -> Any:
     """Parse the first JSON object/array in an LLM response (tolerates ```json fences)."""
     if not text:

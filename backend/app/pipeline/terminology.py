@@ -85,7 +85,8 @@ HINDI_TERM_HINTS: dict[str, str] = {
 
 
 def norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", str(text or "").lower()).strip()
+    # Keep Devanagari and other scripts; only punctuation/separators are dropped.
+    return re.sub(r"[^\w\u0900-\u097f]+", " ", str(text or "").lower()).strip()
 
 
 def normalize_label(label: str, context: str = "") -> str:
@@ -198,36 +199,24 @@ def acronym_expansion(topic: str) -> str:
 # Real reference titles and URLs. Kept here so every external note carries a
 # citable source instead of a vague "standard terminology" phrase.
 REFERENCE_URLS: dict[str, tuple[str, str]] = {
-    "Generic networking terminology; RFC 1122 (Requirements for Internet Hosts)": (
+    "RFC 1122: internet is a network of networks": (
         "RFC 1122: Requirements for Internet Hosts - Communication Layers",
         "https://www.rfc-editor.org/rfc/rfc1122"),
-    "RFC 1122; standard Internet terminology": (
-        "RFC 1122: Requirements for Internet Hosts - Communication Layers",
-        "https://www.rfc-editor.org/rfc/rfc1122"),
-    "ARPA/DARPA ARPANET history; IEEE milestone records": (
-        "ARPANET - Wikipedia (history, ARPA/DARPA, 1969, 1983, 1990)",
-        "https://en.wikipedia.org/wiki/ARPANET"),
-    "Standard cellular network and submarine-cable architecture": (
-        "Submarine Cable Map (Telegeography) - global cable routes",
+    "Internet Society: A Brief History of the Internet": (
+        "A Brief History of the Internet (Leiner, Cerf, Clark, Kahn, Kleinrock, Postel, Roberts et al.)",
+        "https://www.internetsociety.org/internet/history-internet/brief-history-internet/"),
+    "3GPP TS 23.002: Network architecture": (
+        "3GPP TS 23.002 - Network architecture (3GPP specification archive)",
+        "https://www.3gpp.org/ftp/Specs/archive/23_series/23.002/"),
+    "TeleGeography: Submarine Cable Map": (
+        "TeleGeography Submarine Cable Map - global submarine cable routes",
         "https://www.submarinecablemap.com/"),
-    "Standard submarine cable infrastructure references": (
-        "Submarine Cable Map (Telegeography) - global cable routes",
-        "https://www.submarinecablemap.com/"),
-    "ISO/IEC 7498-1; RFC 1122": (
-        "ISO/IEC 7498-1:1994 - Open Systems Interconnection, Basic Reference Model",
-        "https://www.iso.org/standard/37097.html"),
-    "RFC 1122": (
-        "RFC 1122: Requirements for Internet Hosts - Communication Layers",
-        "https://www.rfc-editor.org/rfc/rfc1122"),
-    "Standard Wi-Fi / radio-link terminology": (
-        "IEEE 802.11 - Wireless LAN Medium Access Control and Physical Layer Specifications",
-        "https://standards.ieee.org/ieee/802.11/6981/"),
-    "Generic access-network terminology": (
-        "RFC 1122: Requirements for Internet Hosts - Communication Layers",
-        "https://www.rfc-editor.org/rfc/rfc1122"),
-    "Generic networking terminology": (
-        "IEEE 802.3 / IEEE 802.11 networking standards overview",
-        "https://standards.ieee.org/"),
+    "ITU-T X.200: OSI Basic Reference Model": (
+        "ITU-T Recommendation X.200 - Information technology, Open Systems Interconnection, Basic Reference Model",
+        "https://www.itu.int/rec/T-REC-X.200/en"),
+    "IEEE 802.11-2020: Wireless LAN MAC/PHY": (
+        "IEEE 802.11-2020 - Wireless LAN Medium Access Control and Physical Layer Specifications",
+        "https://standards.ieee.org/standard/802_11-2020.html"),
 }
 
 
@@ -250,7 +239,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("A WAN is described as 'a type of internet' and the Internet as the collection of all WANs.",
                   "A WAN (Wide Area Network) is a network classified by geographic scale. The Internet is one specific global internetwork that uses TCP/IP to interconnect many networks. The word 'internet' is a shortening of 'internetwork', not 'International Network'; a private WAN is not automatically part of the Internet.",
-                  "Generic networking terminology; RFC 1122 (Requirements for Internet Hosts)",
+                  "RFC 1122: internet is a network of networks",
                   required=True),
         ],
         # Targeted text fixes applied only to AI teaching fields, never to evidence.
@@ -267,7 +256,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("The video derives 'Internet' from 'International Network'.",
                   "'Internet' is a contraction of 'internetwork' (a network of networks), not of 'International Network'. The Internet is the global system of interconnected computer networks that uses the TCP/IP protocol suite.",
-                  "RFC 1122; standard Internet terminology", required=True),
+                  "RFC 1122: internet is a network of networks", required=True),
         ],
         "replacements": [
             (r"\bfull form is (?:obviously )?International Network\b",
@@ -280,7 +269,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("The speaker is unsure of the expansion ('Association... maybe Agency Network').",
                   "ARPANET expands to Advanced Research Projects Agency Network. It was established by ARPA (later DARPA) of the US Department of Defense; the first hosts were connected in 1969, TCP/IP replaced NCP on 1 January 1983, and ARPANET was decommissioned in 1990. It was a research network, not a public service.",
-                  "ARPA/DARPA ARPANET history; IEEE milestone records", required=True),
+                  "Internet Society: A Brief History of the Internet", required=True),
         ],
         "replacements": [
             (r"\bthe acronym, is ARPANET\b", "acronym is ARPANET, Advanced Research Projects Agency Network"),
@@ -294,8 +283,8 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
     "cell tower": {
         "notes": [
             _note("International traffic is described as going by fibre 'to the tower located at the US-based provider'.",
-                  "A cell tower (cell site/base station) is the radio access point at the edge of a mobile network. The tower is normally backhauled over fibre to the operator's core network; an international call crosses one or more submarine fibre cables to the destination operator's core network and only then reaches a nearby cell tower serving the recipient.",
-                  "Standard cellular network and submarine-cable architecture", required=True),
+                  "A cell tower (cell site/base station) is the radio access point at the edge of a mobile network. The tower is normally backhauled over fibre to the operator's core network; an international call is handed between operator core networks and only then reaches a local tower serving the recipient. The long-haul international path itself is covered by the separate submarine-cable correction.",
+                  "3GPP TS 23.002: Network architecture", required=True),
         ],
         "replacements": [
             (r"\btower located at the US-based providers?(?:, or whatever telecom providers are there)?\b",
@@ -306,15 +295,15 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("The video discusses fibre cables laid on the seabed near the Strait of Hormuz.",
                   "Submarine fibre-optic cables carry the overwhelming majority of intercontinental data traffic; satellites carry only a small share. Because cables are physically routed through narrow seas, a single chokepoint can affect several systems at once, which is why route diversity matters.",
-                  "Standard submarine cable infrastructure references"),
+                  "TeleGeography: Submarine Cable Map"),
         ],
         "replacements": [],
     },
     "osi model": {
         "notes": [
             _note("The video says 'nothing was defined in the OSI protocols' and that OSI was only used in 4.3BSD.",
-                  "The OSI Reference Model (ISO/IEC 7498-1) defines seven abstraction layers and their responsibilities; the OSI programme also specified concrete protocols (for example X.25). The model is a reference/teaching framework, whereas TCP/IP is the protocol suite implemented in practice. The 4.3BSD detail is a video-specific historical claim and is not relied on here.",
-                  "ISO/IEC 7498-1; RFC 1122", required=True),
+                  "The OSI Reference Model (ITU-T X.200 / ISO/IEC 7498-1) defines seven abstraction layers and their responsibilities; the OSI programme also specified concrete protocols (for example X.25). The model is a reference/teaching framework, whereas TCP/IP is the protocol suite implemented in practice. The 4.3BSD detail is a video-specific historical claim and is not relied on here.",
+                  "ITU-T X.200: OSI Basic Reference Model", required=True),
         ],
         "replacements": [
             (r"\bnothing was defined in the OSI protocols\b",
@@ -325,7 +314,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("None - the video correctly notes TCP and UDP both sit in the transport layer.",
                   "TCP/IP is a protocol suite named after its two best-known protocols; UDP, ICMP and many others belong to it. Confirmed here so the AI explanation is not misled by an out-of-context quote such as 'we cannot include UDP in it'.",
-                  "RFC 1122"),
+                  "RFC 1122: internet is a network of networks"),
         ],
         "replacements": [],
     },
@@ -333,7 +322,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("The video says data speed is inversely proportional to the wavelength/range of the radio waves.",
                   "Wi-Fi throughput depends on the modulation and coding scheme, channel width, number of spatial streams and the signal-to-noise ratio at the receiver. Higher frequency bands can offer wider channels but suffer greater path loss, so range tends to fall as frequency rises. Reducing this to 'speed is inversely proportional to wavelength' is an oversimplification of the video's claim.",
-                  "Standard Wi-Fi / radio-link terminology", required=True),
+                  "IEEE 802.11-2020: Wireless LAN MAC/PHY", required=True),
         ],
         "replacements": [
             (r"\bdata speed is inversely proportional to the wavelength, which corresponds to the range\b",
@@ -346,7 +335,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("The video describes fibre being extended from the provider's network into different localities.",
                   "This is the access or 'last mile' part of the network: the provider's backbone reaches a local area and fibre equipment is then extended locality by locality to subscribers. It is distinct from a LAN, which is a local network inside one building or campus.",
-                  "Generic access-network terminology"),
+                  "RFC 1122: internet is a network of networks"),
         ],
         "replacements": [],
     },
@@ -354,7 +343,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("None - the video defines LAN directly.",
                   "The geographical scale sequence is PAN (a person), LAN (a building or campus), MAN (a city) and WAN (multiple cities, countries or continents). These are different categories, not synonyms.",
-                  "Generic networking terminology"),
+                  "RFC 1122: internet is a network of networks"),
         ],
         "replacements": [],
     },
@@ -362,7 +351,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("None - the video names PAN as the first geographical category.",
                   "PAN (Personal Area Network) covers roughly the space around one person (a few metres), for example Bluetooth earbuds paired to a phone. It is smaller than a LAN, which covers a building or campus.",
-                  "Generic networking terminology"),
+                  "RFC 1122: internet is a network of networks"),
         ],
         "replacements": [],
     },
@@ -370,7 +359,7 @@ TECHNICAL_CORRECTIONS: dict[str, dict[str, Any]] = {
         "notes": [
             _note("None - the video names MAN as a geographical category.",
                   "MAN (Metropolitan Area Network) covers a city or metropolitan region, sitting between a LAN (one building or campus) and a WAN (multiple cities or countries). It is a distinct category, not another name for a WAN.",
-                  "Generic networking terminology"),
+                  "RFC 1122: internet is a network of networks"),
         ],
         "replacements": [],
     },

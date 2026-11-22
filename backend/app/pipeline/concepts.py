@@ -31,7 +31,7 @@ import numpy as np
 from ..config import has_module
 from .embeddings import cosine_matrix, embed
 from .segmentation import Segment, stop_words
-from .text_utils import FILLER_WORDS, candidate_phrases, smart_title, split_sentences
+from .text_utils import FILLER_WORDS, candidate_phrases, smart_title, split_sentences, unicode_norm
 from .terminology import is_meaningful_label, normalize_label
 
 log = logging.getLogger("mivmap.concepts")
@@ -175,7 +175,7 @@ def _spacy():
 
 
 def _norm_label(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", str(text or "").lower()).strip()
+    return unicode_norm(text)
 
 
 def _valid_phrase(phrase: str, stops: set[str]) -> bool:

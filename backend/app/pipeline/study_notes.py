@@ -23,7 +23,7 @@ import re
 import numpy as np
 
 from .embeddings import cosine_matrix, embed
-from .text_utils import fmt_time, truncate
+from .text_utils import fmt_time, truncate, unicode_norm
 
 DEFINITION_CUE = re.compile(
     r"^\s*(?:or|which is|that is|is|are|was|were|means?|refers? to|is called|"
@@ -77,7 +77,7 @@ ACRONYM_WORDS = {
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", str(text or "").lower()).strip()
+    return unicode_norm(text)
 
 
 def _clean(sentence: str) -> str:

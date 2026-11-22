@@ -38,7 +38,8 @@ from .embeddings import Embedder, backend_name, cosine_matrix
 from .segmentation import Segment, segment_transcript
 from .study_notes import build_study_note
 from .topics import ESSENTIAL_LABELS, HTTP_TOPICS, active_topics, detect_domain, supplement_concepts
-from .text_utils import FILLER_WORDS, VERB_FORMS, fmt_time, parse_description_chapters, smart_title, truncate
+from .text_utils import (FILLER_WORDS, VERB_FORMS, fmt_time, parse_description_chapters,
+                         smart_title, truncate, unicode_norm)
 from .terminology import HINDI_TERM_HINTS, misleading_detail
 from .tone import detect_tone, merge_tone
 from .transcript import Transcript, TranscriptEntry, get_transcript, sentences_with_time
@@ -172,7 +173,9 @@ def ensure_essential_topics(mindmap: dict, entries: list[TranscriptEntry]) -> No
                 continue
             hits = sum(1 for a in aliases if re.search(r"(?<![a-z])" + re.escape(a) + r"(?![a-z])", text, re.I))
             score = hits * 3 + (1 if COPULA_RE.search(text) else 0) + min(len(text) // 60, 3)
-            if hits and (best is None or e.start < best[1].start):
+            # Strongest evidence wins; earliest timestamp breaks equal scores.
+            rank = (score, -float(e.start))
+            if hits and (best is None or rank > (best[0], -float(best[1].start))):
                 best = (score, e)
         if not best:
             continue
@@ -820,7 +823,7 @@ TAG_RULES = [
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
+    return unicode_norm(text)
 
 
 def compress(text: str, max_words: int) -> str:

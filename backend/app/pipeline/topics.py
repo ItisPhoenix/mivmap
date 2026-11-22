@@ -15,6 +15,7 @@ import re
 from dataclasses import dataclass
 
 from .concepts import Concept
+from .text_utils import unicode_norm
 
 # (canonical label, aliases -> any one cue is enough)
 HTTP_TOPICS = [
@@ -73,7 +74,7 @@ class TopicHit:
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
+    return unicode_norm(text)
 
 
 def _hits(blocks, topics: list[tuple[str, list[str]]]) -> list[TopicHit]:

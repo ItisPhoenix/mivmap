@@ -10,6 +10,8 @@ import difflib
 import re
 from typing import Any
 
+from .text_utils import check_teaching_languages, field_language_ok, unicode_norm
+
 LESSON_FIELDS = (
     "explain",          # definition / plain-English meaning
     "intuition",        # mental model in everyday language
@@ -40,7 +42,7 @@ ACTION_VERBS = re.compile(
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", (text or "").lower()).strip()
+    return unicode_norm(text)
 
 
 def _topic_terms(topic: str) -> set[str]:
@@ -55,8 +57,14 @@ def _topic_terms(topic: str) -> set[str]:
         elif w.endswith("s"):
             terms.add(w[:-1])
     from .study_notes import ACRONYM_WORDS
+    from .terminology import HINDI_TERM_HINTS
     for w in list(terms):
         terms.update(ACRONYM_WORDS.get(w, []))
+    # Hindi teaching keeps English acronyms but may also use the spoken Hindi
+    # technical term; both must satisfy topic-specific validation.
+    for hint, canonical in HINDI_TERM_HINTS.items():
+        if unicode_norm(canonical) in {unicode_norm(t) for t in terms}:
+            terms.add(hint.lower())
     return terms
 
 
@@ -68,17 +76,8 @@ def overlap(text: str, evidence: str) -> float:
 
 
 def _script_ok(text: str, language: str) -> bool:
-    """Cheap script check so a requested teaching language is actually used."""
-    lang = (language or "en").lower().split("-")[0]
-    if lang == "en":
-        letters = [ch for ch in text if ch.isalpha()]
-        return bool(letters) and sum(ch.isascii() for ch in letters) / len(letters) > 0.7
-    if lang == "hi":
-        dev = sum(1 for ch in text if "\u0900" <= ch <= "\u097f")
-        latin = sum(1 for ch in text if ch.isascii() and ch.isalpha())
-        # Hindi teaching may legitimately keep English technical acronyms.
-        return dev > 0 and dev >= max(8, latin * 0.25)
-    return True  # unknown language: do not reject on script alone
+    """Shared script check; technical-only fields are exempt by design."""
+    return field_language_ok(text, language)
 
 
 def validate_deep_teaching(lesson: dict[str, Any], topic: str,
@@ -108,16 +107,13 @@ def validate_deep_teaching(lesson: dict[str, Any], topic: str,
         errors.append(f"acronym expansion wrong or missing (expected {expected})")
     if correction_required(topic) and not lesson.get("accuracy_notes"):
         errors.append("externally supplemented accuracy note missing")
-    for field in ("explain", "intuition", "why_it_matters", "worked_example", "misconception"):
-        value = lesson.get(field)
-        if isinstance(value, str) and value.strip() and not _script_ok(value, teaching_language):
-            errors.append(f"{field} not written in the teaching language")
-            break
+    errors.extend(check_teaching_languages(lesson, teaching_language))
     return (not errors), errors
 
 
 def validate_lesson(lesson: dict[str, Any], evidence_text: str, topic: str,
-                    evidence: list[dict] | None = None) -> tuple[bool, list[str]]:
+                    evidence: list[dict] | None = None,
+                    teaching_language: str | None = None) -> tuple[bool, list[str]]:
     """Return (accepted, errors). No subject-specific facts are consulted here.
 
     The optional `evidence` list enables timestamp/quote checks against the concept's
@@ -254,5 +250,6 @@ def validate_lesson(lesson: dict[str, Any], evidence_text: str, topic: str,
                 if len(str(q)) >= 12 and _norm(q) not in supplied:
                     errors.append("evidence quote not in transcript")
 
-    # Provenance is stamped by the pipeline; the model often omits it.
+    if teaching_language:
+        errors.extend(check_teaching_languages(lesson, teaching_language))
     return (not errors), errors

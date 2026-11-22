@@ -30,19 +30,48 @@ test('floating player opens once at an exact timestamp and reuses the iframe', (
   assert.equal(hasPreview(), false);
 });
 
-test('a real generated Deep export imports into the viewer and keeps Quick recall Q&A', async () => {
-  const { readFileSync } = await import('node:fs');
-  const path = new URL('../../examples/verification/networking-deep-verified.json', import.meta.url);
-  let map;
-  try { map = JSON.parse(readFileSync(path, 'utf8')); }
-  catch { return; } // generation not run yet: the import test runs in the full verification pass
+test('self-contained map imports into viewer with concepts and Quick recall Q&A', () => {
+  // Original fixture: no generated exports, private transcripts or file reads.
+  const map = {
+    schema: 'tubemind/1',
+    meta: { videoId: 'synthetic-map-001', mode: 'deep', teachingLanguage: 'en' },
+    root: {
+      id: 'root', type: 'root', text: 'Synthetic networking map', summary: 'LAN · WAN',
+      start: 0, end: 40, children: [
+        {
+          id: 's1', type: 'section', text: 'Network types', start: 0, end: 40, children: [
+            { id: 'c1', type: 'concept', text: 'LAN', start: 1, end: 10, summary: '', children: [] },
+            { id: 'c2', type: 'concept', text: 'WAN', start: 11, end: 20, summary: '', children: [] },
+          ],
+        },
+        {
+          id: 'recall', type: 'section', recall: true, text: 'Quick recall',
+          summary: 'LAN · WAN', start: 0, end: 40, children: [
+            { id: 'q0', type: 'concept', oneline: true, text: 'In one line: LAN · WAN', children: [] },
+            { id: 'q1', type: 'concept', qa: true, start: 1, end: 10,
+              text: 'Q: What does LAN stand for?  A: Local Area Network.', children: [] },
+          ],
+        },
+      ],
+    },
+    edges: [], transcript: [],
+  };
+
   const model = new MindMapModel();
   model.load(map);
-  assert.ok(model.root.children.length > 0, 'map imports into the viewer model');
-  const hasConcepts = (map.root.children || []).some((s) => (s.children || []).some((c) => c.type === 'concept'));
-  if (!hasConcepts) return; // a smoke export legitimately has no accepted lessons
+  assert.ok(model.root, 'viewer model has a root');
+  assert.equal(model.root.children.length, 2, 'section and Quick recall imported');
+
+  const concepts = model.root.children
+    .filter((s) => !s.recall)
+    .flatMap((s) => s.children || [])
+    .filter((c) => c.type === 'concept');
+  assert.equal(concepts.length, 2, 'both concepts imported');
+  assert.deepEqual(concepts.map((c) => c.text).sort(), ['LAN', 'WAN']);
+
   const o = outline(map);
   assert.ok(o.recall.length > 0, 'Quick recall is present in the content map');
   const qa = o.recall.filter((r) => /^Q:/.test(r.text || ''));
-  assert.ok(qa.length > 0, 'Quick recall entries are compact Q&A, not raw transcript fragments');
+  assert.equal(qa.length, 1, 'one genuine Q&A entry is available');
+  assert.match(qa[0].text, /Local Area Network/, 'Q&A answer is grounded in the concept');
 });

@@ -17,6 +17,7 @@ TRANSCRIPT_MARKERS = re.compile(
 VAGUE_WORDS = {"revisit", "additional", "information", "foundation", "foundations", "overview", "message", "messages"}
 
 from .pipeline.topics import ESSENTIAL_LABELS, detect_domain
+from .pipeline.text_utils import check_teaching_languages, unicode_norm
 from .pipeline.terminology import (acronym_expansion, is_meaningful_label,
                                    correction_required, misleading_detail,
                                    normalize_label)
@@ -108,7 +109,7 @@ def _walk(node: dict):
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", _s(text).lower()).strip()
+    return unicode_norm(_s(text))
 
 
 def _s(value) -> str:
@@ -622,16 +623,12 @@ def analyze_map(mindmap: dict) -> QualityReport:
         r.check("concept_label_explanation_consistency", not mismatched,
                 {"count": len(mismatched), "examples": mismatched[:5]}, "teaching_ready")
 
-        # 6) Explanations must be in the selected teaching language.
+        # 6) Every learner-facing field must use the selected teaching language.
+        # Shared with lesson acceptance so the two checks cannot disagree.
         wrong_lang = []
         for n in taught:
-            body = " ".join(str(n.get(k) or "") for k in ("explain", "intuition", "exercise"))
-            dev = sum(1 for c in body if "\u0900" <= c <= "\u097f")
-            latin = sum(1 for c in body if c.isascii() and c.isalpha())
-            if teaching_language.startswith("hi") and dev < 20:
-                wrong_lang.append(n.get("text"))
-            if teaching_language == "en" and latin < 40:
-                wrong_lang.append(n.get("text"))
+            for detail in check_teaching_languages(n, teaching_language):
+                wrong_lang.append(f"{n.get('text')}: {detail}")
         r.check("language_consistency", not wrong_lang,
                 {"expected": teaching_language, "count": len(wrong_lang), "examples": wrong_lang[:5]},
                 "teaching_ready")

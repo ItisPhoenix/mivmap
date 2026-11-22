@@ -39,7 +39,7 @@ from .terminology import (acronym_expansion, apply_accuracy_corrections, norm as
                          TECHNICAL_CORRECTIONS)
 from .topics import ESSENTIAL_LABELS, HTTP_TOPICS
 from .embeddings import Embedder
-from .text_utils import fmt_time, truncate
+from .text_utils import fmt_time, truncate, unicode_norm
 from .translate import needs_translation
 
 log = logging.getLogger("mivmap.labels")
@@ -253,7 +253,9 @@ ID_RE = re.compile(r"^\[?([scd]\d+)\]?$", re.I)
 LINK_RE = re.compile(r"^\[?(c\d+)\]?\s*(?:->|>|→|,|\s)\s*\[?(c\d+)\]?$", re.I)
 BARE_LINK_RE = re.compile(r"^\s*(c\d+)\s+(c\d+)\s*$", re.I)
 TIME_RE = re.compile(r"\[?\(?\b\d{1,2}:\d{2}(?::\d{2})?\b\)?\]?")
-META_RE = re.compile(r"\b(?:the speaker|this section|this video|the video|speaker (?:mentions|says|talks))\b", re.I)
+META_RE = re.compile(
+    r"\b(?:the speaker|this section|this video|the video|speaker (?:mentions|says|talks)|"
+    r"here is|here are|let's|we will|we're going to|as i mentioned|i think)\b", re.I)
 TAG_ALIASES = {
     "def": "Def", "definition": "Def", "defn": "Def", "meaning": "Def",
     "eg": "Eg", "e.g": "Eg", "e.g.": "Eg", "example": "Eg", "ex": "Eg",
@@ -263,11 +265,15 @@ TAG_ALIASES = {
 }
 
 
-def clean_label(text: str, max_chars: int, max_words: int) -> str | None:
+def clean_label(text: str, max_chars: int, max_words: int,
+                teaching_language: str = "en") -> str | None:
     text = TIME_RE.sub(" ", text.replace("**", "").replace("`", ""))
     text = re.sub(r"\s+", " ", text).strip().strip("\"'“”‘’").rstrip(".;,").strip()
     text = re.sub(r"\s+:", ":", text)
-    if not text or META_RE.search(text) or not re.search(r"[A-Za-z0-9]", text) or needs_translation(text):
+    hindi_ok = teaching_language.lower().split("-")[0] == "hi"
+    has_content = any(ch.isalnum() for ch in text)  # Unicode-aware, keeps Devanagari
+    if (not text or META_RE.search(text) or not has_content or "।" in text
+            or (not hindi_ok and needs_translation(text))):
         return None
     if len(text.split()) > max_words or len(text) > max_chars:
         return None
@@ -278,8 +284,9 @@ def _tag(text: str) -> str | None:
     return TAG_ALIASES.get(text.strip().strip("[]()*").lower())
 
 
-def parse_labels(text: str) -> Parsed:
+def parse_labels(text: str, teaching_language: str = "en") -> Parsed:
     """Parse the pipe format. Never raises; anything unusable is counted as malformed and skipped."""
+    lang = teaching_language
     out = Parsed()
     last_concept: str | None = None
     last_section: str | None = None
@@ -297,11 +304,11 @@ def parse_labels(text: str) -> Parsed:
                 out.malformed += 1
                 continue
             if stripped and not out.root:
-                label = clean_label(stripped, 60, 8)
+                label = clean_label(stripped, 60, 8, lang)
                 if label: out.root = label
                 continue
             if stripped and not out.summary:
-                label = clean_label(stripped, 170, 24)
+                label = clean_label(stripped, 170, 24, lang)
                 if label: out.summary = label
                 continue
         if not raw.strip() or raw.strip().startswith("```"):
@@ -316,7 +323,7 @@ def parse_labels(text: str) -> Parsed:
             continue
         parts = [p.strip() for p in rest.split("|")]
         if kind in "RM":
-            label = clean_label(" ".join(p for p in parts if p), 60 if kind == "R" else 170, 8 if kind == "R" else 24)
+            label = clean_label(" ".join(p for p in parts if p), 60 if kind == "R" else 170, 8 if kind == "R" else 24, lang)
             current = out.root if kind == "R" else out.summary
             if label and current is None:
                 if kind == "R":
@@ -335,8 +342,8 @@ def parse_labels(text: str) -> Parsed:
             key = ident.group(1).lower()
             if kind == "S":
                 last_section = key
-                title = clean_label(parts[1], 60, 8)
-                summary = clean_label(". ".join(p for p in parts[2:] if p), 140, 20) if len(parts) > 2 else None
+                title = clean_label(parts[1], 60, 8, lang)
+                summary = clean_label(". ".join(p for p in parts[2:] if p), 140, 20, lang) if len(parts) > 2 else None
                 if title and key not in out.sections:
                     out.sections[key] = title
                 if summary and key not in out.section_summaries:
@@ -348,7 +355,7 @@ def parse_labels(text: str) -> Parsed:
                 last_concept = key
                 # The fast model often emits C|Term: meaning|source-sentence.
                 label_text = parts[1] if len(parts) >= 3 and parts[1] and ":" in parts[1] else ": ".join(p for p in parts[1:] if p)
-                label = clean_label(label_text, 110, 16)
+                label = clean_label(label_text, 110, 16, lang)
                 if label and key not in out.concepts:
                     out.concepts[key] = label
                 elif not label:
@@ -360,7 +367,7 @@ def parse_labels(text: str) -> Parsed:
             inline = re.match(r"^(def|definition|eg|e\.g\.?|example|formula|equation|tip|remember|note|watch[- ]?out|caution|warning)\s*:\s*", body, re.I)
             if inline:  # "Watch out: …" written inside the text: that is the tag
                 tag, body = tag or _tag(inline.group(1)), body[inline.end():]
-            label = clean_label(body, 110, 16)
+            label = clean_label(body, 110, 16, lang)
             target = f"{key}#{tag or ''}" if id_kind == "C" else key
             if label and target not in out.details:
                 out.details[target] = (tag, label)
@@ -378,15 +385,15 @@ def parse_labels(text: str) -> Parsed:
             if not key or not body_parts:
                 out.malformed += 1
                 continue
-            body = clean_label(": ".join(p for p in body_parts if p), 180, 28)
+            body = clean_label(": ".join(p for p in body_parts if p), 180, 28, lang)
             if not body:
                 out.malformed += 1
                 continue
             target = {
                 "A": out.explanations, "E": out.examples, "G": out.diagrams, "Q": out.exercises,
             }[kind]
-            fingerprint = re.sub(r"[^a-z0-9]+", " ", body.lower()).strip()
-            if any(re.sub(r"[^a-z0-9]+", " ", v.lower()).strip() == fingerprint for v in target.values()):
+            fingerprint = unicode_norm(body)
+            if any(unicode_norm(v) == fingerprint for v in target.values()):
                 out.malformed += 1
                 continue
             target.setdefault(key, body)
@@ -394,7 +401,7 @@ def parse_labels(text: str) -> Parsed:
         # X
         link = LINK_RE.match(parts[0]) if parts else None
         bare = BARE_LINK_RE.match(parts[0]) if parts else None
-        label = clean_label(parts[1], 32, 4) if len(parts) > 1 else None
+        label = clean_label(parts[1], 32, 4, lang) if len(parts) > 1 else None
         if bare and label and len(out.links) < MAX_LINKS:
             out.links.append((bare.group(1).lower(), bare.group(2).lower(), label))
         elif link and label and len(out.links) < MAX_LINKS:
@@ -620,7 +627,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
         if hit and isinstance(hit.get("lesson"), dict):
             stamped = finish(hit["lesson"], item)
             ev_text = " ".join(e.get("text", "") for e in item["evidence"])
-            ok, _ = validate_lesson(stamped, ev_text, item["topic"], item["evidence"])
+            ok, _ = validate_lesson(stamped, ev_text, item["topic"], item["evidence"], teaching_language)
             ok2, _ = validate_deep_teaching(stamped, item["topic"], teaching_language)
             if ok and ok2:
                 accepted[item["id"]] = stamped
@@ -657,7 +664,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
                                 entries.setdefault(str(k).lower(), {})[field] = v
             ev_text = " ".join(e.get("text", "") for e in item["evidence"])
             for cid, obj in entries.items():
-                ok, errors = validate_lesson(obj, ev_text, item["topic"], item["evidence"])
+                ok, errors = validate_lesson(obj, ev_text, item["topic"], item["evidence"], teaching_language)
                 if ok:
                     stamped = finish(obj, item)
                     ok2, errors2 = validate_deep_teaching(stamped, item["topic"], teaching_language)
@@ -707,6 +714,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
     provider = llm.fast_provider()
     remote_llm = bool(provider and "llm.test" not in provider[0])
     is_deep = (mindmap.get("meta") or {}).get("mode") == "deep"
+    teaching_language = (mindmap.get("meta") or {}).get("teachingLanguage") or "en"
 
     # 1. cache lookup ----------------------------------------------------------------
     todo: list[SectionCand] = []
@@ -774,7 +782,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
             text = comp.text
             if not comp.ok and not text.endswith("\n"):  # cut off mid-line: drop the unfinished label
                 text = text.rsplit("\n", 1)[0] if "\n" in text else ""
-            parsed = parse_labels(text)
+            parsed = parse_labels(text, teaching_language)
             parsed.details = _resolve_details(parsed, details)
             stats["malformed"] += parsed.malformed
             if want_root and merged.root is None and parsed.root:
@@ -917,7 +925,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", (text or "").lower()).strip()
+    return unicode_norm(text)
 
 
 def _missing_topic_ops(mindmap: dict) -> list[dict]:
