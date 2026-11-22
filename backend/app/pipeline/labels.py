@@ -542,46 +542,110 @@ def _llm_enrich(mindmap: dict, concepts: dict, details: dict) -> dict:
         result["generatedBy"].setdefault(item["id"], "extractive-transcript")
     return result
 
-def parse_lesson_entries(data: Any, cid: str) -> dict[str, dict]:
-    """Normalise the provider's lesson response into {concept_id: lesson}.
+def _is_knowledge_check(value: Any) -> bool:
+    """Distinguish a nested Q&A object from a columnar concept-id mapping."""
+    return isinstance(value, dict) and any(
+        isinstance(value.get(key), str) and value[key].strip()
+        for key in ("question", "answer", "explanation")
+    )
 
-    Providers return a one-item list, a list of objects with their own id, a
-    dict keyed by arbitrary ids, or a flat lesson object. All are accepted;
-    nothing is filed under a concept that did not return a lesson.
+
+def _is_lesson_object(value: Any) -> bool:
+    """Recognise a lesson by its field values, not merely by nested dictionaries."""
+    if not isinstance(value, dict):
+        return False
+    for field in ("title", "explain", "intuition", "why_it_matters", "worked_example",
+                  "diagram", "misconception", "exercise"):
+        if isinstance(value.get(field), str) and value[field].strip():
+            return True
+    if isinstance(value.get("steps"), list) and value["steps"]:
+        return True
+    return _is_knowledge_check(value.get("knowledge_check"))
+
+
+def parse_lesson_entries(data: Any, cid: str) -> dict[str, dict]:
+    """Normalise flat, keyed, list, wrapper, JSON-string and columnar responses.
+
+    A normal lesson's knowledge_check is itself a dictionary. It must never be
+    mistaken for a map of concept IDs; doing so used to split its question,
+    answer and explanation into three malformed pseudo-lessons.
     """
+    cid = str(cid or "").lower()
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except (TypeError, ValueError):
+            return {}
+
     entries: dict[str, dict] = {}
-    cid = str(cid).lower()
+
     if isinstance(data, list):
         for obj in data:
-            if isinstance(obj, str):  # some gateways return JSON-encoded strings
+            if isinstance(obj, str):
                 try:
                     obj = json.loads(obj)
                 except (TypeError, ValueError):
                     continue
-            if isinstance(obj, list):
-                candidates = [x for x in obj if isinstance(x, dict)]
-            elif isinstance(obj, dict):
-                candidates = [obj]
-            else:
-                candidates = []
-            for lesson_obj in candidates:
-                entries[str(lesson_obj.get("id") or cid).lower()] = lesson_obj
-    elif isinstance(data, dict):
-        for key, value in data.items():
-            if isinstance(value, dict) and any(f in value for f in LESSON_FIELDS):
-                entries[str(key).lower()] = value
-        if isinstance(data.get("id"), str):
-            entries.setdefault(data["id"].lower(), data)
-        flat_shaped = any(isinstance(data.get(f), dict) for f in LESSON_FIELDS)
-        if not entries and not flat_shaped and any(f in data for f in LESSON_FIELDS):
-            entries[cid] = data
-        if not entries:
-            for field in LESSON_FIELDS + ("provenance",):
-                flat = data.get(field) or {}
-                if isinstance(flat, dict):
-                    for key, value in flat.items():
-                        entries.setdefault(str(key).lower(), {})[field] = value
-    return entries
+            if _is_lesson_object(obj):
+                key = str(obj.get("id") or (cid if len(data) == 1 else "")).lower()
+                if key:
+                    entries[key] = obj
+            elif isinstance(obj, dict) and _is_lesson_object(obj.get("lesson")):
+                lesson = obj["lesson"]
+                key = str(obj.get("id") or lesson.get("id") or (cid if len(data) == 1 else "")).lower()
+                if key:
+                    entries[key] = lesson
+            elif isinstance(obj, (dict, list)):
+                entries.update(parse_lesson_entries(obj, cid if len(data) == 1 else ""))
+        return entries
+
+    if not isinstance(data, dict):
+        return {}
+
+    if _is_lesson_object(data):
+        key = str(data.get("id") or cid).lower()
+        return {key: data} if key else {}
+
+    if _is_lesson_object(data.get("lesson")):
+        lesson = data["lesson"]
+        key = str(data.get("id") or lesson.get("id") or cid).lower()
+        return {key: lesson} if key else {}
+
+    # Common response wrappers used by gateways and model adapters.
+    for wrapper in ("lessons", "results", "items", "data", "result", "response"):
+        nested = data.get(wrapper)
+        if isinstance(nested, (dict, list, str)):
+            parsed = parse_lesson_entries(nested, cid)
+            if parsed:
+                return parsed
+
+    # A dictionary keyed by concept ID (or provider-generated lesson ID).
+    for key, value in data.items():
+        if _is_lesson_object(value):
+            lesson_id = str(value.get("id") or key).lower()
+            if lesson_id:
+                entries[lesson_id] = value
+        elif isinstance(value, dict) and _is_lesson_object(value.get("lesson")):
+            lesson = value["lesson"]
+            lesson_id = str(value.get("id") or lesson.get("id") or key).lower()
+            if lesson_id:
+                entries[lesson_id] = lesson
+    if entries:
+        return entries
+
+    # Columnar shape: {"explain": {"c1": "..."}, "steps": {"c1": [...]}, ...}
+    for field in LESSON_FIELDS + ("title", "provenance"):
+        values = data.get(field)
+        if not isinstance(values, dict):
+            continue
+        if field == "knowledge_check" and _is_knowledge_check(values):
+            continue
+        for key, value in values.items():
+            if str(key).lower() == "id":
+                continue
+            entries.setdefault(str(key).lower(), {})[field] = value
+
+    return {key: value for key, value in entries.items() if _is_lesson_object(value)}
 
 
 def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], list[dict]]:
@@ -620,7 +684,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
             "knownPitfalls": pitfalls,
         })
     if not items:
-        return {}, []
+        return {}, [], []
 
     language_rule = (
         "Write EVERY teaching field in English. Keep standard technical acronyms "
@@ -686,9 +750,9 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
     accepted: dict[str, dict] = {}
     failed: list[str] = []
     rejections: list[dict] = []
-    max_attempts = 4
-    base_delay = 2.0
-    max_delay = 45.0
+    max_attempts = 3
+    base_delay = 1.5
+    max_delay = 8.0
 
     for item in items:
         hit = load_lesson(item["key"])
@@ -705,52 +769,125 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
         call_errors: list[str] = []
         parse_notes: list[str] = []
         last_errors: list[str] = []
+        last_candidate: dict | None = None
+        failure_kind = "provider_error"
+        provider_diag: dict = {}
+        attempts_made = 0
+        retry_stop_reason = ""
+
         for attempt in range(max_attempts):
+            attempts_made = attempt + 1
+            request_fields = (
+                ("id", "topic", "evidence", "teachingLanguage", "sourceLanguage")
+                if teaching_language.lower().split("-")[0] != "en" else
+                ("id", "topic", "evidence", "teachingLanguage", "sourceLanguage",
+                 "acronymExpansion", "knownPitfalls")
+            )
+            request_item = {k: item[k] for k in request_fields}
+            if attempt:
+                # Do not repeat the same failed prompt blindly. Give the provider
+                # the exact validation/parser feedback and its previous candidate.
+                feedback = {
+                    "failureKind": failure_kind,
+                    "previousErrors": last_errors[:10],
+                    "parseNotes": parse_notes[-2:],
+                }
+                if last_candidate is not None:
+                    feedback["previousRejectedLesson"] = last_candidate
+                request_item["repairFeedback"] = feedback
+
             data = None
             try:
                 data = llm.chat_json(
                     system,
-                    json.dumps([{k: item[k] for k in (
-                        ("id", "topic", "evidence", "teachingLanguage", "sourceLanguage")
-                        if teaching_language.lower().split("-")[0] != "en" else
-                        ("id", "topic", "evidence", "teachingLanguage", "sourceLanguage",
-                         "acronymExpansion", "knownPitfalls"))}],
-                               ensure_ascii=False),
-                    max_tokens=2400, temperature=0.25,
+                    json.dumps([request_item], ensure_ascii=False),
+                    max_tokens=2800,
+                    temperature=0.2 if attempt else 0.25,
                 )
             except Exception as exc:  # noqa: BLE001
-                call_errors.append(f"attempt {attempt + 1}: {type(exc).__name__}: {str(exc)[:160]}")
-                log.warning("Deep lesson call failed for %s: %s", item["id"], exc)
+                call_errors.append(f"attempt {attempts_made}: {type(exc).__name__}: {str(exc)[:160]}")
+
+            diag_fn = getattr(llm, "chat_json_diagnostics", None)
+            try:
+                provider_diag = diag_fn() if callable(diag_fn) else {}
+            except Exception:  # noqa: BLE001
+                provider_diag = {}
+
+            if data is None:
+                provider_error = str(provider_diag.get("error") or "provider returned no JSON object")
+                call_errors.append(f"attempt {attempts_made}: {provider_error[:240]}")
+                failure_kind = str(provider_diag.get("error_kind") or "provider_error")
+                last_errors = [provider_error[:240]]
+                if failure_kind == "response_parse":
+                    parse_notes.append(f"attempt {attempts_made}: provider response was not valid JSON")
+
             cid = str(item["id"]).lower()
             entries = parse_lesson_entries(data, cid)
             if not entries:
                 kind = type(data).__name__ if data is not None else "None"
-                parse_notes.append(f"attempt {attempt + 1}: no lesson object parsed from {kind} response")
-            ev_text = " ".join(e.get("text", "") for e in item["evidence"])
-            # Validate the object for this concept first; other returned objects
-            # are only a fallback and must never be filed under the wrong topic.
-            candidates = ([entries[cid]] if cid in entries else []) + [
-                v for k, v in entries.items() if k != cid]
-            for obj in candidates:
-                ok, errors = validate_lesson(obj, ev_text, item["topic"], item["evidence"], teaching_language)
-                last_errors = list(errors)
-                if ok:
-                    stamped = finish(obj, item)
-                    ok2, errors2 = validate_deep_teaching(stamped, item["topic"], teaching_language)
-                    if ok2:
-                        lesson = stamped
-                        break
-                    errors = errors2
-                    last_errors = list(errors2)
-                log.info("deep lesson rejected %s: %s", cid, "; ".join(errors[:3]))
-            if lesson is not None:
+                parse_notes.append(f"attempt {attempts_made}: no lesson object parsed from {kind} response")
+                if data is not None:
+                    last_errors = ["response did not contain a recognisable lesson object"]
+                    failure_kind = "lesson_parse"
+            else:
+                candidate = entries.get(cid)
+                if candidate is None and len(entries) == 1:
+                    candidate = next(iter(entries.values()))
+                if candidate is None:
+                    last_errors = ["response contained multiple lessons but none matched the requested concept id"]
+                    failure_kind = "lesson_parse"
+                else:
+                    last_candidate = candidate
+                    ev_text = " ".join(e.get("text", "") for e in item["evidence"])
+                    ok, errors = validate_lesson(
+                        candidate, ev_text, item["topic"], item["evidence"], teaching_language
+                    )
+                    if ok:
+                        stamped = finish(candidate, item)
+                        ok2, errors2 = validate_deep_teaching(stamped, item["topic"], teaching_language)
+                        if ok2:
+                            lesson = stamped
+                            break
+                        errors = errors2
+                    last_errors = list(errors)
+                    failure_kind = "validation"
+                    log.info("deep lesson rejected %s: %s", cid, "; ".join(last_errors[:5]))
+
+            if lesson is not None or attempt >= max_attempts - 1:
                 break
-            if attempt < max_attempts - 1:
-                retry_after = getattr(llm, "LAST_RETRY_AFTER", None)
+
+            status = provider_diag.get("status")
+            if status is None:
                 status = getattr(llm, "LAST_STATUS", None)
-                delay = float(retry_after) if (status == 429 and retry_after) else min(max_delay, base_delay * (2 ** attempt))
-                log.info("retrying lesson %s in %.1fs (status=%s)", item["id"], delay, status)
-                time.sleep(delay)
+            retry_after = provider_diag.get("retry_after")
+            if retry_after is None:
+                retry_after = getattr(llm, "LAST_RETRY_AFTER", None)
+
+            if provider_diag.get("error_kind") == "not_configured":
+                retry_stop_reason = "retry stopped: no LLM provider configured"
+                break
+            if status in (400, 401, 403, 404, 413):
+                retry_stop_reason = f"retry stopped after non-retryable HTTP {status}"
+                break
+            if status == 429 and retry_after is not None:
+                try:
+                    retry_after = float(retry_after)
+                except (TypeError, ValueError):
+                    retry_after = None
+                if retry_after is not None and retry_after > max_delay:
+                    retry_stop_reason = (
+                        f"retry stopped: provider Retry-After {retry_after:g}s exceeds "
+                        f"the {max_delay:g}s per-concept wait budget"
+                    )
+                    break
+            delay = (
+                max(0.5, retry_after)
+                if status == 429 and retry_after is not None
+                else min(max_delay, base_delay * (2 ** attempt))
+            )
+            log.info("retrying lesson %s in %.1fs (status=%s, failure=%s)",
+                     item["id"], delay, status, failure_kind)
+            time.sleep(delay)
 
         if lesson is None:
             failed.append(item["label"])
@@ -758,13 +895,19 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
                 "topic": item["topic"],
                 "label": item["label"],
                 "teachingLanguage": teaching_language,
-                "attempts": max_attempts,
+                "failureKind": failure_kind,
+                "provider": provider_diag.get("provider"),
+                "providerStatus": provider_diag.get("status", getattr(llm, "LAST_STATUS", None)),
+                "providerErrorKind": provider_diag.get("error_kind"),
+                "providerError": provider_diag.get("error") or (call_errors[-1] if call_errors else None),
+                "attempts": attempts_made,
                 "errors": last_errors[:8],
                 "parseNotes": parse_notes[:4],
                 "callErrors": call_errors[:4],
+                "retryStopReason": retry_stop_reason or None,
             })
-            log.warning("Deep lesson rejection detail %s: validation=%s parse=%s calls=%s",
-                        item["topic"], last_errors[:5], parse_notes[:2], call_errors[:2])
+            log.warning("Deep lesson rejection detail %s: kind=%s validation=%s parse=%s calls=%s",
+                        item["topic"], failure_kind, last_errors[:5], parse_notes[:2], call_errors[:2])
             continue
         accepted[item["id"]] = lesson
         try:
