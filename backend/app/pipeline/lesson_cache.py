@@ -17,19 +17,33 @@ from typing import Any
 
 from ..config import settings
 
-PROMPT_VERSION = "deep-lesson-v1"
+PROMPT_VERSION = "deep-lesson-v4-unicode-cache"
 
 
-def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", str(text or "").lower()).strip()
+def lesson_key(topic: str, evidence: list[dict], model: str, base_url: str,
+               teaching_language: str = "en") -> str:
+    """Content-addressed key that preserves every Unicode script in the source.
 
-
-def lesson_key(topic: str, evidence: list[dict], model: str, base_url: str) -> str:
-    evidence_text = "|".join(
-        f"{round(float(e.get('start') or 0), 1)}:{_norm(e.get('text', ''))}" for e in evidence
-    )
-    raw = f"{PROMPT_VERSION}|{model}|{base_url}|{_norm(topic)}|{evidence_text}"
-    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:24]
+    ASCII-only normalisation collapsed different Devanagari passages onto the
+    same key. Serialise the full UTF-8 payload deterministically and hash it
+    with SHA-256 so distinct evidence can never collide silently.
+    """
+    payload = {
+        "prompt_version": PROMPT_VERSION,
+        "model": str(model or ""),
+        "base_url": str(base_url or ""),
+        "teaching_language": str(teaching_language or "en"),
+        "topic": str(topic or ""),
+        "evidence": [
+            {
+                "start": round(float(e.get("start") or 0), 1),
+                "text": str(e.get("text") or "").strip(),
+            }
+            for e in (evidence or [])
+        ],
+    }
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
 
 
 def cache_dir() -> Path:

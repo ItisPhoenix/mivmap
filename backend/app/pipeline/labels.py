@@ -29,15 +29,19 @@ import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from typing import Any
 
 from ..collab.ops import apply_op
 from ..config import settings
 from . import llm
 from .builder import TAGS, make_node, new_id, score_faithfulness
-from .lessons import LESSON_FIELDS, validate_lesson
+from .lessons import LESSON_FIELDS, overlap, validate_deep_teaching, validate_lesson
+from .terminology import (acronym_expansion, apply_accuracy_corrections, canonical_topic,
+                          norm as term_norm,
+                         TECHNICAL_CORRECTIONS)
 from .topics import ESSENTIAL_LABELS, HTTP_TOPICS
 from .embeddings import Embedder
-from .text_utils import fmt_time, truncate
+from .text_utils import fmt_time, truncate, unicode_norm
 from .translate import needs_translation
 
 log = logging.getLogger("mivmap.labels")
@@ -251,7 +255,9 @@ ID_RE = re.compile(r"^\[?([scd]\d+)\]?$", re.I)
 LINK_RE = re.compile(r"^\[?(c\d+)\]?\s*(?:->|>|→|,|\s)\s*\[?(c\d+)\]?$", re.I)
 BARE_LINK_RE = re.compile(r"^\s*(c\d+)\s+(c\d+)\s*$", re.I)
 TIME_RE = re.compile(r"\[?\(?\b\d{1,2}:\d{2}(?::\d{2})?\b\)?\]?")
-META_RE = re.compile(r"\b(?:the speaker|this section|this video|the video|speaker (?:mentions|says|talks))\b", re.I)
+META_RE = re.compile(
+    r"\b(?:the speaker|this section|this video|the video|speaker (?:mentions|says|talks)|"
+    r"here is|here are|let's|we will|we're going to|as i mentioned|i think)\b", re.I)
 TAG_ALIASES = {
     "def": "Def", "definition": "Def", "defn": "Def", "meaning": "Def",
     "eg": "Eg", "e.g": "Eg", "e.g.": "Eg", "example": "Eg", "ex": "Eg",
@@ -261,11 +267,35 @@ TAG_ALIASES = {
 }
 
 
-def clean_label(text: str, max_chars: int, max_words: int) -> str | None:
+CAPTION_DISCOURSE = re.compile(
+    r"\b(?:we|you|they|it|this|that|there|here|what|why|how|would|could|should|"
+    r"going to|let's|i think|maybe|right now|okay|yesterday|today|whatever|"
+    r"speaking|showing|screen|content|thing|things)\b", re.I)
+VAGUE_CONCEPT_LABELS = {
+    "study", "studying", "communicate", "communication", "learn", "learning",
+    "understanding", "introduction", "overview", "content", "things", "thing",
+}
+
+
+def clean_concept_label(text: str, language: str = "en") -> str | None:
+    """Concept names must be short topics, not rewritten caption sentences."""
+    label = clean_label(text, 110, 16, language)
+    if not label or len(label.split()) > 6 or CAPTION_DISCOURSE.search(label):
+        return None
+    if label.strip().lower() in VAGUE_CONCEPT_LABELS:
+        return None
+    return label
+
+
+def clean_label(text: str, max_chars: int, max_words: int,
+                teaching_language: str = "en") -> str | None:
     text = TIME_RE.sub(" ", text.replace("**", "").replace("`", ""))
     text = re.sub(r"\s+", " ", text).strip().strip("\"'“”‘’").rstrip(".;,").strip()
     text = re.sub(r"\s+:", ":", text)
-    if not text or META_RE.search(text) or not re.search(r"[A-Za-z0-9]", text) or needs_translation(text):
+    hindi_ok = teaching_language.lower().split("-")[0] == "hi"
+    has_content = any(ch.isalnum() for ch in text)  # Unicode-aware, keeps Devanagari
+    if (not text or META_RE.search(text) or not has_content or "।" in text
+            or (not hindi_ok and needs_translation(text))):
         return None
     if len(text.split()) > max_words or len(text) > max_chars:
         return None
@@ -276,8 +306,9 @@ def _tag(text: str) -> str | None:
     return TAG_ALIASES.get(text.strip().strip("[]()*").lower())
 
 
-def parse_labels(text: str) -> Parsed:
+def parse_labels(text: str, teaching_language: str = "en") -> Parsed:
     """Parse the pipe format. Never raises; anything unusable is counted as malformed and skipped."""
+    lang = teaching_language
     out = Parsed()
     last_concept: str | None = None
     last_section: str | None = None
@@ -295,11 +326,11 @@ def parse_labels(text: str) -> Parsed:
                 out.malformed += 1
                 continue
             if stripped and not out.root:
-                label = clean_label(stripped, 60, 8)
+                label = clean_label(stripped, 60, 8, lang)
                 if label: out.root = label
                 continue
             if stripped and not out.summary:
-                label = clean_label(stripped, 170, 24)
+                label = clean_label(stripped, 170, 24, lang)
                 if label: out.summary = label
                 continue
         if not raw.strip() or raw.strip().startswith("```"):
@@ -314,7 +345,7 @@ def parse_labels(text: str) -> Parsed:
             continue
         parts = [p.strip() for p in rest.split("|")]
         if kind in "RM":
-            label = clean_label(" ".join(p for p in parts if p), 60 if kind == "R" else 170, 8 if kind == "R" else 24)
+            label = clean_label(" ".join(p for p in parts if p), 60 if kind == "R" else 170, 8 if kind == "R" else 24, lang)
             current = out.root if kind == "R" else out.summary
             if label and current is None:
                 if kind == "R":
@@ -333,8 +364,8 @@ def parse_labels(text: str) -> Parsed:
             key = ident.group(1).lower()
             if kind == "S":
                 last_section = key
-                title = clean_label(parts[1], 60, 8)
-                summary = clean_label(". ".join(p for p in parts[2:] if p), 140, 20) if len(parts) > 2 else None
+                title = clean_label(parts[1], 60, 8, lang)
+                summary = clean_label(". ".join(p for p in parts[2:] if p), 140, 20, lang) if len(parts) > 2 else None
                 if title and key not in out.sections:
                     out.sections[key] = title
                 if summary and key not in out.section_summaries:
@@ -346,7 +377,7 @@ def parse_labels(text: str) -> Parsed:
                 last_concept = key
                 # The fast model often emits C|Term: meaning|source-sentence.
                 label_text = parts[1] if len(parts) >= 3 and parts[1] and ":" in parts[1] else ": ".join(p for p in parts[1:] if p)
-                label = clean_label(label_text, 110, 16)
+                label = clean_concept_label(label_text, lang)
                 if label and key not in out.concepts:
                     out.concepts[key] = label
                 elif not label:
@@ -358,7 +389,7 @@ def parse_labels(text: str) -> Parsed:
             inline = re.match(r"^(def|definition|eg|e\.g\.?|example|formula|equation|tip|remember|note|watch[- ]?out|caution|warning)\s*:\s*", body, re.I)
             if inline:  # "Watch out: …" written inside the text: that is the tag
                 tag, body = tag or _tag(inline.group(1)), body[inline.end():]
-            label = clean_label(body, 110, 16)
+            label = clean_label(body, 110, 16, lang)
             target = f"{key}#{tag or ''}" if id_kind == "C" else key
             if label and target not in out.details:
                 out.details[target] = (tag, label)
@@ -376,15 +407,15 @@ def parse_labels(text: str) -> Parsed:
             if not key or not body_parts:
                 out.malformed += 1
                 continue
-            body = clean_label(": ".join(p for p in body_parts if p), 180, 28)
+            body = clean_label(": ".join(p for p in body_parts if p), 180, 28, lang)
             if not body:
                 out.malformed += 1
                 continue
             target = {
                 "A": out.explanations, "E": out.examples, "G": out.diagrams, "Q": out.exercises,
             }[kind]
-            fingerprint = re.sub(r"[^a-z0-9]+", " ", body.lower()).strip()
-            if any(re.sub(r"[^a-z0-9]+", " ", v.lower()).strip() == fingerprint for v in target.values()):
+            fingerprint = unicode_norm(body)
+            if any(unicode_norm(v) == fingerprint for v in target.values()):
                 out.malformed += 1
                 continue
             target.setdefault(key, body)
@@ -392,7 +423,7 @@ def parse_labels(text: str) -> Parsed:
         # X
         link = LINK_RE.match(parts[0]) if parts else None
         bare = BARE_LINK_RE.match(parts[0]) if parts else None
-        label = clean_label(parts[1], 32, 4) if len(parts) > 1 else None
+        label = clean_label(parts[1], 32, 4, lang) if len(parts) > 1 else None
         if bare and label and len(out.links) < MAX_LINKS:
             out.links.append((bare.group(1).lower(), bare.group(2).lower(), label))
         elif link and label and len(out.links) < MAX_LINKS:
@@ -443,7 +474,7 @@ def _cache_write(key: str, value: dict) -> None:
 # Main entry point
 # ---------------------------------------------------------------------------
 def _llm_enrich(mindmap: dict, concepts: dict, details: dict) -> dict:
-    """Generate real teaching content for every concept from its transcript evidence."""
+    """LLM teaching aids for non-deep modes; deterministic notes remain the fallback."""
     items = []
     for c in concepts.values():
         node = c.node
@@ -452,166 +483,438 @@ def _llm_enrich(mindmap: dict, concepts: dict, details: dict) -> dict:
             "id": c.cid,
             "title": node.get("text", ""),
             "topic": node.get("topic", ""),
-            "evidence": [{"at": round(e.get("start") or 0, 1), "text": (e.get("text") or "")[:260]} for e in evidence[:3]],
+            "evidence": [{"at": round(float(e.get("start") or 0), 1), "text": (e.get("text") or "")[:260]}
+                         for e in evidence[:3]],
         })
     if not items:
         return {}
     system = (
-        "You are an expert teacher writing beginner study material for a mind map. Always name the exact concept/topic at the start of the definition. Write concrete definitions; never hedge with 'available information' or 'component that can be part of'. Return JSON only. "
-        "Use ONLY the supplied evidence for factual claims. If the evidence is insufficient for a claim, "
-        'set available to false and leave text fields empty. Never say "the speaker says" or claim the '
-        "explanation is quoted from the video. Explanations, mechanisms, examples and exercises are "
-        "your own teaching aids derived from the evidence. "
-        "For each id return: "
-        '{"id":{"title":"<=5 words","definition":"1-2 specific sentences","mechanism":"3 numbered steps '
-        'specific to this concept, not generic instructions","example":"one concrete domain example",'
-        '"exercise":"one hands-on task a learner can actually perform",'
-        '"diagram":"a tiny ASCII/text diagram showing the steps or flow, or empty if not useful","available":true}}'
+        "You are an expert teacher writing beginner study aids. Return a JSON object keyed by the given id. "
+        "For each id return: definition (1-2 specific sentences that name the concept), intuition (plain-English "
+        "mental model), why_it_matters, steps (3 ordered mechanism steps specific to this concept), "
+        "worked_example (one concrete supplemental example), diagram (ASCII flow), "
+        "misconception (wrong idea and correction), exercise (a task a learner can actually perform), "
+        "knowledge_check {question, answer, explanation}, provenance {example_source:'supplemental'}. "
+        "Use ONLY supplied evidence for factual claims about the video. Examples, diagrams and exercises are "
+        "your own teaching aids: keep them supplemental and never attribute them to the video. If the evidence "
+        "is insufficient for a concept, return an empty object for that id. Never say 'the speaker says'."
     )
-    result = {"explanations": {}, "mechanisms": {}, "examples": {}, "exercises": {}, "titles": {}, "diagrams": {}, "available": {}}
-    wanted = [it["id"] for it in items]
+    result: dict[str, dict] = {
+        "explanations": {}, "intuitions": {}, "why_it_matters": {}, "mechanisms": {},
+        "examples": {}, "exercises": {}, "titles": {}, "diagrams": {},
+        "misconceptions": {}, "knowledge_checks": {}, "available": {}, "generatedBy": {},
+    }
+    wanted = {it["id"] for it in items}
     for item in items:
-        data = llm.chat_json(system, json.dumps([item], ensure_ascii=False), max_tokens=900, temperature=0.3)
+        data = llm.chat_json(system, json.dumps({item["id"]: item}, ensure_ascii=False),
+                             max_tokens=1200, temperature=0.3)
         if not isinstance(data, dict):
             continue
-            # Accept either {id:{...}} or flat maps.
-            entries: dict = {}
-            for key, value in data.items():
-                k = str(key).lower()
-                if isinstance(value, dict) and k.startswith("c"):
-                    entries[k] = value
-            if not entries:
-                for key in ("explanations", "mechanisms", "examples", "exercises", "titles", "diagrams", "available"):
-                    flat = data.get(key) or {}
-                    if isinstance(flat, dict):
-                        for k, v in flat.items():
-                            entries.setdefault(str(k).lower(), {})[key] = v
-            for cid, obj in entries.items():
-                definition = obj.get("definition")
-                if isinstance(definition, str) and definition.strip():
-                    ev = next((it for it in items if it["id"] == cid), None)
-                    ev_text = " ".join(e.get("text", "") for e in (ev or {}).get("evidence", []))
-                    import difflib
-                    dnorm = re.sub(r"[^a-z0-9]+", " ", definition.lower())
-                    enorm = re.sub(r"[^a-z0-9]+", " ", ev_text.lower())
-                    overlap = difflib.SequenceMatcher(None, dnorm, enorm).ratio()
-                    if len(definition.strip()) < 40 or overlap > 0.75:
-                        continue  # reject transcript-copy / too-short definitions
-                available = obj.get("available")
-                if isinstance(available, str):
-                    available = available.lower() in ("true", "yes", "1")
-                available = bool(available) if available is not None else bool(obj.get("definition"))
-                result["available"][cid] = available
-                for source_key, target_key in (("definition", "explanations"), ("mechanism", "mechanisms"),
-                                               ("example", "examples"), ("exercise", "exercises"), ("title", "titles"),
-                                               ("diagram", "diagrams")):
-                    value = obj.get(source_key)
-                    if isinstance(value, str) and value.strip():
-                        result[target_key][cid] = value.strip()
-    # No fabricated teaching content: any concept NVIDIA did not explain is marked unavailable
-    # and removed by prune_weak_concepts before export.
-    result.setdefault("generatedBy", {})
-    for item in items:
-        cid = item["id"]
-        if cid in result["explanations"]:
+        entries = {str(k).lower(): v for k, v in data.items()
+                   if isinstance(v, dict) and str(k).lower() in wanted}
+        if not entries:  # flat maps: {"explanations": {"c1": ...}, ...}
+            for key, values in data.items():
+                if isinstance(values, dict):
+                    for cid, value in values.items():
+                        if str(cid).lower() in wanted:
+                            entries.setdefault(str(cid).lower(), {})[key] = value
+        for cid, obj in entries.items():
+            ev = next((it for it in items if it["id"] == cid), None)
+            ev_text = " ".join(e.get("text", "") for e in (ev or {}).get("evidence", []))
+            definition = str(obj.get("definition") or "").strip()
+            if len(definition) < 40 or overlap(definition, ev_text) > 0.78:
+                continue  # reject transcript copies / too-short definitions
+            result["explanations"][cid] = definition
+            for source_key, target_key in (
+                ("intuition", "intuitions"), ("why_it_matters", "why_it_matters"),
+                ("steps", "mechanisms"), ("worked_example", "examples"),
+                ("exercise", "exercises"), ("diagram", "diagrams"),
+                ("misconception", "misconceptions"), ("knowledge_check", "knowledge_checks"),
+            ):
+                value = obj.get(source_key)
+                if isinstance(value, str) and value.strip():
+                    result[target_key][cid] = value.strip()
+                elif value:
+                    result[target_key][cid] = value  # steps: list, knowledge_check: dict
+            result["available"][cid] = True
             result["generatedBy"][cid] = "llm"
-        else:
-            result["available"][cid] = False
-            result["generatedBy"][cid] = "unavailable"
+    for item in items:
+        result["generatedBy"].setdefault(item["id"], "extractive-transcript")
     return result
 
+def _is_knowledge_check(value: Any) -> bool:
+    """Distinguish a nested Q&A object from a columnar concept-id mapping."""
+    return isinstance(value, dict) and any(
+        isinstance(value.get(key), str) and value[key].strip()
+        for key in ("question", "answer", "explanation")
+    )
 
-def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str]]:
-    """Generate, validate and checkpoint one lesson per concept.
 
-    Returns (accepted_lessons, failed_concept_labels). Cache hits are reused;
-    only missing concepts call the LLM, with bounded exponential backoff that
-    honours Retry-After on HTTP 429.
+def _is_lesson_object(value: Any) -> bool:
+    """Recognise a lesson by its field values, not merely by nested dictionaries."""
+    if not isinstance(value, dict):
+        return False
+    for field in ("title", "explain", "intuition", "why_it_matters", "worked_example",
+                  "diagram", "misconception", "exercise"):
+        if isinstance(value.get(field), str) and value[field].strip():
+            return True
+    if isinstance(value.get("steps"), list) and value["steps"]:
+        return True
+    return _is_knowledge_check(value.get("knowledge_check"))
+
+
+def parse_lesson_entries(data: Any, cid: str) -> dict[str, dict]:
+    """Normalise flat, keyed, list, wrapper, JSON-string and columnar responses.
+
+    A normal lesson's knowledge_check is itself a dictionary. It must never be
+    mistaken for a map of concept IDs; doing so used to split its question,
+    answer and explanation into three malformed pseudo-lessons.
     """
-    from .lesson_cache import cache_dir, lesson_key, load as load_lesson, save as save_lesson
+    cid = str(cid or "").lower()
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except (TypeError, ValueError):
+            return {}
 
+    entries: dict[str, dict] = {}
+
+    if isinstance(data, list):
+        for obj in data:
+            if isinstance(obj, str):
+                try:
+                    obj = json.loads(obj)
+                except (TypeError, ValueError):
+                    continue
+            if _is_lesson_object(obj):
+                key = str(obj.get("id") or (cid if len(data) == 1 else "")).lower()
+                if key:
+                    entries[key] = obj
+            elif isinstance(obj, dict) and _is_lesson_object(obj.get("lesson")):
+                lesson = obj["lesson"]
+                key = str(obj.get("id") or lesson.get("id") or (cid if len(data) == 1 else "")).lower()
+                if key:
+                    entries[key] = lesson
+            elif isinstance(obj, (dict, list)):
+                entries.update(parse_lesson_entries(obj, cid if len(data) == 1 else ""))
+        return entries
+
+    if not isinstance(data, dict):
+        return {}
+
+    if _is_lesson_object(data):
+        key = str(data.get("id") or cid).lower()
+        return {key: data} if key else {}
+
+    if _is_lesson_object(data.get("lesson")):
+        lesson = data["lesson"]
+        key = str(data.get("id") or lesson.get("id") or cid).lower()
+        return {key: lesson} if key else {}
+
+    # Common response wrappers used by gateways and model adapters.
+    for wrapper in ("lessons", "results", "items", "data", "result", "response"):
+        nested = data.get(wrapper)
+        if isinstance(nested, (dict, list, str)):
+            parsed = parse_lesson_entries(nested, cid)
+            if parsed:
+                return parsed
+
+    # A dictionary keyed by concept ID (or provider-generated lesson ID).
+    for key, value in data.items():
+        if _is_lesson_object(value):
+            lesson_id = str(value.get("id") or key).lower()
+            if lesson_id:
+                entries[lesson_id] = value
+        elif isinstance(value, dict) and _is_lesson_object(value.get("lesson")):
+            lesson = value["lesson"]
+            lesson_id = str(value.get("id") or lesson.get("id") or key).lower()
+            if lesson_id:
+                entries[lesson_id] = lesson
+    if entries:
+        return entries
+
+    # Columnar shape: {"explain": {"c1": "..."}, "steps": {"c1": [...]}, ...}
+    for field in LESSON_FIELDS + ("title", "provenance"):
+        values = data.get(field)
+        if not isinstance(values, dict):
+            continue
+        if field == "knowledge_check" and _is_knowledge_check(values):
+            continue
+        for key, value in values.items():
+            if str(key).lower() == "id":
+                continue
+            entries.setdefault(str(key).lower(), {})[field] = value
+
+    return {key: value for key, value in entries.items() if _is_lesson_object(value)}
+
+
+def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], list[dict]]:
+    """Generate, validate and checkpoint one study-ready lesson per concept.
+
+    Returns (accepted_lessons, failed_concept_labels, rejection_reasons). Every
+    accepted lesson is stamped with three-way provenance, the correct acronym
+    expansion (when the concept is an acronym) and externally sourced accuracy
+    notes. Cache hits are reused; only missing concepts call the LLM, with
+    bounded backoff. Rejection reasons are returned for honest diagnostics
+    rather than silently marking a concept unavailable.
+    """
+    from .lesson_cache import lesson_key, load as load_lesson, save as save_lesson
+
+    meta = mindmap.get("meta") or {}
+    teaching_language = meta.get("teachingLanguage") or "en"
+    source_language = meta.get("sourceLanguage") or "en"
     items = []
     for c in concepts.values():
         node = c.node
         evidence = node.get("evidence") or [{"start": node.get("start"), "end": node.get("end"), "text": node.get("source", "")}]
         ev = [{"start": e.get("start") or 0, "end": e.get("end"), "text": (e.get("text") or "")[:320]} for e in evidence[:4]]
-        topic = node.get("topic") or node.get("text", "")
+        raw_topic = node.get("topic") or node.get("text", "")
+        topic = canonical_topic(raw_topic)
         model = settings.llm_model or settings.groq_model
         base = settings.llm_base_url or "configured"
-        key = lesson_key(topic, ev, model, base)
-        items.append({"id": c.cid, "topic": topic, "evidence": ev, "key": key, "label": node.get("text", topic)})
+        key = lesson_key(topic, ev, model, base, teaching_language)
+        cfg = TECHNICAL_CORRECTIONS.get(term_norm(topic), {})
+        pitfalls = [{"video_claim": n["video_claim"], "correction": n["correction"]}
+                    for n in cfg.get("notes", [])]
+        items.append({
+            "id": c.cid, "topic": topic, "evidence": ev, "key": key,
+            "label": node.get("text", topic),
+            "teachingLanguage": teaching_language, "sourceLanguage": source_language,
+            "acronymExpansion": acronym_expansion(topic),
+            "knownPitfalls": pitfalls,
+        })
     if not items:
-        return {}, []
+        return {}, [], []
 
-    system = (
-        "Return JSON only. For each id: explain (definition), why_it_matters, steps (3 numbered strings), "
-        "worked_example, diagram (ASCII flow), misconception, exercise, "
-        "knowledge_check {question,answer}, provenance {example_source:'supplemental'}. "
-        "Base facts on evidence; label examples as supplemental; be concise."
+    language_rule = (
+        "Write EVERY teaching field in English. Keep standard technical acronyms "
+        "(LAN, WAN, TCP/IP, OSI, ARPANET) in their conventional English form."
+        if teaching_language.lower().split("-")[0] == "en" else
+        f"Write EVERY teaching field in {teaching_language} so a {teaching_language} speaker can "
+        "learn without replaying the video. Keep standard technical acronyms and proper nouns "
+        "(LAN, WAN, TCP/IP, OSI, ARPANET, BGP, ONT) in English, but explain them in "
+        f"{teaching_language}. Do not translate the supplied evidence - it is for grounding only."
     )
+    if teaching_language.lower().split("-")[0] != "en":
+        # The cloud provider is markedly less reliable with long, deeply nested
+        # prompts for non-English output. Keep the same required fields but use
+        # a compact instruction; all provenance/accuracy stamping is done below.
+        system = (
+            "Return JSON only, keyed by id. Fields per id: title, explain (2 sentences), intuition, "
+            "why_it_matters, steps (3), worked_example, diagram (ASCII), misconception, exercise, "
+            "knowledge_check {question, answer, explanation}, "
+            "evidence {timestamps:[numbers from evidence], quotes:[short exact phrases]}. "
+            + language_rule + " "
+            "Ground video claims in the supplied evidence. Examples, diagrams and exercises are your own "
+            "teaching aids. If evidence is insufficient, return an empty object for that id."
+        )
+    else:
+        system = (
+            "You are an expert teacher. Return JSON only, an object keyed by the given id. Per id return: "
+            "title, explain (2+ sentences, begins with the concept name), intuition, why_it_matters, "
+            "steps (3-6), worked_example, diagram (multi-line ASCII), misconception, exercise, "
+            "knowledge_check {question, answer, explanation}, "
+            "evidence {timestamps:[numbers from the supplied evidence], quotes:[short exact phrases from it]}. "
+            + language_rule + " "
+            "Use only the supplied evidence for video claims; examples, diagrams and exercises are your own teaching "
+            "aids - never say 'the speaker says'. If knownPitfalls is given, correct that video claim, do not repeat it. "
+            "Each field teaches something new. Insufficient evidence: return an empty object for that id."
+        )
+
+    def finish(lesson: dict, item: dict) -> dict:
+        """Stamp honest, deterministic source attribution onto a validated lesson."""
+        out = apply_accuracy_corrections(lesson, item["topic"])
+        # The model sometimes omits the evidence object. Fall back to the
+        # verified transcript positions already attached to this concept;
+        # never invent a timestamp or a quote.
+        ev = out.get("evidence")
+        if not isinstance(ev, dict) or not (ev.get("timestamps") or ev.get("starts")):
+            stamps = sorted({round(float(e.get("start") or 0), 2)
+                             for e in item["evidence"] if e.get("start") is not None})
+            out["evidence"] = {"timestamps": stamps, "quotes": []}
+        external = ["accuracy_notes"] if out.get("accuracy_notes") else []
+        out["provenance"] = {
+            "source": "video+ai+external" if external else "video+ai",
+            "video_supported": ["explain", "lesson_evidence"],
+            "ai_explanation": ["intuition", "why_it_matters", "steps", "worked_example",
+                               "diagram", "misconception", "exercise", "knowledge_check"],
+            "external_supplement": external,
+            "example_source": "ai-generated",
+        }
+        expansion = item.get("acronymExpansion") or acronym_expansion(item["topic"])
+        if expansion:
+            out["acronym_expansion"] = expansion
+        out["teaching_language"] = teaching_language
+        return out
+
     accepted: dict[str, dict] = {}
     failed: list[str] = []
-    max_attempts = 4
-    base_delay = 2.0
-    max_delay = 45.0
+    rejections: list[dict] = []
+    max_attempts = 3
+    base_delay = 1.5
+    max_delay = 8.0
 
     for item in items:
         hit = load_lesson(item["key"])
         if hit and isinstance(hit.get("lesson"), dict):
+            stamped = finish(hit["lesson"], item)
             ev_text = " ".join(e.get("text", "") for e in item["evidence"])
-            ok, _ = validate_lesson(hit["lesson"], ev_text, item["topic"])
-            if ok:
-                accepted[item["id"]] = hit["lesson"]
+            ok, _ = validate_lesson(stamped, ev_text, item["topic"], item["evidence"], teaching_language)
+            ok2, _ = validate_deep_teaching(stamped, item["topic"], teaching_language)
+            if ok and ok2:
+                accepted[item["id"]] = stamped
                 continue
 
         lesson = None
+        call_errors: list[str] = []
+        parse_notes: list[str] = []
+        last_errors: list[str] = []
+        last_candidate: dict | None = None
+        failure_kind = "provider_error"
+        provider_diag: dict = {}
+        attempts_made = 0
+        retry_stop_reason = ""
+
         for attempt in range(max_attempts):
+            attempts_made = attempt + 1
+            request_fields = (
+                ("id", "topic", "evidence", "teachingLanguage", "sourceLanguage")
+                if teaching_language.lower().split("-")[0] != "en" else
+                ("id", "topic", "evidence", "teachingLanguage", "sourceLanguage",
+                 "acronymExpansion", "knownPitfalls")
+            )
+            request_item = {k: item[k] for k in request_fields}
+            if attempt:
+                # Do not repeat the same failed prompt blindly. Give the provider
+                # the exact validation/parser feedback and its previous candidate.
+                feedback = {
+                    "failureKind": failure_kind,
+                    "previousErrors": last_errors[:10],
+                    "parseNotes": parse_notes[-2:],
+                }
+                if last_candidate is not None:
+                    feedback["previousRejectedLesson"] = last_candidate
+                request_item["repairFeedback"] = feedback
+
             data = None
             try:
                 data = llm.chat_json(
-                    system, json.dumps([{k: item[k] for k in ("id", "topic", "evidence")}], ensure_ascii=False),
-                    max_tokens=1200, temperature=0.25,
+                    system,
+                    json.dumps([request_item], ensure_ascii=False),
+                    max_tokens=2800,
+                    temperature=0.2 if attempt else 0.25,
                 )
             except Exception as exc:  # noqa: BLE001
-                log.warning("Deep lesson call failed for %s: %s", item["id"], exc)
-            entries: dict = {}
-            if isinstance(data, dict):
-                entries = {k.lower(): v for k, v in data.items() if isinstance(v, dict) and k.lower().startswith("c")}
-                if not entries and isinstance(data.get("id"), str):
-                    entries = {data["id"].lower(): data}
-                if not entries:
-                    for field in LESSON_FIELDS + ("provenance",):
-                        flat = data.get(field) or {}
-                        if isinstance(flat, dict):
-                            for k, v in flat.items():
-                                entries.setdefault(str(k).lower(), {})[field] = v
-            ev_text = " ".join(e.get("text", "") for e in item["evidence"])
-            for cid, obj in entries.items():
-                ok, errors = validate_lesson(obj, ev_text, item["topic"])
-                if ok:
-                    lesson = obj
-                    break
-                log.info("deep lesson rejected %s: %s", cid, "; ".join(errors[:3]))
-            if lesson is not None:
+                call_errors.append(f"attempt {attempts_made}: {type(exc).__name__}: {str(exc)[:160]}")
+
+            diag_fn = getattr(llm, "chat_json_diagnostics", None)
+            try:
+                provider_diag = diag_fn() if callable(diag_fn) else {}
+            except Exception:  # noqa: BLE001
+                provider_diag = {}
+
+            if data is None:
+                provider_error = str(provider_diag.get("error") or "provider returned no JSON object")
+                call_errors.append(f"attempt {attempts_made}: {provider_error[:240]}")
+                failure_kind = str(provider_diag.get("error_kind") or "provider_error")
+                last_errors = [provider_error[:240]]
+                if failure_kind == "response_parse":
+                    parse_notes.append(f"attempt {attempts_made}: provider response was not valid JSON")
+
+            cid = str(item["id"]).lower()
+            entries = parse_lesson_entries(data, cid)
+            if not entries:
+                kind = type(data).__name__ if data is not None else "None"
+                parse_notes.append(f"attempt {attempts_made}: no lesson object parsed from {kind} response")
+                if data is not None:
+                    last_errors = ["response did not contain a recognisable lesson object"]
+                    failure_kind = "lesson_parse"
+            else:
+                candidate = entries.get(cid)
+                if candidate is None and len(entries) == 1:
+                    candidate = next(iter(entries.values()))
+                if candidate is None:
+                    last_errors = ["response contained multiple lessons but none matched the requested concept id"]
+                    failure_kind = "lesson_parse"
+                else:
+                    last_candidate = candidate
+                    ev_text = " ".join(e.get("text", "") for e in item["evidence"])
+                    ok, errors = validate_lesson(
+                        candidate, ev_text, item["topic"], item["evidence"], teaching_language
+                    )
+                    if ok:
+                        stamped = finish(candidate, item)
+                        ok2, errors2 = validate_deep_teaching(stamped, item["topic"], teaching_language)
+                        if ok2:
+                            lesson = stamped
+                            break
+                        errors = errors2
+                    last_errors = list(errors)
+                    failure_kind = "validation"
+                    log.info("deep lesson rejected %s: %s", cid, "; ".join(last_errors[:5]))
+
+            if lesson is not None or attempt >= max_attempts - 1:
                 break
-            if attempt < max_attempts - 1:
-                retry_after = getattr(llm, "LAST_RETRY_AFTER", None)
+
+            status = provider_diag.get("status")
+            if status is None:
                 status = getattr(llm, "LAST_STATUS", None)
-                delay = float(retry_after) if (status == 429 and retry_after) else min(max_delay, base_delay * (2 ** attempt))
-                log.info("retrying lesson %s in %.1fs (status=%s)", item["id"], delay, status)
-                time.sleep(delay)
+            retry_after = provider_diag.get("retry_after")
+            if retry_after is None:
+                retry_after = getattr(llm, "LAST_RETRY_AFTER", None)
+
+            if provider_diag.get("error_kind") == "not_configured":
+                retry_stop_reason = "retry stopped: no LLM provider configured"
+                break
+            if status in (400, 401, 403, 404, 413):
+                retry_stop_reason = f"retry stopped after non-retryable HTTP {status}"
+                break
+            if status == 429 and retry_after is not None:
+                try:
+                    retry_after = float(retry_after)
+                except (TypeError, ValueError):
+                    retry_after = None
+                if retry_after is not None and retry_after > max_delay:
+                    retry_stop_reason = (
+                        f"retry stopped: provider Retry-After {retry_after:g}s exceeds "
+                        f"the {max_delay:g}s per-concept wait budget"
+                    )
+                    break
+            delay = (
+                max(0.5, retry_after)
+                if status == 429 and retry_after is not None
+                else min(max_delay, base_delay * (2 ** attempt))
+            )
+            log.info("retrying lesson %s in %.1fs (status=%s, failure=%s)",
+                     item["id"], delay, status, failure_kind)
+            time.sleep(delay)
 
         if lesson is None:
             failed.append(item["label"])
+            rejections.append({
+                "topic": item["topic"],
+                "label": item["label"],
+                "teachingLanguage": teaching_language,
+                "failureKind": failure_kind,
+                "provider": provider_diag.get("provider"),
+                "providerStatus": provider_diag.get("status", getattr(llm, "LAST_STATUS", None)),
+                "providerErrorKind": provider_diag.get("error_kind"),
+                "providerError": provider_diag.get("error") or (call_errors[-1] if call_errors else None),
+                "attempts": attempts_made,
+                "errors": last_errors[:8],
+                "parseNotes": parse_notes[:4],
+                "callErrors": call_errors[:4],
+                "retryStopReason": retry_stop_reason or None,
+            })
+            log.warning("Deep lesson rejection detail %s: kind=%s validation=%s parse=%s calls=%s",
+                        item["topic"], failure_kind, last_errors[:5], parse_notes[:2], call_errors[:2])
             continue
-        lesson = dict(lesson)
-        lesson["provenance"] = {"example_source": "supplemental"}
         accepted[item["id"]] = lesson
         try:
             save_lesson(item["key"], {"lesson": lesson, "topic": item["topic"]})
         except Exception as exc:  # noqa: BLE001
             log.warning("lesson checkpoint failed for %s: %s", item["id"], exc)
-    return accepted, failed
+    return accepted, failed, rejections
 
 
 
@@ -635,6 +938,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
     provider = llm.fast_provider()
     remote_llm = bool(provider and "llm.test" not in provider[0])
     is_deep = (mindmap.get("meta") or {}).get("mode") == "deep"
+    teaching_language = (mindmap.get("meta") or {}).get("teachingLanguage") or "en"
 
     # 1. cache lookup ----------------------------------------------------------------
     todo: list[SectionCand] = []
@@ -702,7 +1006,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
             text = comp.text
             if not comp.ok and not text.endswith("\n"):  # cut off mid-line: drop the unfinished label
                 text = text.rsplit("\n", 1)[0] if "\n" in text else ""
-            parsed = parse_labels(text)
+            parsed = parse_labels(text, teaching_language)
             parsed.details = _resolve_details(parsed, details)
             stats["malformed"] += parsed.malformed
             if want_root and merged.root is None and parsed.root:
@@ -747,15 +1051,23 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
             _cache_write(root_key, {"root": merged.root, "summary": merged.summary, "links": [list(link) for link in fresh_links]})
 
     test_provider = bool(provider and "llm.test" in provider[0])
+    deep_status = "n/a"
     if is_deep and concepts and llm.fast_available() and not test_provider:
         try:
-            lessons, failed_lessons = _llm_deep_lessons(mindmap, concepts)
+            deep_result = _llm_deep_lessons(mindmap, concepts)
+            if len(deep_result) == 3:
+                lessons, failed_lessons, lesson_rejections = deep_result
+            else:  # older callers/tests returning (accepted, failed)
+                lessons, failed_lessons = deep_result
+                lesson_rejections = []
             if not hasattr(merged, "lessons"):
                 merged.lessons = {}
             if not hasattr(merged, "available"):
                 merged.available = {}
             if not hasattr(merged, "generatedBy"):
                 merged.generatedBy = {}
+            if not hasattr(merged, "unavailable"):
+                merged.unavailable = {}
             for cid, lesson in lessons.items():
                 merged.lessons[cid] = lesson
                 merged.explanations[cid] = lesson.get("explain", "")
@@ -764,12 +1076,25 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
             for cid in concepts:
                 if cid not in lessons:
                     merged.available[cid] = False  # fail closed: no fabricated teaching
+                    merged.unavailable[cid] = "Lesson generation failed; concept kept with explicit unavailable status."
             stats["lesson_failures"] = failed_lessons
+            stats["deepRejectionReasons"] = lesson_rejections
+            stats["lessonsAccepted"] = len(lessons)
+            stats["lessonsRejected"] = len(failed_lessons)
+            stats["lessonsAttempted"] = len(lessons) + len(failed_lessons)
+            stats["provider"] = llm.provider_name()
+            stats["teachingLanguage"] = (mindmap.get("meta") or {}).get("teachingLanguage") or "en"
+            deep_status = "ok" if not failed_lessons else f"incomplete: {len(failed_lessons)} concepts rejected"
             if failed_lessons:
                 log.warning("Deep lessons failed for: %s", ", ".join(failed_lessons))
+                log.warning("Deep lesson rejection reasons: %s", json.dumps(lesson_rejections, ensure_ascii=False)[:4000])
             stats["calls"] += 1
         except Exception as exc:  # noqa: BLE001
+            deep_status = "failed: provider or validation error"
             log.warning("Deep lesson generation failed: %s", exc)
+    if is_deep and deep_status == "n/a":
+        deep_status = ("unavailable: no LLM provider configured" if not llm.fast_available()
+                       else "unavailable: no concepts with evidence")
     if concepts and llm.fast_available() and not test_provider and not is_deep:
         try:
             enriched = _llm_enrich(mindmap, concepts, details)
@@ -795,6 +1120,10 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
                 merged.generatedBy = {}
             for cid, value in (enriched.get("generatedBy") or {}).items():
                 merged.generatedBy[cid] = value
+            for key in ("intuitions", "why_it_matters", "misconceptions", "knowledge_checks"):
+                if not hasattr(merged, key):
+                    setattr(merged, key, {})
+                getattr(merged, key).update(enriched.get(key) or {})
             stats["calls"] += 1
         except Exception as exc:  # noqa: BLE001
             log.warning("NVIDIA study-aid enrichment failed: %s", exc)
@@ -816,6 +1145,11 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
         stats["applied"], stats["candidates"], stats["cached_sections"], len(sections), stats["malformed"], stats["errors"] or "none", stats["apply_ms"], stats["ms"],
     )
     meta = {"labelled": labelled or (not todo and root_hit is not None)}
+    if is_deep:
+        meta["deepStatus"] = deep_status
+        meta["provider"] = llm.provider_name()
+        if stats.get("deepRejectionReasons"):
+            meta["deepRejectionReasons"] = stats["deepRejectionReasons"]
     if stats["calls"] or stats["cached_sections"]:
         meta["llm"] = llm.fast_name()
     return {"ops": ops, "meta": meta, "stats": stats}
@@ -824,7 +1158,7 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", (text or "").lower()).strip()
+    return unicode_norm(text)
 
 
 def _missing_topic_ops(mindmap: dict) -> list[dict]:
@@ -905,6 +1239,14 @@ def _to_ops(mindmap: dict, sections: list[SectionCand], concepts: dict[str, Conc
             patch["text"] = truncate(parsed.titles[cid].split(":", 1)[0].strip(), 48)
         if cid in parsed.explanations:
             patch.update(explain=parsed.explanations[cid], generatedBy="llm")
+        if cid in getattr(parsed, "intuitions", {}):
+            patch["intuition"] = parsed.intuitions[cid]
+        if cid in getattr(parsed, "why_it_matters", {}):
+            patch["why_it_matters"] = parsed.why_it_matters[cid]
+        if cid in getattr(parsed, "misconceptions", {}):
+            patch["misconception"] = parsed.misconceptions[cid]
+        if cid in getattr(parsed, "knowledge_checks", {}):
+            patch["knowledge_check"] = parsed.knowledge_checks[cid]
         if cid in getattr(parsed, "mechanisms", {}):
             patch["mechanism"] = parsed.mechanisms[cid]
         if cid in getattr(parsed, "diagrams", {}):
@@ -917,11 +1259,20 @@ def _to_ops(mindmap: dict, sections: list[SectionCand], concepts: dict[str, Conc
             patch["exercise"] = parsed.exercises[cid]
         if cid in getattr(parsed, "available", {}):
             patch["available"] = bool(parsed.available[cid])
+        if getattr(parsed, "unavailable", {}).get(cid):
+            patch.update({
+                "conceptUnavailable": True, "available": False, "lesson_available": False,
+                "explain": "", "steps": [], "worked_example": "", "exercise": "",
+                "diagram": "", "misconception": "", "knowledge_check": {},
+                "generatedBy": "unavailable",
+                "unavailableReason": str(parsed.unavailable[cid])[:200],
+            })
         if cid in getattr(parsed, "lessons", {}):
             lesson = parsed.lessons[cid]
             patch.update({
                 "text": truncate(str(lesson.get("title") or node.get("text", "")).split(":", 1)[0].strip(), 48),
                 "explain": lesson.get("explain", ""),
+                "intuition": lesson.get("intuition", ""),
                 "why_it_matters": lesson.get("why_it_matters", ""),
                 "steps": lesson.get("steps", []),
                 "worked_example": lesson.get("worked_example", ""),
@@ -929,7 +1280,16 @@ def _to_ops(mindmap: dict, sections: list[SectionCand], concepts: dict[str, Conc
                 "misconception": lesson.get("misconception", ""),
                 "exercise": lesson.get("exercise", ""),
                 "knowledge_check": lesson.get("knowledge_check", {}),
+                "lesson_evidence": lesson.get("evidence", {}),
                 "provenance": lesson.get("provenance", {"example_source": "supplemental"}),
+                "groundingNote": (
+                    "Factual claims about the video are grounded in the timestamped transcript; "
+                    "intuition, examples, diagrams and exercises are AI-generated teaching aids; "
+                    "accuracy_notes are externally supplemented corrections, not video claims."
+                ),
+                "accuracy_notes": lesson.get("accuracy_notes", []),
+                "acronym_expansion": lesson.get("acronym_expansion", ""),
+                "teaching_language": lesson.get("teaching_language", ""),
                 "lesson_available": True,
                 "generatedBy": "llm-deep",
             })
@@ -941,6 +1301,14 @@ def _to_ops(mindmap: dict, sections: list[SectionCand], concepts: dict[str, Conc
         patch = {}
         if cid in parsed.explanations:
             patch["explain"] = parsed.explanations[cid]
+        if cid in getattr(parsed, "intuitions", {}):
+            patch["intuition"] = parsed.intuitions[cid]
+        if cid in getattr(parsed, "why_it_matters", {}):
+            patch["why_it_matters"] = parsed.why_it_matters[cid]
+        if cid in getattr(parsed, "misconceptions", {}):
+            patch["misconception"] = parsed.misconceptions[cid]
+        if cid in getattr(parsed, "knowledge_checks", {}):
+            patch["knowledge_check"] = parsed.knowledge_checks[cid]
         if cid in getattr(parsed, "mechanisms", {}):
             patch["mechanism"] = parsed.mechanisms[cid]
         if cid in getattr(parsed, "diagrams", {}):
@@ -953,10 +1321,19 @@ def _to_ops(mindmap: dict, sections: list[SectionCand], concepts: dict[str, Conc
             patch["text"] = truncate(parsed.titles[cid].split(":", 1)[0].strip(), 48)
         if cid in getattr(parsed, "available", {}):
             patch["available"] = bool(parsed.available[cid])
+        if getattr(parsed, "unavailable", {}).get(cid):
+            patch.update({
+                "conceptUnavailable": True, "available": False, "lesson_available": False,
+                "explain": "", "steps": [], "worked_example": "", "exercise": "",
+                "diagram": "", "misconception": "", "knowledge_check": {},
+                "generatedBy": "unavailable",
+                "unavailableReason": str(parsed.unavailable[cid])[:200],
+            })
         if cid in getattr(parsed, "lessons", {}):
             lesson = parsed.lessons[cid]
             patch.update({
                 "explain": lesson.get("explain", ""),
+                "intuition": lesson.get("intuition", ""),
                 "why_it_matters": lesson.get("why_it_matters", ""),
                 "steps": lesson.get("steps", []),
                 "worked_example": lesson.get("worked_example", ""),
@@ -964,7 +1341,16 @@ def _to_ops(mindmap: dict, sections: list[SectionCand], concepts: dict[str, Conc
                 "misconception": lesson.get("misconception", ""),
                 "exercise": lesson.get("exercise", ""),
                 "knowledge_check": lesson.get("knowledge_check", {}),
+                "lesson_evidence": lesson.get("evidence", {}),
                 "provenance": lesson.get("provenance", {"example_source": "supplemental"}),
+                "groundingNote": (
+                    "Factual claims about the video are grounded in the timestamped transcript; "
+                    "intuition, examples, diagrams and exercises are AI-generated teaching aids; "
+                    "accuracy_notes are externally supplemented corrections, not video claims."
+                ),
+                "accuracy_notes": lesson.get("accuracy_notes", []),
+                "acronym_expansion": lesson.get("acronym_expansion", ""),
+                "teaching_language": lesson.get("teaching_language", ""),
                 "lesson_available": True,
                 "generatedBy": "llm-deep",
             })
@@ -1050,5 +1436,12 @@ def apply_outcome(mindmap: dict, outcome: dict) -> dict:
         apply_op(mindmap, op)
     mindmap.setdefault("meta", {}).update(outcome.get("meta", {}))
     stats = outcome.get("stats") or {}
-    mindmap["meta"]["labelStats"] = {k: stats.get(k) for k in ("calls", "prompt_tokens", "completion_tokens", "llm_ms", "applied", "candidates")}
+    mindmap["meta"]["labelStats"] = {
+        k: stats.get(k) for k in (
+            "calls", "prompt_tokens", "completion_tokens", "llm_ms", "applied", "candidates",
+            "lessonsAttempted", "lessonsAccepted", "lessonsRejected", "lesson_failures",
+            "deepRejectionReasons", "provider", "teachingLanguage",
+        )
+    }
+    mindmap["meta"]["generationMs"] = stats.get("ms")
     return mindmap

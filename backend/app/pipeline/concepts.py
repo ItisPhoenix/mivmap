@@ -31,7 +31,8 @@ import numpy as np
 from ..config import has_module
 from .embeddings import cosine_matrix, embed
 from .segmentation import Segment, stop_words
-from .text_utils import FILLER_WORDS, candidate_phrases, smart_title, split_sentences
+from .text_utils import FILLER_WORDS, candidate_phrases, smart_title, split_sentences, unicode_norm
+from .terminology import is_meaningful_label, normalize_label
 
 log = logging.getLogger("mivmap.concepts")
 
@@ -43,6 +44,66 @@ VAGUE_TERMS = {
     "web", "server", "request", "response", "http", "url", "uri", "cookie", "cookies",
 }
 VAGUE_LABELS = VAGUE_TERMS
+
+# Filler-style "concepts" observed in generated maps: generic states or process
+# nouns that name nothing a learner can study.
+FILLER_CONCEPT_LABELS = {
+    "hard work", "hard working", "hardworking", "working hard",
+    "motivated", "motivating", "motivation", "motivates", "motivate",
+    "length", "lengths",
+    "researching", "research", "researches",
+    "effort", "efforts",
+    "trying", "trying to",
+    "crazy", "powerful", "reassuring", "complicated", "necessary", "distinct",
+    "recognizing", "dig", "various", "general", "specific",
+}
+# Words/phrases observed as junk concepts in real exports (e.g. Networking for Hackers #2).
+# "Hope"/"Ended"/"Extra" are outro or discourse words; "Quite Technical" is an evaluative
+# aside. None of them names something a learner could study.
+NON_CONCEPT_LABELS = VAGUE_TERMS | FILLER_CONCEPT_LABELS | {
+    "hope", "hoped", "hoping", "ended", "ending", "ends", "extra", "extras", "quite technical",
+    "technical", "quick", "quickly", "really", "pretty", "fairly", "somewhat", "totally",
+    "advanced", "basic", "basics", "simple", "complex", "important", "main", "major",
+    "other", "others", "something", "anything", "everything", "everyone", "guys", "friends",
+    "subscribe", "subscribing", "like", "share", "comment", "comments", "description", "link",
+    "links", "welcome", "thanks", "thank you", "everybody", "moment", "moments", "bit",
+    "way", "ways", "lot", "lots", "kind", "sort", "point", "points", "idea", "ideas",
+    "difference", "differences", "similarity", "similarities", "start", "beginning", "end",
+    "research", "box", "infrastructure inside", "fiber equipment", "fibre equipment", "funding",
+    "wi fi signal", "signal", "signals", "networking playlist", "phone connects", "square feet",
+    "yesterday", "notes", "print", "money", "equipment", "layer", "model", "provider", "providers",
+    "previous videos compared", "upcoming videos", "entire content", "extra infrastructure inside",
+    "outside continents", "hardware level", "nearby", "fails", "gestures", "check", "storage",
+    "offices", "subscriber", "data", "support", "area network", "fiber connection",
+    "fiber optic connections", "wi-fi connection", "tier", "department of defense",
+    "advanced research projects", "website request", "upcoming", "distant",
+    "mb storage cost", "multiple cities", "research projects", "wired connections international",
+    "experience", "curious", "videos compared", "entire networking module",
+}
+GENERIC_WORDS = {
+    "previous", "upcoming", "videos", "video", "module", "project", "projects", "labs", "lab",
+    "storage", "cost", "thousands", "energy", "distant", "fails", "curious", "experience",
+    "entire", "international", "wired", "compared", "multiple", "cities", "research",
+    "connections", "connection", "goodbye", "support", "data", "offices", "subscriber",
+    "nearby", "gestures", "check", "piece", "equipment", "extra", "networking",
+}
+CANONICAL_LABELS = {
+    "lan": "LAN", "pan": "PAN", "man": "MAN", "wan": "WAN", "isp": "ISP", "isps": "ISPs",
+    "osi": "OSI", "cdn": "CDN", "cdns": "CDNs", "tcp": "TCP", "ip": "IP", "tcp ip": "TCP/IP",
+    "arpanet": "ARPANET", "ont": "ONT", "http": "HTTP", "https": "HTTPS", "url": "URL", "uri": "URI",
+}
+
+
+def canonical_label(label: str) -> str:
+    """Keep common acronyms in their conventional upper case on the canvas."""
+    return CANONICAL_LABELS.get(re.sub(r"[^a-z0-9 ]", " ", label.lower()).strip(), label)
+EVALUATIVE_PREFIX = re.compile(
+    r"^(?:quite|very|really|pretty|fairly|somewhat|too|so|kind of|sort of|kind|sort|"
+    r"basically|actually|literally|simply|just|especially|totally)\b", re.I)
+PROMO_MARKERS = re.compile(
+    r"\b(?:subscribe|like and subscribe|thanks for watching|thank you for watching|"
+    r"see you in the next|hope you (?:enjoyed|liked|are)|check (?:out|the) description|"
+    r"link in the description|comment below|hit the bell|next video|your momentum)\b", re.I)
 
 TRANSCRIPT_MARKERS = re.compile(
     r"\b(?:revisit|number of reasons|first being|let's|we're going to|we have|here we|"
@@ -113,6 +174,10 @@ def _spacy():
         return None
 
 
+def _norm_label(text: str) -> str:
+    return unicode_norm(text)
+
+
 def _valid_phrase(phrase: str, stops: set[str]) -> bool:
     words = phrase.split()
     if not words or len(words) > 4:
@@ -126,8 +191,14 @@ def _valid_phrase(phrase: str, stops: set[str]) -> bool:
     if TRANSCRIPT_MARKERS.search(phrase):
         return False
     core = re.sub(r"[^a-z0-9 ]", "", phrase.lower()).strip()
-    if core in VAGUE_TERMS:
+    if core in VAGUE_TERMS or core in NON_CONCEPT_LABELS:
         return False
+    if EVALUATIVE_PREFIX.match(phrase.strip()) or PROMO_MARKERS.search(phrase):
+        return False
+    if any(w in GENERIC_WORDS for w in core.split()):
+        from .topics import ESSENTIAL_LABELS  # local import avoids a module cycle
+        if core not in {_norm_label(e) for e in ESSENTIAL_LABELS}:
+            return False  # generic / meta wording, whatever combination it appears in
     if len(words) == 1 and core in VAGUE_TERMS:
         return False
     return len(set(words)) == len(words)  # "data data" style caption stutter
@@ -199,12 +270,47 @@ def extract_concepts(segments: list[Segment], max_concepts: int = 60) -> Concept
         concepts.append(
             Concept(
                 id=f"c{len(concepts) + 1}",
-                label=smart_title(head[0]),
+                label=canonical_label(smart_title(head[0])),
                 score=sum(candidates[i][1] for i in members),
                 aliases=[candidates[i][0] for i in members],
                 segments=[segments[s].id for s in seg_idx],
             )
         )
+    # Final normalization + gate. This is where caption fragments become real
+    # terminology ("Local Area" -> LAN, "Sign of Internet" -> Internet), where
+    # section headings and generic words are rejected, and where two fragments
+    # that normalize to the same topic are merged instead of duplicated.
+    from .topics import ESSENTIAL_LABELS
+    essentials = {_norm_label(e) for e in ESSENTIAL_LABELS}
+    seg_text = {s.id: s.text for s in segments}
+    normalized: dict[str, Concept] = {}
+    kept: list[Concept] = []
+    for c in concepts:
+        core = _norm_label(c.label)
+        context = " ".join(seg_text.get(sid, "") for sid in c.segments[:6])
+        label = normalize_label(c.label, context)
+        essential = core in essentials
+        if essential and not label:
+            label = c.label  # a syllabus topic always survives normalization
+        if not label or not is_meaningful_label(label):
+            continue
+        if not essential and (core in NON_CONCEPT_LABELS
+                              or (set(_norm_label(label).split()) & GENERIC_WORDS)
+                              or EVALUATIVE_PREFIX.match(label)
+                              or PROMO_MARKERS.search(label)):
+            continue
+        c.label = label
+        c.aliases = list(dict.fromkeys(c.aliases + [label]))
+        merge_key = _norm_label(label)
+        if merge_key in normalized:
+            other = normalized[merge_key]
+            other.aliases = list(dict.fromkeys(other.aliases + c.aliases))
+            other.segments = list(dict.fromkeys(other.segments + c.segments))
+            other.score = max(other.score, c.score)
+            continue
+        normalized[merge_key] = c
+        kept.append(c)
+    concepts = kept
     concepts.sort(key=lambda c: -c.score)
     concepts = concepts[:max_concepts]
     for i, c in enumerate(concepts):
@@ -248,7 +354,7 @@ def _mention_matrix(concepts: list[Concept], blocks: list) -> np.ndarray:
     """presence[i, j] = concept i is mentioned in block j (one combined word-boundary regex per concept)."""
     presence = np.zeros((len(concepts), len(blocks)), dtype=bool)
     for i, c in enumerate(concepts):
-        pattern = re.compile(r"(?:" + "|".join(re.escape(a) for a in c.aliases[:5]) + r")", re.I)
+        pattern = re.compile(r"\b(?:" + "|".join(re.escape(a) for a in c.aliases[:5]) + r")\b", re.I)
         presence[i] = [bool(pattern.search(b.text)) for b in blocks]
     return presence
 

@@ -21,6 +21,7 @@ the tree, timestamps or transcript leaves.
 """
 from __future__ import annotations
 
+import difflib
 import hashlib
 import logging
 import re
@@ -32,11 +33,15 @@ from typing import Callable
 import numpy as np
 
 from . import llm, translate
-from .concepts import VAGUE_LABELS, ConceptGraph, extract_concepts
+from .concepts import Concept, FILLER_CONCEPT_LABELS, VAGUE_LABELS, ConceptGraph, extract_concepts
 from .embeddings import Embedder, backend_name, cosine_matrix
 from .segmentation import Segment, segment_transcript
-from .topics import ESSENTIAL_LABELS, HTTP_TOPICS, supplement_concepts
-from .text_utils import FILLER_WORDS, VERB_FORMS, fmt_time, parse_description_chapters, smart_title, truncate
+from .study_notes import build_study_note
+from .topics import (ESSENTIAL_LABELS, HTTP_TOPICS, active_topics, detect_domain,
+                     supplement_concepts, topic_regex)
+from .text_utils import (FILLER_WORDS, VERB_FORMS, fmt_time, parse_description_chapters,
+                         smart_title, truncate, unicode_norm)
+from .terminology import HINDI_TERM_HINTS, misleading_detail
 from .tone import detect_tone, merge_tone
 from .transcript import Transcript, TranscriptEntry, get_transcript, sentences_with_time
 
@@ -73,6 +78,8 @@ TRANSCRIPT_MARKERS = re.compile(
 VAGUE_LABELS = {"revisit", "revisit http", "foundations", "foundation", "additional", "information",
                 "message", "messages", "overview", "topic", "topics", "part", "parts", "web server",
                 "server", "general", "other", "others", "something", "example", "examples"}
+# Filler-style "concepts" observed in generated maps (see concepts.FILLER_CONCEPT_LABELS).
+VAGUE_LABELS = VAGUE_LABELS | FILLER_CONCEPT_LABELS
 
 
 def new_id(prefix: str = "n") -> str:
@@ -149,28 +156,43 @@ def prune_weak_concepts(mindmap: dict) -> None:
 
 def ensure_essential_topics(mindmap: dict, entries: list[TranscriptEntry]) -> None:
     """Add domain key topics that were not extracted, using strong transcript evidence only."""
-    if not any("http" in e.text.lower() for e in entries[:80]):
-        return
     sections = [s for s in mindmap["root"].get("children", []) if not s.get("recall")]
     if not sections:
         return
+    topics = active_topics(mindmap)
+    is_deep = (mindmap.get("meta") or {}).get("mode") == "deep"
     present = {_norm(c.get("topic") or c.get("text") or "") for s in sections for c in s.get("children", [])
                if c.get("type") == "concept"}
-    for label, _patterns in HTTP_TOPICS:
-        aliases = [w for w in re.findall(r"[a-z]{4,}", label.lower()) if w not in {"and", "the", "for"}]
+    for label, patterns in topics:
+        # Use the lexicon's own cues (English + Devanagari/Hinglish) instead of
+        # reconstructing English-only aliases from the canonical label.
+        rx = topic_regex(patterns)
         best = None
         for e in entries:
             text = e.text.strip()
-            if len(text) < 35:
+            if len(text) < 25:
                 continue
-            hits = sum(1 for a in aliases if re.search(r"(?<![a-z])" + re.escape(a) + r"(?![a-z])", text, re.I))
-            score = hits * 3 + (1 if COPULA_RE.search(text) else 0) + min(len(text) // 60, 3)
-            if hits and (best is None or score > best[0]):
+            matches = rx.findall(text)
+            if not matches:
+                continue
+            cues = len({m if isinstance(m, str) else m[0] for m in matches})
+            defines = bool(COPULA_RE.search(text) or HINDI_COPULA_RE.search(text))
+            score = min(cues, 4) * 3 + (1 if defines else 0) + min(len(text) // 60, 3)
+            # Strongest evidence wins; earliest timestamp breaks equal scores.
+            rank = (score, -float(e.start))
+            if best is None or rank > (best[0], -float(best[1].start)):
                 best = (score, e)
         if not best:
             continue
         e = best[1]
-        section = min(sections, key=lambda s: abs((s.get("start") or 0) - e.start))
+        section = next((s for s in sections
+                        if s.get("start") is not None and s.get("end") is not None
+                        and s["start"] - 2 <= e.start <= s["end"] + 2), None)
+        if section is None:
+            section = min(sections, key=lambda s: abs((s.get("start") or 0) - e.start))
+        lo = float(section.get("start") or e.start) - 60
+        hi = float(section.get("end") or e.start) + 60
+        context = [{"text": x.text, "start": x.start} for x in entries if lo <= x.start <= hi][:40]
         if _norm(label) in present:
             # repair an existing concept whose evidence does not support its topic
             for sec in sections:
@@ -178,15 +200,22 @@ def ensure_essential_topics(mindmap: dict, entries: list[TranscriptEntry]) -> No
                     if node.get("type") != "concept" or _norm(node.get("topic") or node.get("text") or "") != _norm(label):
                         continue
                     evidence = _norm((node.get("evidence") or [{}])[0].get("text", "") or node.get("source", ""))
-                    if any(w in evidence for w in _norm(label).split()):
-                        break
-                    node["start"] = round(e.start, 2)
-                    node["end"] = round(e.end, 2)
-                    node["source"] = truncate(e.text, 300)
-                    node["evidence"] = [{"start": round(e.start, 2), "end": round(e.end, 2), "text": truncate(e.text, 300)}]
-                    node["faith"] = 1.0
-                    node.update({"explain": "", "mechanism": "", "example": "", "exercise": "", "diagram": "",
-                                 "available": False, "generatedBy": "unavailable"})
+                    aligned = any(w in evidence for w in _norm(label).split())
+                    # A supplemental topic may already be present but still lack a
+                    # study note (supplement_concepts adds the node). Revision maps
+                    # must never surface an unavailable concept because of that.
+                    if not is_deep and node.get("available") is True:
+                        continue
+                    if not aligned:
+                        node["start"] = round(e.start, 2)
+                        node["end"] = round(e.end, 2)
+                        node["source"] = truncate(e.text, 300)
+                        node["evidence"] = [{"start": round(e.start, 2), "end": round(e.end, 2), "text": truncate(e.text, 300)}]
+                        node["faith"] = 1.0
+                        node.update({"explain": "", "mechanism": "", "example": "", "exercise": "", "diagram": "",
+                                     "available": False, "generatedBy": "unavailable"})
+                    if not is_deep:
+                        node.update(build_study_note(label, [{"start": e.start, "end": e.end, "text": e.text}], context=context))
             continue
         node = make_node(
             smart_title(label), "concept", 2, e.start, e.end,
@@ -196,6 +225,8 @@ def ensure_essential_topics(mindmap: dict, entries: list[TranscriptEntry]) -> No
             explain="", mechanism="", example="", exercise="", diagram="",
             available=False, generatedBy="unavailable",
         )
+        if not is_deep:
+            node.update(build_study_note(label, [{"start": e.start, "end": e.end, "text": e.text}], context=context))
         section["children"].append(node)
 
 
@@ -272,6 +303,7 @@ def finalize_concepts(mindmap: dict) -> None:
     # 2) Evidence-based identity + timestamp + ownership for concepts.
     concepts = [(sec, node) for sec in sections for node in sec.get("children", [])
                 if node.get("type") == "concept"]
+    faithful: list[tuple[dict, str, str]] = []  # (node, concept text, evidence sentence)
     for sec, node in concepts:
         evidence = node.get("evidence") or []
         if not evidence and node.get("source"):
@@ -300,18 +332,80 @@ def finalize_concepts(mindmap: dict) -> None:
         if owner is not None and owner is not sec:
             sec["children"] = [c for c in sec.get("children", []) if c is not node]
             owner["children"].append(node)
-        # Measure grounding: topic presence in evidence + similarity to the source.
-        teaching = _norm(" ".join(str(node.get(k) or "") for k in ("text", "explain", "steps", "worked_example")))
-        evidence_text = _norm(best.get("text") or "")
-        topic_hit = sum(1 for w in words if w in evidence_text) / max(1, len(words))
-        similarity = difflib.SequenceMatcher(None, teaching, evidence_text).ratio()
-        node["faith"] = round(min(0.95, max(0.0, 0.6 * topic_hit + 0.4 * min(1.0, similarity * 2))), 2)
+        # Faith is measured with the single batched pass below: cosine of the
+        # concept text against the evidence sentence it anchors to.
+        query = f"{node.get('topic') or node.get('text') or ''} {node.get('explain') or ''}".strip()
+        faithful.append((node, query, best.get("text") or ""))
+
+    # One embed call for every concept against its evidence sentence:
+    # faith = min(0.90, sim) — honest, never a fake 1.0, never keyword overlap.
+    if faithful:
+        texts = [q for _, q, _ in faithful]
+        evs = [e for _, _, e in faithful]
+        allv = Embedder(evs or ["empty"]).encode([*texts, *evs])
+        sims = cosine_matrix(allv[: len(texts)], allv[len(texts):])
+        for i, (node, _, _) in enumerate(faithful):
+            node["faith"] = round(min(0.90, max(0.0, float(sims[i, i]))), 2)
+
+    # 2b) Revision maps must never surface a concept with empty teaching. A
+    # supplemental topic can arrive with evidence but without a study note;
+    # build one from that same grounded evidence instead of leaving it blank.
+    if not is_deep:
+        for node, _, _ in faithful:
+            if node.get("available") is True:
+                continue
+            topic = node.get("topic") or node.get("text") or ""
+            evidence = node.get("evidence") or []
+            if not evidence and node.get("source"):
+                evidence = [{"start": node.get("start"), "end": node.get("end"),
+                             "text": node.get("source", "")}]
+            if evidence:
+                node.update(build_study_note(topic, evidence))
 
     # 3) Fail closed: in Deep Mode, keep only concepts with a validated lesson.
+    essential_lower = {e.lower() for e in ESSENTIAL_LABELS}
     for sec in sections:
         sec["children"] = [c for c in sec.get("children", [])
                            if c.get("type") != "concept"
-                           or (c.get("evidence") and (not is_deep or c.get("lesson_available")))]
+                           or (c.get("evidence")
+                               and len(str(c.get("source") or "").strip()) >= 30
+                               and (not is_deep or c.get("lesson_available") or c.get("conceptUnavailable") or c.get("hindiSource"))
+                               and (c.get("faith", 1.0) >= 0.30
+                                    or (c.get("topic") or "").lower() in essential_lower
+                                     or c.get("hindiSource") or c.get("conceptUnavailable")))]
+
+    # 3a0) A detail must name its own concept and must not be dominated by a
+    # different concept's topic (e.g. status-code text under Message Body).
+    all_topics = {(_norm(c.get("topic") or c.get("text") or ""), c.get("id"))
+                  for s in sections for c in s.get("children", []) if c.get("type") == "concept"}
+    for sec in sections:
+        for node in sec.get("children", []):
+            if node.get("type") != "concept":
+                continue
+            own = [t for t in _norm(node.get("topic") or node.get("text") or "").split() if len(t) >= 3]
+            foreign_terms = {
+                t for topic, cid in all_topics if cid != node.get("id")
+                for t in topic.split() if len(t) >= 4 and t not in own
+            }
+            node["children"] = [ch for ch in node.get("children", [])
+                                if ch.get("type") != "detail"
+                                or (own and any(t in _norm(ch.get("text") or "") for t in own)
+                                    and not any(t in _norm(ch.get("text") or "") for t in foreign_terms))]
+
+    # 3a) Keep concepts whose lesson could not be generated as explicit
+    # unavailable cards (with their real timestamp), never as a transcript
+    # fragment dressed up as a lesson. Drop misleading raw details in both cases.
+    for sec in sections:
+        for node in sec.get("children", []):
+            if node.get("type") != "concept":
+                continue
+            if node.get("conceptUnavailable"):
+                node["children"] = []
+                continue
+            if node.get("accuracy_notes"):
+                node["children"] = [ch for ch in node.get("children", [])
+                                    if ch.get("type") != "detail"
+                                    or not misleading_detail(ch.get("text"), node.get("topic") or "")]
 
     # 3b) Detail timestamps must fall inside their concept's verified span.
     for sec in sections:
@@ -329,7 +423,7 @@ def finalize_concepts(mindmap: dict) -> None:
     seen: list[tuple[dict, dict]] = []
     for sec in sections:
         for node in list(sec.get("children", [])):
-            if node.get("type") != "concept":
+            if node.get("type") != "concept" or node.get("recall") or node.get("oneline"):
                 continue
             key = _norm(node.get("topic") or node.get("text") or "")
             title = _norm(node.get("text") or "")
@@ -348,8 +442,10 @@ def finalize_concepts(mindmap: dict) -> None:
             if twin is None:
                 seen.append((sec, node)); continue
             other_sec, other = twin
-            better = len(teaching) > len(_norm(" ".join(str(other.get(k) or "") for k in ("explain", "mechanism", "steps", "worked_example"))))
-            if better:
+            oteaching = _norm(" ".join(str(other.get(k) or "") for k in ("explain", "mechanism", "steps", "worked_example")))
+            keep_new = ((node.get("topic") or "").lower() in essential_lower
+                        and (other.get("topic") or "").lower() not in essential_lower) or len(teaching) > len(oteaching)
+            if keep_new:
                 other_sec["children"] = [c for c in other_sec.get("children", []) if c is not other]
                 seen[seen.index(twin)] = (sec, node)
             else:
@@ -368,6 +464,8 @@ def generate_mindmap(request: dict, progress: ProgressFn | None = None) -> dict:
         finalize_concepts(mindmap)
     else:
         finalize_concepts(mindmap)
+    reconcile_final_stats(mindmap)
+    rebuild_recall_from_lessons(mindmap)
     return mindmap
 
 
@@ -402,6 +500,13 @@ def build_skeleton(request: dict, progress: ProgressFn | None = None) -> dict:
     # 1b. English only: detect the language once; translate once (cached) BEFORE every other stage
     title = request.get("title") or "YouTube video"
     chapters = [dict(c) for c in (request.get("chapters") or parse_description_chapters(request.get("description", ""), duration))]
+    # Keep the verbatim source captions and their exact timestamps before NLLB
+    # replaces the working transcript with English units. They are exported so
+    # multilingual maps remain auditable against the original video.
+    original_entries = [
+        {"start": round(e.start, 2), "end": round(e.end, 2), "text": e.text}
+        for e in transcript.entries
+    ]
     tinfo = translate.to_english(
         video_id, transcript, _language_hint(request, transcript), [title] + [str(c.get("title") or "") for c in chapters],
         min_coverage=float(request.get("minCoverage") or 1.0),  # a click may start from an evenly spread part
@@ -422,10 +527,19 @@ def build_skeleton(request: dict, progress: ProgressFn | None = None) -> dict:
 
     # 3. Concepts + knowledge graph ------------------------------------------------
     progress(f"Extracting concepts from {len(segments)} sections", 0.5)
-    graph = extract_concepts(segments, max_concepts=max(30, len(segments) * cfg.concepts * 2))
+    concept_budget = int(request.get("maxConcepts") or max(30, len(segments) * cfg.concepts * 2))
+    graph = extract_concepts(segments, max_concepts=concept_budget)
+    # Devanagari captions produce no English noun chunks / stop-word candidates.
+    # Recover the technical terms actually spoken, keeping original text + time.
+    # Hinglish may yield *some* English candidates, so this is not an all-or-nothing
+    # fallback: missing Hindi terms are added alongside whatever was extracted.
+    if any("\u0900" <= ch <= "\u097f" for e in transcript.entries for ch in e.text):
+        hindi = _hindi_concepts(transcript.entries, segments)
+        known = {_norm(c.label) for c in graph.concepts}
+        graph.concepts += [c for c in hindi if _norm(c.label) not in known]
     all_blocks = [block for seg in segments for block in seg.blocks]
-    http_domain = any("http" in (b.text or "").lower() for b in all_blocks[:40])
-    if http_domain:
+    detected_domain, topic_hits = detect_domain(all_blocks[:60])
+    if topic_hits:
         graph.concepts = supplement_concepts(graph.concepts, segments, all_blocks)
     lap("concepts")
 
@@ -436,7 +550,7 @@ def build_skeleton(request: dict, progress: ProgressFn | None = None) -> dict:
     used_terms: set[str] = set()
     def _concepts_for(seg: Segment):
         picked = graph.for_segment(seg.id, limit=cfg.concepts * 2)
-        if http_domain:
+        if topic_hits:
             for c in graph.concepts:
                 if c.label in ESSENTIAL_LABELS and seg.id in c.segments and c not in picked:
                     picked.append(c)
@@ -466,9 +580,14 @@ def build_skeleton(request: dict, progress: ProgressFn | None = None) -> dict:
     # 5. Cross links (knowledge graph + embedding similarity) + faithfulness ---------
     edges = _cross_edges(root, graph, index)
     score_faithfulness([n for sec in root["children"] for n in _walk(sec)], index.encoder, {sec["id"]: seg.text[:6000] for sec, seg in zip(sections, segments)})
+    # Deep Mode fails closed at finalize_concepts with faith >= 0.30. Apply the
+    # same bar here so weak concepts never consume an expensive LLM lesson call
+    # only to be discarded after generation.
+    faith_floor = 0.30 if mode == "deep" else 0.20
     for sec in sections:
         keep = [c for c in sec["children"]
-                if c.get("type") != "concept" or c.get("faith", 1.0) >= 0.20
+                if c.get("type") != "concept" or c.get("faith", 1.0) >= faith_floor
+                or c.get("hindiSource")
                 or (c.get("text") or "").lower() in {e.lower() for e in ESSENTIAL_LABELS}]
         if len(keep) != len(sec["children"]):
             log.info("pruned %d weak concepts from %s", len(sec["children"]) - len(keep), sec["text"])
@@ -502,6 +621,8 @@ def build_skeleton(request: dict, progress: ProgressFn | None = None) -> dict:
             "mode": mode,
             "language": transcript.language,
             "sourceLanguage": tinfo.lang,
+            "teachingLanguage": request.get("teachingLanguage") or "en",
+            "originalTranscript": original_entries if tinfo.lang != "en" else [],
             "translation": tinfo.to_dict(),
             "originalTitle": request.get("title") or "",
             "transcriptSource": transcript.source,
@@ -567,6 +688,31 @@ class _Grounder:
         return order[:k]
 
 
+def _hindi_concepts(entries, segments) -> list:
+    """Build concepts from Devanagari technical terms spoken in the transcript."""
+    found: dict[str, dict] = {}
+    for hint, label in HINDI_TERM_HINTS.items():
+        for e in entries:
+            if hint not in e.text:
+                continue
+            seg_ids = [s.id for s in segments if s.start - 1 <= e.start <= s.end + 1]
+            if not seg_ids and segments:
+                seg_ids = [min(segments, key=lambda s: abs(s.start - e.start)).id]
+            cur = found.setdefault(label, {"label": label, "hint": hint, "at": e.start, "segs": []})
+            cur["segs"] = list(dict.fromkeys(cur["segs"] + seg_ids))
+            break
+    out = []
+    for i, item in enumerate(found.values()):
+        c = Concept(
+            id=f"hi{i + 1}", label=item["label"], score=100.0 - i,
+            aliases=[item["hint"], item["label"]], segments=item["segs"],
+            first_ts=item["at"],
+        )
+        c.hindi_source = True  # type: ignore[attr-defined]
+        out.append(c)
+    return out
+
+
 def _language_hint(request: dict, transcript: Transcript) -> str | None:
     """Caption-track language from YouTube, when the transcript came with one."""
     if transcript.source == "extension":
@@ -622,7 +768,7 @@ def _assemble_section(seg: Segment, concepts, index: SentenceIndex, cfg: ModeCon
     if seg.from_chapter:
         section["chapter"] = True  # creator's title: never relabelled
 
-    raw_concepts = _heuristic_concepts(concepts, sents, cfg, used_terms)
+    raw_concepts = _heuristic_concepts(concepts, sents, cfg, used_terms, deep=cfg.expanded)
     sims = grounding.sims([rc["term"] + " " + rc["source"] for rc in raw_concepts])
     used_leaves: set[int] = set()
     anchors: set[int] = set()
@@ -634,6 +780,7 @@ def _assemble_section(seg: Segment, concepts, index: SentenceIndex, cfg: ModeCon
             summary="",
             source=truncate(rc["source"], 300),
             topic=rc["term"],
+            hindiSource=rc.get("hindiSource", False),
             evidence=[{"start": round(st, 2), "end": round(en, 2), "text": truncate(tx, 300)} for st, en, tx in rc.get("evidence", [])[:4]],
             **rc.get("learning", {}),
         )
@@ -692,6 +839,10 @@ def summary_points(grounding: _Grounder, k: int) -> list[TranscriptEntry]:
 # The LLM rewrites them later; when it cannot, these are what the student reads.
 # ---------------------------------------------------------------------------
 COPULA_RE = re.compile(r"^(?:is|are|was|were|means|mean|refers to|refer to|is called|are called|is defined as|are defined as|stands for|describes)\s+", re.I)
+# Hindi/Hinglish definition cues signal stronger evidence than a bare mention.
+HINDI_COPULA_RE = re.compile(
+    r"(?:मतलब|यानी|अर्थात|कहलाता|कहलाती|कहलाते|होता है|होती है|है जो|से जुड़ता|से जुड़ती|"
+    r"को जोड़ता|को जोड़ती|द्वारा|के लिए|की तरह|वाला एक|वाली एक)", re.I)
 LEAD_RE = re.compile(r"^(?:so|and|but|now|okay|ok|well|basically|actually|right|also|then|because)\b[,\s]+", re.I)
 ARTICLE_RE = re.compile(r"^(?:a|an|the)\s+", re.I)
 CLAUSE_RE = re.compile(r",|;|\s(?:which|because|so that|whereas|while|although)\s|\s[-–—]\s")
@@ -705,7 +856,7 @@ TAG_RULES = [
 
 
 def _norm(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
+    return unicode_norm(text)
 
 
 def compress(text: str, max_words: int) -> str:
@@ -777,11 +928,29 @@ def _learning_unavailable(term: str) -> dict:
 
 
 
-def _heuristic_concepts(concepts, sents: list[TranscriptEntry], cfg: ModeConfig, used_terms: set[str]) -> list[dict]:
+def _heuristic_concepts(concepts, sents: list[TranscriptEntry], cfg: ModeConfig, used_terms: set[str], deep: bool = False) -> list[dict]:
     """Select concepts that have real transcript evidence; reject weak/transcript-like candidates."""
+    essential = {e.lower() for e in ESSENTIAL_LABELS}
     fresh = [c for c in concepts if c.label.lower() not in used_terms]
-    picks = (fresh + [c for c in concepts if c.label.lower() in used_terms])[: cfg.concepts * 3]
-    out: list[dict] = []
+    candidates = fresh + [c for c in concepts if c.label.lower() in used_terms]
+
+    def _defined(c) -> bool:
+        core = re.sub(r"[^a-z0-9]+", " ", c.label.lower()).strip()
+        if core in essential or any(core in e or e in core for e in essential if len(e) >= 3):
+            return True
+        return any(COPULA_RE.search(m.text[m.text.lower().find(a) + len(a):])
+                   for m in sents for a in c.aliases[:3] if a in m.text.lower())
+
+    picks = sorted(candidates[: cfg.concepts * 5], key=lambda c: (-int(_defined(c)), -c.score))[: cfg.concepts * 3]
+
+    # Semantic support: keyword mentions form the candidate pool; one batched
+    # embed pass over the section sentences + cosine(concept, mention) decides
+    # which concepts this section actually supports.
+    texts = [s.text for s in sents]
+    enc = Embedder(texts or ["empty"])
+    vecs = enc.encode(texts)
+    idx = {id(s): i for i, s in enumerate(sents)}
+    pool = []
     for c in picks:
         core = re.sub(r"[^a-z0-9]+", " ", c.label.lower()).strip()
         if core in VAGUE_LABELS or len(core.split()) > 4:
@@ -796,16 +965,45 @@ def _heuristic_concepts(concepts, sents: list[TranscriptEntry], cfg: ModeConfig,
                 mentions.append(sent)
         if not mentions:
             continue  # reject: no evidence in this section
+        pool.append((c, mentions, aliases, core))
+
+    queries = [f"{c.label} {' '.join(c.aliases[:5])}".strip() or c.label for c, _, _, _ in pool]
+    qvecs = enc.encode(queries) if pool else np.zeros((0, vecs.shape[1] if vecs.size else 1), dtype=np.float32)
+    out: list[dict] = []
+    for (c, mentions, aliases, core), qvec in zip(pool, qvecs):
+        sims = cosine_matrix(qvec[None, :], vecs)[0] if vecs.size else np.zeros(len(sents))
+        mention_sims = {id(m): float(sims[idx[id(m)]]) for m in mentions}
+        essential_for_core = (getattr(c, "hindi_source", False) or core in essential or any(
+            core in e or e in core for e in essential if len(e) >= 3))
+
+        def _after_alias(m: TranscriptEntry) -> str:
+            """Text after the term in the mention (lowercased, stripped) — for copula checks."""
+            low = m.text.lower()
+            return max((low[low.find(a) + len(a):].lstrip() for a in aliases if a and a in low),
+                       key=len, default="")
+
+        def _definitional(m: TranscriptEntry) -> bool:
+            return bool(COPULA_RE.search(m.text) or COPULA_RE.search(_after_alias(m)))
+
+        has_copula_def = any(_definitional(m) for m in mentions)
+        best_sim = max(mention_sims.values()) if mention_sims else 0.0
+        if not essential_for_core and not has_copula_def and best_sim < 0.60:
+            continue  # skip: non-essential concept without semantic or copula support
+
         def uscore(m: TranscriptEntry) -> float:
-            definitional = 1.0 if COPULA_RE.search(m.text) or any(
-                COPULA_RE.search(m.text[m.text.lower().find(a) + len(a):]) for a in aliases if a in m.text.lower()) else 0.0
             length_ok = 1.0 if 35 <= len(m.text) <= 260 else 0.0
             clean = 0.0 if TRANSCRIPT_MARKERS.search(m.text) else 1.0
             near = 1.0 / (1.0 + abs(m.start - c.first_ts) / 30.0)
-            return definitional * 2 + length_ok + clean + near
+            # 2.0 per definitional anchor + a small embedding-similarity term (the
+            # LSA fallback can rank a genuinely concept-mentioning sentence low,
+            # so this term leans the anchor towards the concept without moving it).
+            return 2.0 * (_definitional(m) and 1.0 or 0.0) + length_ok + clean + near + 0.3 * mention_sims.get(id(m), 0.0)
+
         anchor = max(mentions, key=uscore)
         if len(anchor.text.strip()) < 18 or TRANSCRIPT_MARKERS.search(anchor.text):
             continue  # reject weak evidence
+        # Defined / syllabus concepts are preferred; fragments are kept only when a
+        # section has no better candidates (so small or synthetic lectures still work).
         # The anchor is the single best supporting passage. Later nearby mentions are extra evidence;
         # earlier ones are not evidence for this concept and must not pull its timestamp backwards.
         others = sorted((m for m in mentions if m is not anchor and m.start > anchor.start and m.start <= anchor.start + 60),
@@ -813,27 +1011,144 @@ def _heuristic_concepts(concepts, sents: list[TranscriptEntry], cfg: ModeConfig,
         evidence = [(anchor.start, anchor.end, anchor.text)] + [(m.start, m.end, m.text) for m in others]
         near = [m for m in mentions if m is not anchor and anchor.start - 1 <= m.start <= anchor.start + 60
                 and not TRANSCRIPT_MARKERS.search(m.text)]
-        tagged = [(tag, m) for m in near if (tag := classify(m.text))]
+        # A detail belongs to this concept only when the caption line actually
+        # names it. Without this gate, a WAN line lands under LAN and a status
+        # code line lands under Message Headers.
+        detail_aliases = [a for a in aliases if len(a) >= 3]
+        tagged = [(tag, m) for m in near
+                  if _mentions_alias(m.text, detail_aliases) and (tag := classify(m.text))]
         first_per_tag: dict[str, tuple[str, TranscriptEntry]] = {}
         for item in tagged:
             first_per_tag.setdefault(item[0], item)
         ordered = list(first_per_tag.values()) + [item for item in tagged if item not in first_per_tag.values()]
-        if not ordered and near:
-            ordered = [("Def", near[0])]
+        if not ordered:
+            fallback = [m for m in near if _mentions_alias(m.text, detail_aliases)]
+            if fallback:
+                ordered = [("Def", fallback[0])]
         used_terms.add(core)
+        context_texts = [{"text": m.text, "start": m.start} for m in sents
+                         if m is not anchor and not TRANSCRIPT_MARKERS.search(m.text)]
         out.append({
             "label": smart_title(c.label)[:48],
             "term": c.label,
+            "hindiSource": bool(getattr(c, "hindi_source", False)),
             "start": evidence[0][0] if evidence else anchor.start,
             "end": evidence[0][1] if evidence else (anchor.end if anchor.end > anchor.start else anchor.start + 1.0),
             "source": evidence[0][2] if evidence else anchor.text,
             "evidence": evidence,
             "children": sorted(ordered[: cfg.details], key=lambda item: TAGS.index(item[0]) if item[0] else len(TAGS)),
-            "learning": _learning_unavailable(c.label),
+            "learning": (_learning_unavailable(c.label) if deep else
+                         {k: v for k, v in build_study_note(
+                             c.label,
+                             [{"start": st, "end": en, "text": tx} for st, en, tx in evidence],
+                             context=context_texts,
+                         ).items() if k != "evidence"}),
         })
         if len(out) >= cfg.concepts:
             break
     return out
+
+
+def reconcile_final_stats(mindmap: dict) -> None:
+    """Make reported lesson counts match the concepts actually in the export.
+
+    Generation-time accepted lessons can later be dropped by grounding gates
+    (faith, evidence length, ownership). Report both numbers instead of leaving
+    a figure that cannot be reconciled with the exported file.
+    """
+    meta = mindmap.setdefault("meta", {})
+    stats = meta.get("labelStats")
+    if not isinstance(stats, dict):
+        return
+    concepts = [c for s in mindmap.get("root", {}).get("children", [])
+                if not s.get("recall") for c in s.get("children", [])
+                if c.get("type") == "concept"]
+    final_lessons = sum(1 for c in concepts if c.get("lesson_available") or c.get("available"))
+    generated = stats.get("lessonsAccepted")
+    stats["lessonsAcceptedAtGeneration"] = generated
+    stats["lessonsAccepted"] = final_lessons
+    stats["conceptsFinal"] = len(concepts)
+    if isinstance(generated, int):
+        stats["lessonsDroppedByGroundingGates"] = max(0, generated - final_lessons)
+
+
+def rebuild_recall_from_lessons(mindmap: dict) -> None:
+    """Build root summary/keywords and Quick recall from validated concepts only.
+
+    No "Covers ..." boilerplate, no caption fragments, no invented questions.
+    When no lesson is available, the recall section is left without fragments.
+    """
+    root = mindmap.get("root") or {}
+    sections = [s for s in root.get("children", []) if not s.get("recall")]
+    validated = [c for s in sections for c in s.get("children", [])
+                 if c.get("type") == "concept"
+                 and (c.get("lesson_available") or c.get("available"))
+                 and not c.get("conceptUnavailable")]
+    focus = [str(c.get("text") or "").strip() for c in validated]
+    focus = [f for f in focus if f][:6]
+    summary = " · ".join(focus)
+    root["summary"] = summary
+    root["explain"] = summary
+    root["keywords"] = [str(c.get("text") or "").strip() for c in validated][:8]
+
+    recall = next((s for s in root.get("children", []) if s.get("recall")), None)
+    if recall is None:
+        return
+    # Generic "Covers ..." / caption-fragment summary is not revision material.
+    usable_summary = bool(summary) and not summary.lower().startswith("covers")
+    recall["summary"] = summary if usable_summary else ""
+    picks: list[dict] = []
+    seen: set[str] = set()
+    for node in validated:
+        check = node.get("knowledge_check") or {}
+        question = str(check.get("question") or "").strip()
+        answer = str(check.get("answer") or "").strip()
+        if not question or not answer:
+            continue
+        # A caption fragment is a statement, not a revision question.
+        if "?" not in question and not re.search(r"\b(?:what|why|how|which|when|where|who)\b", question, re.I):
+            continue
+        key = _norm(question)
+        if key in seen or any(difflib.SequenceMatcher(None, key, old).ratio() > 0.6 for old in seen):
+            continue
+        seen.add(key)
+        picks.append({"question": question, "answer": answer, "node": node})
+    picks.sort(key=lambda p: (p["node"].get("start") if p["node"].get("start") is not None else 1e9))
+    if len(picks) > 6:
+        picks = [picks[round(i * (len(picks) - 1) / 5)] for i in range(6)]
+    children: list[dict] = []
+    if usable_summary:
+        children.append(make_node(
+            f"In one line: {summary}", "concept", 2, 0, root.get("end"),
+            source=summary, recall=True, oneline=True, generatedBy="validated-concepts",
+        ))
+    for p in picks:
+        source = p["node"]
+        children.append(make_node(
+            f"Q: {p['question']}  A: {p['answer']}", "concept", 2,
+            source.get("start"), source.get("end"),
+            source=truncate(source.get("source") or "", 300),
+            question=p["question"], answer=p["answer"],
+            recall=True, qa=True, conceptId=source.get("id"),
+            generatedBy=source.get("generatedBy") or "llm",
+        ))
+    recall["children"] = children
+    recall["qaCount"] = len(picks)
+
+
+def _mentions_alias(text: str, aliases: list[str]) -> bool:
+    """Word-boundary match for latin aliases, substring match for other scripts."""
+    low = str(text or "").lower()
+    for alias in aliases:
+        a = str(alias or "").lower().strip()
+        if len(a) < 3:
+            continue
+        if a.isascii():
+            if re.search(r"(?<![a-z0-9])" + re.escape(a) + r"(?![a-z0-9])", low):
+                return True
+        elif a in low:
+            return True
+    return False
 
 
 def _recall_branch(sections: list[dict], duration: float) -> dict | None:

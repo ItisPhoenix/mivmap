@@ -41,6 +41,7 @@ FAST_MODEL_PREFERENCE = ["llama-3.1-8b-instant", "qwen/qwen3", "llama-3.3-70b", 
 _semaphore = threading.BoundedSemaphore(4)
 _client: httpx.Client | None = None
 _client_lock = threading.Lock()
+_CHAT_JSON_STATE = threading.local()
 _stats_lock = threading.Lock()
 STATS = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "errors": 0}
 _groq_models: list[str] | None = None
@@ -314,15 +315,42 @@ def complete(system: str, user: str, *, max_tokens: int, temperature: float = 0.
 # ---------------------------------------------------------------------------
 # JSON calls for user-triggered features (refine, study)
 # ---------------------------------------------------------------------------
+def chat_json_diagnostics() -> dict[str, Any]:
+    """Return diagnostics for the current thread's most recent chat_json call."""
+    return dict(getattr(_CHAT_JSON_STATE, "diagnostics", {}) or {})
+
+
+def _record_chat_json_diagnostics(
+    provider: str,
+    error: str | None = None,
+    error_kind: str | None = None,
+) -> None:
+    _CHAT_JSON_STATE.diagnostics = {
+        "provider": provider,
+        "status": LAST_STATUS,
+        "retry_after": LAST_RETRY_AFTER,
+        "error": str(error)[:1200] if error else None,
+        "error_kind": error_kind,
+    }
+
+
 def chat_json(system: str, user: str, max_tokens: int = 1800, temperature: float = 0.3) -> Any | None:
-    """Return parsed JSON from the best available LLM, or None if no LLM is usable."""
+    """Return parsed JSON and retain per-thread diagnostics when every provider fails."""
+    global LAST_STATUS, LAST_RETRY_AFTER
+    LAST_STATUS = None
+    LAST_RETRY_AFTER = None
+    _record_chat_json_diagnostics("none")
+
     messages = [
         {"role": "system", "content": system + "\nRespond with valid JSON only. No markdown fences."},
         {"role": "user", "content": user},
     ]
     errors = []
+    attempted_provider = "none"
+    last_error_kind = None
     with _semaphore:
         if settings.llm_enabled and llm_chat_url():
+            attempted_provider = f"openai-compatible:{settings.llm_model}"
             # Reasoning models sometimes answer in <reasoning> only, or emit truncated JSON.
             # Retry once without json_mode and with a larger budget before giving up.
             last_error: Exception | None = None
@@ -333,34 +361,78 @@ def chat_json(system: str, user: str, max_tokens: int = 1800, temperature: float
                         budget, temperature, json_mode=json_mode, attempts=1,
                     )
                     if text and text.strip():
-                        return extract_json(text)
+                        parsed = extract_json(text)
+                        _record_chat_json_diagnostics(attempted_provider)
+                        return parsed
                     last_error = RuntimeError("empty LLM response")
+                    last_error_kind = "empty_response"
                 except Exception as exc:  # noqa: BLE001
                     last_error = exc
+                    last_error_kind = (
+                        "response_parse" if isinstance(exc, (ValueError, json.JSONDecodeError))
+                        else "provider_error"
+                    )
             if last_error:
-                errors.append(f"openai-compatible/{settings.llm_model}: {last_error}")
+                errors.append(f"{attempted_provider}: {type(last_error).__name__}: {last_error}")
                 log.warning("OpenAI-compatible model %s failed: %s", settings.llm_model, last_error)
+
         if settings.groq_enabled:
             for model in dict.fromkeys([settings.groq_model, settings.groq_fallback_model]):
+                attempted_provider = f"groq:{model}"
                 try:
-                    return extract_json(_openai_compatible(GROQ_URL, settings.groq_api_key, model, messages, max_tokens, temperature, json_mode=True))
+                    parsed = extract_json(_openai_compatible(
+                        GROQ_URL, settings.groq_api_key, model, messages, max_tokens,
+                        temperature, json_mode=True,
+                    ))
+                    _record_chat_json_diagnostics(attempted_provider)
+                    return parsed
                 except Exception as exc:  # noqa: BLE001
-                    errors.append(f"groq/{model}: {exc}")
+                    errors.append(f"{attempted_provider}: {type(exc).__name__}: {exc}")
+                    last_error_kind = (
+                        "response_parse" if isinstance(exc, (ValueError, json.JSONDecodeError))
+                        else "provider_error"
+                    )
                     log.warning("Groq %s failed: %s", model, exc)
+
         if settings.hf_token:
+            attempted_provider = f"huggingface:{settings.hf_model}"
             try:
-                return extract_json(_openai_compatible(HF_URL, settings.hf_token, settings.hf_model, messages, max_tokens, temperature, json_mode=False))
+                parsed = extract_json(_openai_compatible(
+                    HF_URL, settings.hf_token, settings.hf_model, messages,
+                    max_tokens, temperature, json_mode=False,
+                ))
+                _record_chat_json_diagnostics(attempted_provider)
+                return parsed
             except Exception as exc:  # noqa: BLE001
-                errors.append(f"hf: {exc}")
+                errors.append(f"{attempted_provider}: {type(exc).__name__}: {exc}")
+                last_error_kind = (
+                    "response_parse" if isinstance(exc, (ValueError, json.JSONDecodeError))
+                    else "provider_error"
+                )
                 log.warning("Hugging Face router failed: %s", exc)
+
         if settings.hf_local_model and has_module("transformers"):
+            attempted_provider = f"local:{settings.hf_local_model}"
             try:
-                return extract_json(_local_generate(messages, max_tokens, temperature))
+                parsed = extract_json(_local_generate(messages, max_tokens, temperature))
+                _record_chat_json_diagnostics(attempted_provider)
+                return parsed
             except Exception as exc:  # noqa: BLE001
-                errors.append(f"local: {exc}")
+                errors.append(f"{attempted_provider}: {type(exc).__name__}: {exc}")
+                last_error_kind = (
+                    "response_parse" if isinstance(exc, (ValueError, json.JSONDecodeError))
+                    else "provider_error"
+                )
                 log.warning("Local model failed: %s", exc)
+
     if errors:
-        log.error("All LLM providers failed: %s", " | ".join(errors))
+        error = " | ".join(errors)
+        error_kind = last_error_kind or "provider_error"
+        log.error("All LLM providers failed: %s", error)
+    else:
+        error = "no LLM provider configured"
+        error_kind = "not_configured"
+    _record_chat_json_diagnostics(attempted_provider, error, error_kind)
     return None
 
 
