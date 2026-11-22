@@ -198,6 +198,11 @@ HINDI_GRAMMAR_WORDS = frozenset({
     "भेजता", "भेजती", "भेजने", "लेता",
     "देता", "मिलता", "चलता", "आता", "रखता", "दिखाता", "समझाता", "बताता", "पढ़ता",
     "लिखता", "बनाता", "सकता", "सकती", "चाहिए", "पहचानें", "समझें", "देखें",
+    # Common imperative forms used in Hindi exercises and instructions.
+    "बनाएँ", "बनाएं", "बनाइए", "खींचें", "खींचिए", "समझाएँ", "समझाएं", "समझाइए",
+    "दिखाएँ", "दिखाएं", "दिखाइए", "पहचानिए", "जाँचें", "जांचें", "जाँचिए",
+    "देखिए", "लिखें", "लिखिए", "आज़माएँ", "आजमाएं", "आज़माइए", "कीजिए",
+    "कीजिये", "करें", "करिए", "बताइए", "बताएँ", "पढ़ें", "दें", "दीजिए",
 })
 ENGLISH_GRAMMAR_WORDS = frozenset({
     "a", "an", "the", "of", "to", "in", "on", "at", "for", "from", "by", "with",
@@ -267,7 +272,7 @@ def is_technical_only(text: str) -> bool:
     return all(t.isdigit() or t in known for t in tokens)
 
 
-def field_language_ok(text: str, language: str) -> bool:
+def field_language_ok(text: str, language: str, *, allow_short_label: bool = False) -> bool:
     """Check one learner-facing field against the requested teaching language.
 
     A script-percentage threshold is not enough: "a राउटर is a device that
@@ -294,11 +299,14 @@ def field_language_ok(text: str, language: str) -> bool:
         hindi_markers = sum(t in HINDI_GRAMMAR_WORDS for t in tokens)
         english_markers = sum(t in ENGLISH_GRAMMAR_WORDS for t in tokens)
         ratio = dev / letters
-        # Natural Hindi or Hinglish: Hindi grammar present and not outweighed by
-        # English grammar. Short pure-Devanagari labels/titles need no full prose.
+        # Prose must show Hindi grammar. Script alone is not proof of Hindi:
+        # random Devanagari words and noun piles are not accepted as explanations.
         if hindi_markers >= 2 and hindi_markers >= english_markers and ratio >= 0.15:
             return True
-        if ratio >= 0.55 and english_markers == 0 and dev >= 4:
+        # Short labels may be noun phrases, but this exception is enabled only
+        # for the title field by check_teaching_languages().
+        if (allow_short_label and len(tokens) <= 4 and len(str(text).strip()) <= 60
+                and ratio >= 0.55 and english_markers == 0):
             return True
         return False
     return latin > 0 and latin / letters >= 0.8
@@ -328,7 +336,7 @@ def check_teaching_languages(lesson: dict[str, Any], language: str) -> list[str]
     for name, value in fields:
         if not isinstance(value, str) or not value.strip():
             continue
-        if not field_language_ok(value, lang):
+        if not field_language_ok(value, lang, allow_short_label=(name == "title")):
             errors.append(f"{name} not written in the teaching language")
     return errors
 
