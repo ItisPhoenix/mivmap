@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Mivmap — YouTube to Mindmap",
   "short_name": "Mivmap",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Turn any YouTube video into an interactive, timestamp-linked, hand-drawn mindmap. Open source (MIT).",
   "minimum_chrome_version": "116",
   "icons": {
@@ -58,5 +58,6 @@
       },
       "description": "Generate a mindmap for the current YouTube video"
     }
-  }
+  },
+  "version_name": "0.2.0 Beta"
 }

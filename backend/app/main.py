@@ -106,7 +106,7 @@ async def lifespan(_app: FastAPI):
     yield
 
 
-app = FastAPI(title="Mivmap", version="1.0.0", description="YouTube → interactive mindmap pipeline", lifespan=lifespan)
+app = FastAPI(title="Mivmap", version="0.2.0-beta", description="YouTube → interactive mindmap pipeline", lifespan=lifespan)
 # ALLOWED_ORIGINS is built-ins + user-registered IDs (app/origins.py), so a fresh
 # Windows install never needs Python source edits. Wildcards are never accepted.
 

@@ -2,7 +2,7 @@
 
 **Mivmap** is an open-source YouTube study tool and AI video learning extension: turn any YouTube video into an interactive, timestamp-linked mind map, then learn every concept with a structured Deep Mode lesson. It is local-first — a Brave/Chrome Manifest V3 extension plus a small Python backend — so maps, notes and progress stay in your browser and generation runs on your own machine.
 
-**Release target:** `v0.1.0-beta` (source-only; no binary is distributed by this project).
+**Current release:** `v0.2.0-beta` (source-only; no binary is distributed by this project).
 
 > **Upstream credit:** Mivmap is a rebrand and continuation of the original MIT-licensed [TubeMind project](https://github.com/diyabhattacharjee-git/youtube-extension). Original work © TubeMind contributors; rebrand and subsequent changes © Mivmap contributors. See [LICENSE](LICENSE).
 

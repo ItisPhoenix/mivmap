@@ -1,6 +1,35 @@
 # Changelog
 
-All notable changes to this project are documented here. This release is source-only; no binary or repository is published by the project itself.
+All notable changes to this project are documented here. GitHub releases are source-only; no binary assets are attached.
+
+## [v0.2.0-beta] - 2026-11-24
+
+Second beta focused on making the video-to-learning workflow clearer, more reliable, and more efficient.
+
+### Added and improved
+
+- Dedicated, readable concept explanations with validated generation, honest unavailable states, and retry/recovery behavior.
+- Quick Recall prompts and distinct study sets, with quiz history and learning progress preserved when switching sets.
+- A clearer study inspector with outline and recall views, section navigation, Focus Section and Full Map controls, and responsive drawer behavior.
+- Shorter mind-map labels while preserving the full underlying concept content.
+- More efficient concept selection and long-span embedding handling, with explicit embedding-provider configuration.
+- Improved LLM provider compatibility, lesson quality repair, and cache/retry handling.
+- Expanded backend and extension regression coverage for explanations, layout, study sets, provider behavior, and long-span processing.
+
+### Release verification
+
+- Backend: **317 passed, 2 skipped**.
+- Extension: **53 passed**.
+- Python compilation, JavaScript syntax checks (37 files), staged diff checks, and secret-pattern scan passed.
+- Automated release validation was performed locally on Windows.
+
+### Known limitations carried forward
+
+- Acceptance testing covered Brave; Chrome and Edge remain unverified.
+- A complete fresh Deep Mode export may still depend on provider availability, quotas, and response quality. Failed or incomplete lessons are not represented as successful lessons.
+- Collaboration rooms have no authentication; treat room codes as share links.
+- NLLB translation is optional, slow on CPU, and requires a one-time model conversion.
+- Unpacked extension IDs change with the install path and must be registered once with the backend.
 
 ## [v0.1.0-beta] - 2026-11-18
 
