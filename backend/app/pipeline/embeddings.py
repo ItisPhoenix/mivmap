@@ -833,6 +833,108 @@ def embed(texts: list[str], corpus: list[str] | None = None) -> np.ndarray:
     return Embedder(list(corpus or []) + list(texts)).encode(texts)
 
 
+# ---------------------------------------------------------------------------
+# Long-span embedding: chunk at sentence boundaries, pool back to one vector
+# ---------------------------------------------------------------------------
+# One ~6k character span takes ~18 s on the configured remote endpoint; a batch
+# of eight of them exceeds a 60 s read timeout. ~900 characters keeps each
+# single request comfortably inside that budget without changing providers.
+MAX_SPAN_CHARS = 900
+_SENTENCE_BOUNDARY = re.compile(r"(?<=[.!?।])\s+|\n+")
+
+
+def _validated_chunk_size(max_chars: int) -> int:
+    if isinstance(max_chars, bool) or not isinstance(max_chars, int) or max_chars <= 0:
+        raise ValueError("max_chars must be a positive integer")
+    return max_chars
+
+
+def split_span(text: str, max_chars: int = MAX_SPAN_CHARS) -> list[str]:
+    """Split a long span at sentence boundaries, never inside a sentence.
+
+    Only a sentence longer than `max_chars` is split further, at word boundaries
+    (and as a last resort at character boundaries). Short spans are untouched.
+    """
+    max_chars = _validated_chunk_size(max_chars)
+    value = (text or "").strip()
+    if not value:
+        return []
+    if len(value) <= max_chars:
+        return [value]
+
+    sentences = [s.strip() for s in _SENTENCE_BOUNDARY.split(value) if s.strip()] or [value]
+    chunks: list[str] = []
+    current = ""
+
+    def hard_split(sentence: str) -> None:
+        nonlocal current
+        if current:
+            chunks.append(current)
+            current = ""
+        piece = ""
+        for word in sentence.split(" "):
+            while len(word) > max_chars:
+                if piece:
+                    chunks.append(piece)
+                    piece = ""
+                chunks.append(word[:max_chars])
+                word = word[max_chars:]
+            candidate = f"{piece} {word}".strip()
+            if len(candidate) <= max_chars:
+                piece = candidate
+            else:
+                if piece:
+                    chunks.append(piece)
+                piece = word
+        if piece:
+            chunks.append(piece)
+
+    for sentence in sentences:
+        if len(sentence) > max_chars:
+            hard_split(sentence)
+            continue
+        candidate = f"{current} {sentence}".strip() if current else sentence
+        if len(candidate) <= max_chars:
+            current = candidate
+        else:
+            if current:
+                chunks.append(current)
+            current = sentence
+    if current:
+        chunks.append(current)
+    return chunks or [value[:max_chars]]
+
+
+def encode_long_texts(encoder, texts: list[str], max_chars: int = MAX_SPAN_CHARS) -> np.ndarray:
+    """Embed each span as chunks, then pool to one L2-normalised vector per span.
+
+    All chunks are submitted in a single call to the existing encoder, so the
+    configured provider selection, batching, durable cache and dimension checks
+    are reused unchanged. No parallel requests are introduced.
+    """
+    if not texts:
+        return np.zeros((0, 1), dtype=np.float32)
+    max_chars = _validated_chunk_size(max_chars)
+    groups = [split_span(text, max_chars) for text in texts]
+    if any(not group for group in groups):
+        raise ValueError("encode_long_texts requires non-empty spans")
+    chunks = [chunk for group in groups for chunk in group]
+    # Deduplicate within this call as well as through the durable cache: repeated
+    # sentences across sections must not generate duplicate backend requests.
+    unique = list(dict.fromkeys(chunks))
+    unique_vectors = np.asarray(encoder.encode(unique), dtype=np.float32)
+    if unique_vectors.shape[0] != len(unique):
+        raise EmbeddingBackendError("embedding backend returned the wrong number of chunk vectors")
+    by_text = {text: unique_vectors[index] for index, text in enumerate(unique)}
+
+    pooled: list[np.ndarray] = []
+    for group in groups:
+        part = np.stack([by_text[chunk] for chunk in group])
+        weights = np.asarray([len(chunk) for chunk in group], dtype=np.float32)
+        pooled.append((part * weights[:, None]).sum(axis=0) / weights.sum())
+    return _normalize(np.stack(pooled, axis=0))
+
+
 def cosine_matrix(a: np.ndarray, b: np.ndarray | None = None) -> np.ndarray:
     b = a if b is None else b
     if a.size == 0 or b.size == 0:

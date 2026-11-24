@@ -121,6 +121,20 @@ export class Api {
     return this.request('/api/study', { method: 'POST', body: { map: slim(map, false), count, focusIds } });
   }
 
+  /** Recover validated cached lessons for concepts that still show a placeholder. */
+  recoverExplanations(map, conceptIds = null) {
+    return this.request('/api/explanations/recover', {
+      method: 'POST', body: { map: slim(map, false), conceptIds },
+    });
+  }
+
+  /** Generate a fresh validated lesson for a concept (requires a configured LLM). */
+  generateExplanations(map, conceptIds = null) {
+    return this.request('/api/explanations/generate', {
+      method: 'POST', body: { map: slim(map, false), conceptIds }, timeout: 120000,
+    });
+  }
+
   merge(maps) {
     return this.request('/api/merge', { method: 'POST', body: { maps } });
   }

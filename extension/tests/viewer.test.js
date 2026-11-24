@@ -139,7 +139,12 @@ test('no SVG elements inside node content: only the hand-drawn outline remains',
         assert.ok(!/[▶≈🔗✎●]/u.test(el.textContent), `icon glyph in "${el.textContent}"`);
       }
       // toggles are a plain character too
-      for (const t of g.querySelectorAll('.toggle')) assert.match(t.textContent.replace(t.querySelector('title')?.textContent || '', ''), /^(\+\d*|−)$/);
+      for (const t of g.querySelectorAll('.toggle')) {
+        const glyph = t.textContent.replace(t.querySelector('title')?.textContent || '', '').trim();
+        assert.ok(['+', '▸', '▾'].includes(glyph), `accessible toggle glyph: ${glyph}`);
+        assert.ok(t.getAttribute('aria-label'));
+        assert.equal(t.getAttribute('role'), 'button');
+      }
     }
   }
 });

@@ -17,9 +17,11 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import threading
 import time
 from dataclasses import dataclass
+from urllib.parse import urlsplit
 from functools import lru_cache
 from typing import Any, Callable, Iterator
 
@@ -43,12 +45,156 @@ _client: httpx.Client | None = None
 _client_lock = threading.Lock()
 _CHAT_JSON_STATE = threading.local()
 _stats_lock = threading.Lock()
-STATS = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "errors": 0}
+STATS = {
+    "calls": 0,               # successful model responses (backwards compatible)
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "errors": 0,
+    "logical_calls": 0,       # one per chat_json()/complete() logical request
+    "http_requests": 0,       # every outbound POST, including ones that fail
+}
 _groq_models: list[str] | None = None
 _cooldown_until = 0.0  # after a 429 the provider is skipped (0 calls) until this monotonic time
 DEFAULT_COOLDOWN = 20.0
 LAST_STATUS: int | None = None
 LAST_RETRY_AFTER: float | None = None
+
+# (endpoint, model) pairs observed rejecting `response_format` are remembered for
+# this process so later JSON calls skip the wasted json_object attempt (HTTP 400).
+# The endpoint is normalised (scheme/host lower-cased, userinfo removed) and the
+# model is kept verbatim: two models sharing one gateway must never inherit each
+# other's capability verdict. Neither credentials nor keys are ever stored here.
+_NO_JSON_MODE: set[tuple[str, str]] = set()
+
+
+def _normalize_endpoint(url: str) -> str:
+    """Comparable endpoint identity without credentials, query or fragment."""
+    raw = str(url or "").strip()
+    if not raw:
+        return ""
+    try:
+        parts = urlsplit(raw if "://" in raw else "http://" + raw)
+        host = (parts.hostname or "").lower().rstrip(".")
+        port = f":{parts.port}" if parts.port else ""
+        path = (parts.path or "").rstrip("/")
+        return f"{parts.scheme.lower()}://{host}{port}{path}"
+    except ValueError:
+        return raw.rstrip("/")
+
+
+def json_capability_key(url: str, model: str) -> tuple[str, str]:
+    """Cache key for a response-format capability verdict."""
+    return (_normalize_endpoint(url), str(model or ""))
+
+
+def json_mode_supported(url: str, model: str) -> bool:
+    """True unless this exact endpoint/model pair rejected JSON mode."""
+    return json_capability_key(url, model) not in _NO_JSON_MODE
+
+
+def mark_json_mode_unsupported(url: str, model: str) -> None:
+    """Remember a confirmed response-format rejection for this endpoint/model."""
+    _NO_JSON_MODE.add(json_capability_key(url, model))
+
+
+# Only exact fields the outgoing request contract can actually carry. `json_mode`
+# is not a payload field (json_mode sets `response_format`), so it is deliberately
+# not an alias here.
+_PARAMETER_NAMES = (
+    "temperature",
+    "reasoning_effort",
+    "include_reasoning",
+    "reasoning_format",
+    "response_format",
+)
+
+
+def _unsupported_parameter(error: str) -> bool:
+    """True when a 400 body says the endpoint rejects the submitted parameter."""
+    lowered = error.lower()
+    return any(marker in lowered for marker in (
+        "unsupported value", "unsupported parameter", "unknown parameter",
+        "unexpected parameter", "invalid value", "must be", "not allowed",
+    ))
+
+
+# A message-only rejection must tie the field to a rejection phrase. A quoted
+# field mentioned somewhere else in an unrelated error is deliberately NOT enough.
+_REJECTION_PREFIX = re.compile(
+    r"(?:unsupported|unknown|unexpected|invalid|unrecognized|unrecognised)\s+"
+    r"(?:value|parameter|field|argument)\s*(?::|for)?\s*"
+)
+_REJECTION_SUFFIX = re.compile(
+    r"(?:is\s+)?(?:not\s+supported|unsupported|not\s+allowed|not\s+permitted|"
+    r"disallowed|must\s+be|is\s+invalid|invalid|unknown|rejected)"
+)
+
+
+def _message_rejects_field(message: str, name: str) -> bool:
+    """True only when the message explicitly names `name` as rejected."""
+    lowered = message.lower()
+    quoted = r"['\"]" + re.escape(name) + r"['\"]"
+    # "Unsupported value: 'temperature' must be 1" / "Unknown parameter: 'reasoning_effort'."
+    if re.search(_REJECTION_PREFIX.pattern + quoted, lowered):
+        return True
+    # "'response_format.type' must be 'json_schema' or 'text'" / "'response_format' is not allowed"
+    if re.search(quoted + r"\s+" + _REJECTION_SUFFIX.pattern, lowered):
+        return True
+    # Unquoted is accepted only with an explicit "parameter/field <name> ..." lead-in.
+    if re.search(
+        rf"(?:parameter|field|argument)\s+{re.escape(name)}\s+" + _REJECTION_SUFFIX.pattern,
+        lowered,
+    ):
+        return True
+    return False
+
+
+def _rejected_parameter(error: str) -> str | None:
+    """Return the exact request field a 400 rejects, if any.
+
+    Structured `error.param` wins. Unknown structured params fail closed. Without
+    one, the message must explicitly identify the rejected field next to a
+    rejection phrase; merely mentioning it (even in quotes) is insufficient.
+    """
+    structured = None
+    try:
+        structured = json.loads(error)
+    except (TypeError, ValueError):
+        pass
+
+    param = ""
+    if isinstance(structured, dict):
+        detail = structured.get("error")
+        if isinstance(detail, dict):
+            param = detail.get("param") or ""
+        if not param:
+            param = structured.get("param") or ""
+    name = str(param).strip().strip("'\"").lower()
+    if name:
+        # Never guess from message text when the server already named a field.
+        return name if name in _PARAMETER_NAMES else None
+
+    # Check the sub-field first so 'response_format.type' is not mistaken for
+    # the parent parameter. Both map to `response_format` on the request.
+    if _message_rejects_field(error, "response_format.type"):
+        return "response_format"
+    for candidate in _PARAMETER_NAMES:
+        if _message_rejects_field(error, candidate):
+            return candidate
+    return None
+
+
+def _confirmed_json_mode_rejection(error: str, payload: dict[str, Any]) -> bool:
+    """Only a confirmed rejection of a response_format we actually sent."""
+    return "response_format" in payload and _rejected_parameter(error) == "response_format"
+
+
+def _drop_rejected_parameter(payload: dict[str, Any], name: str) -> bool:
+    """Remove exactly `name`. Return False if absent; preserve all other fields."""
+    if name not in payload:
+        return False
+    del payload[name]
+    return True
 
 
 class LLMError(RuntimeError):
@@ -142,7 +288,29 @@ def fast_provider() -> tuple[str, str, str] | None:
 
 
 def fast_available() -> bool:
+    """An HTTP single-shot provider (remote or unauthenticated loopback) is configured."""
     return fast_provider() is not None
+
+
+def local_available() -> bool:
+    """A local transformers model is configured and importable.
+
+    This is deliberately separate from `fast_provider()`: local inference runs
+    in-process via `chat_json()`/_local_generate(), not through the HTTP
+    streaming path used by `complete()`/`stream()`.
+    """
+    return bool(settings.hf_local_model) and has_module("transformers")
+
+
+def generation_available() -> bool:
+    """True when any provider can serve JSON lesson generation.
+
+    Fresh explanations go through `chat_json()`, which supports the HTTP
+    providers *and* an in-process local transformers model. Gate generation on
+    this, not on `fast_available()` alone, so HF_LOCAL_MODEL is not silently
+    excluded.
+    """
+    return fast_available() or local_available()
 
 
 def fast_name() -> str:
@@ -188,13 +356,29 @@ def reasoning_params(model: str) -> dict:
         return {"reasoning_effort": "low", "include_reasoning": False}
     if "qwen3" in m:
         return {"reasoning_effort": "none"}
+    if "gemma-4" in m or "gemma4" in m:
+        # Gemma 4 reasoning models otherwise spend most of the token budget on
+        # reasoning_content, leaving content empty or truncated. Local gateways
+        # accept reasoning_effort="none" to disable it (already an allowlisted
+        # parameter; the HTTP-400 retry drops it if an endpoint disagrees).
+        return {"reasoning_effort": "none"}
     if "deepseek-r1" in m:
         return {"reasoning_format": "hidden"}
     return {}
 
 
 def _headers(key: str) -> dict:
-    return {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    """Build request headers. An empty key means an unauthenticated local server.
+
+    Local inference endpoints (LM Studio, Ollama, vLLM) typically ignore or
+    reject an Authorization header, so it is omitted entirely when no key is
+    configured. Remote providers always supply a real key (see
+    `Settings.llm_enabled`), so they still receive the Bearer header.
+    """
+    headers: dict[str, str] = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    return headers
 
 
 def _count(c: Completion) -> None:
@@ -221,9 +405,10 @@ def stream(
     result: Completion | None = None,
 ) -> Iterator[str]:
     """
-    Yield text deltas from ONE streamed request. Never raises: errors, 429s and the
+    Yield text deltas from a streamed request. Never raises: errors, 429s and the
     deadline end the stream early and are recorded in `result` (pass one in to read
-    usage/errors afterwards). No retries, no sleeping.
+    usage/errors afterwards). No sleeping; at most one compatibility retry when the
+    endpoint explicitly rejects a submitted request parameter with HTTP 400.
     """
     out = result if result is not None else Completion("")
     provider = fast_provider()
@@ -248,17 +433,28 @@ def stream(
     parts: list[str] = []
     usage: dict = {}
     out.sent = True
+    compat_retried = False
+    attempts = 0
     try:
         with _semaphore:
-            for attempt in range(2):
+            while attempts < 2:
                 req_timeout = httpx.Timeout(max(0.5, deadline - time.monotonic()), connect=min(2.0, timeout))
+                with _stats_lock:
+                    STATS["http_requests"] += 1
                 with client().stream("POST", url, headers=_headers(key), json=payload, timeout=req_timeout) as resp:
-                    if resp.status_code == 400 and attempt == 0 and any(k in payload for k in ("reasoning_effort", "include_reasoning", "reasoning_format")):
-                        # model rejected the reasoning knobs: resend once without them (no tokens were spent)
+                    if resp.status_code == 400:
                         resp.read()
-                        for k in ("reasoning_effort", "include_reasoning", "reasoning_format"):
-                            payload.pop(k, None)
-                        continue
+                        body = resp.text[:300]
+                        rejected = _rejected_parameter(body)
+                        if rejected and not compat_retried and _drop_rejected_parameter(payload, rejected):
+                            # ONE compatibility retry per request: drop only a parameter
+                            # that is actually present, then resend once. A 400 spends no
+                            # tokens; an unchanged payload is never resent.
+                            compat_retried = True
+                            continue
+                        out.error = f"HTTP 400: {body}"
+                        break
+                    attempts += 1
                     if resp.status_code != 200:
                         resp.read()
                         out.error = f"HTTP {resp.status_code}: {resp.text[:160]}"
@@ -306,6 +502,8 @@ def complete(system: str, user: str, *, max_tokens: int, temperature: float = 0.
     """One streamed call collected into a `Completion` (partial text is kept on timeout)."""
     result = Completion("")
     messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+    with _stats_lock:
+        STATS["logical_calls"] += 1
     for delta in stream(messages, max_tokens=max_tokens, temperature=temperature, timeout=timeout, result=result):
         if on_text:
             on_text(delta)
@@ -316,8 +514,28 @@ def complete(system: str, user: str, *, max_tokens: int, temperature: float = 0.
 # JSON calls for user-triggered features (refine, study)
 # ---------------------------------------------------------------------------
 def chat_json_diagnostics() -> dict[str, Any]:
-    """Return diagnostics for the current thread's most recent chat_json call."""
+    """Return diagnostics for the CURRENT thread's most recent chat_json call."""
     return dict(getattr(_CHAT_JSON_STATE, "diagnostics", {}) or {})
+
+
+def _reset_call_diagnostics() -> None:
+    """Clear per-call state so a previous (or another thread's) call cannot leak."""
+    _CHAT_JSON_STATE.status = None
+    _CHAT_JSON_STATE.retry_after = None
+    _CHAT_JSON_STATE.diagnostics = {}
+
+
+def _record_response_status(status: int | None, retry_after: float | None) -> None:
+    """Record the response status on the calling thread, never on a global."""
+    _CHAT_JSON_STATE.status = status
+    _CHAT_JSON_STATE.retry_after = retry_after
+
+
+def _redact(text: Any) -> str | None:
+    """Strip URL userinfo (credentials) from text stored in diagnostics."""
+    if text is None:
+        return None
+    return re.sub(r"://[^/\s:@]+:[^/\s@]+@", "://***:***@", str(text))[:1200]
 
 
 def _record_chat_json_diagnostics(
@@ -327,9 +545,9 @@ def _record_chat_json_diagnostics(
 ) -> None:
     _CHAT_JSON_STATE.diagnostics = {
         "provider": provider,
-        "status": LAST_STATUS,
-        "retry_after": LAST_RETRY_AFTER,
-        "error": str(error)[:1200] if error else None,
+        "status": getattr(_CHAT_JSON_STATE, "status", None),
+        "retry_after": getattr(_CHAT_JSON_STATE, "retry_after", None),
+        "error": _redact(error),
         "error_kind": error_kind,
     }
 
@@ -339,6 +557,9 @@ def chat_json(system: str, user: str, max_tokens: int = 1800, temperature: float
     global LAST_STATUS, LAST_RETRY_AFTER
     LAST_STATUS = None
     LAST_RETRY_AFTER = None
+    _reset_call_diagnostics()
+    with _stats_lock:
+        STATS["logical_calls"] += 1
     _record_chat_json_diagnostics("none")
 
     messages = [
@@ -354,7 +575,11 @@ def chat_json(system: str, user: str, max_tokens: int = 1800, temperature: float
             # Reasoning models sometimes answer in <reasoning> only, or emit truncated JSON.
             # Retry once without json_mode and with a larger budget before giving up.
             last_error: Exception | None = None
-            for json_mode, budget in ((True, max_tokens), (False, min(max_tokens * 2, 3000))):
+            attempts_modes = ((True, max_tokens), (False, min(max_tokens * 2, 3000)))
+            if not json_mode_supported(llm_chat_url(), settings.llm_model):
+                # This exact endpoint/model pair already proved it unsupported.
+                attempts_modes = ((False, min(max_tokens * 2, 3000)),)
+            for json_mode, budget in attempts_modes:
                 try:
                     text = _openai_compatible(
                         llm_chat_url(), settings.llm_api_key, settings.llm_model, messages,
@@ -382,7 +607,7 @@ def chat_json(system: str, user: str, max_tokens: int = 1800, temperature: float
                 try:
                     parsed = extract_json(_openai_compatible(
                         GROQ_URL, settings.groq_api_key, model, messages, max_tokens,
-                        temperature, json_mode=True,
+                        temperature, json_mode=json_mode_supported(GROQ_URL, model),
                     ))
                     _record_chat_json_diagnostics(attempted_provider)
                     return parsed
@@ -397,6 +622,8 @@ def chat_json(system: str, user: str, max_tokens: int = 1800, temperature: float
         if settings.hf_token:
             attempted_provider = f"huggingface:{settings.hf_model}"
             try:
+                # The HF router never receives response_format, so it has no
+                # JSON-mode capability verdict to consult or record.
                 parsed = extract_json(_openai_compatible(
                     HF_URL, settings.hf_token, settings.hf_model, messages,
                     max_tokens, temperature, json_mode=False,
@@ -458,35 +685,44 @@ def _openai_compatible(
         payload["response_format"] = {"type": "json_object"}
 
     started = time.monotonic()
-    for attempt in range(attempts):
+    attempt = 0
+    compat_retried = False
+    while attempt < attempts:
         global LAST_STATUS, LAST_RETRY_AFTER
+        with _stats_lock:
+            STATS["http_requests"] += 1
         resp = client().post(url, headers=_headers(key), json=payload, timeout=60)
         LAST_STATUS = resp.status_code
         LAST_RETRY_AFTER = None if resp.status_code != 429 else _retry_after(resp)
+        _record_response_status(resp.status_code, LAST_RETRY_AFTER)
         if resp.status_code == 200:
             data = resp.json()
             usage = data.get("usage") or {}
             _count(Completion("", model, int(usage.get("prompt_tokens") or 0), int(usage.get("completion_tokens") or 0), (time.monotonic() - started) * 1000))
             return data["choices"][0]["message"]["content"]
         body = resp.text[:300]
-        if resp.status_code == 429 or resp.status_code >= 500:
+        if resp.status_code == 400:
+            rejected = _rejected_parameter(body)
+            if _confirmed_json_mode_rejection(body, payload):
+                mark_json_mode_unsupported(url, model)
+            if rejected and not compat_retried and _drop_rejected_parameter(payload, rejected):
+                # ONE compatibility retry per request: drop only a parameter that is
+                # actually present. No tokens were spent, so the caller's attempt
+                # budget for 429/5xx stays intact. An unchanged payload is never resent.
+                compat_retried = True
+                continue
+            raise LLMError(f"HTTP {resp.status_code}: {body}")
+        if resp.status_code == 429 or 500 <= resp.status_code < 600:
             wait = _retry_after(resp) or 1.0
             if wait > max_wait or attempt == attempts - 1:  # user is waiting: fail fast
                 raise LLMError(f"HTTP {resp.status_code} (rate limited/unavailable): {body}")
             time.sleep(wait)
+            attempt += 1
             continue
-        if resp.status_code == 400 and attempt == 0:
-            low = body.lower()
-            if json_mode and "json" in low:
-                # Some models reject json mode or produce "json_validate_failed" -> retry without it.
-                payload.pop("response_format", None)
-                continue
-            if "reasoning" in low:
-                for k in ("reasoning_effort", "include_reasoning", "reasoning_format"):
-                    payload.pop(k, None)
-                continue
+        # 401/403/404 and every other non-retryable status: never resend a
+        # permanent authentication or client error.
         raise LLMError(f"HTTP {resp.status_code}: {body}")
-    raise LLMError("exhausted retries")
+    raise LLMError(f"HTTP {resp.status_code}: {body}")
 
 
 def _cool_down(resp: httpx.Response) -> None:

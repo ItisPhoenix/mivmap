@@ -27,28 +27,33 @@
         </div>
       </div>
 
-      <nav class="toolbar" aria-label="Mindmap tools">
+      <nav class="toolbar" aria-label="Viewer actions">
         <div class="search">
-          <input id="search" type="search" placeholder="Search concepts here" aria-label="Search nodes" />
+          <input id="search" type="search" placeholder="Search concepts" aria-label="Search nodes" />
           <div id="search-results" class="dropdown search-results" hidden></div>
         </div>
-        <button id="btn-content-map" class="btn" aria-pressed="true" aria-controls="content-map" title="Numbered outline of the whole video">Content map</button>
-        <div id="layer-seg" class="seg" role="radiogroup" aria-label="What the map shows"></div>
-        <button id="btn-study" class="btn" title="Flashcards & quizzes">🎓 Study</button>
-        <button id="btn-voice" class="btn icon-only" title="Voice commands">🎙</button>
-        <button id="btn-share" class="btn" title="Real-time collaboration">👥 Share</button>
+        <button id="btn-content-map" class="btn toolbar-quiet" aria-pressed="true" aria-controls="content-map" title="Show or hide the outline">Outline</button>
+        <button id="btn-focus-mode" class="btn toolbar-quiet" aria-pressed="false" title="Focus one section / show full map">Focus section</button>
+        <button id="btn-inspector" class="btn toolbar-quiet icon-only" aria-pressed="false" aria-controls="inspector" aria-label="Show concept inspector" title="Show concept inspector" hidden>◎</button>
+        <button id="btn-study" class="btn btn-accent" title="Flashcards & quizzes">🎓 Study</button>
         <div class="menu">
-          <button id="btn-export" class="btn" aria-haspopup="true">⤓ Export</button>
-          <div id="export-menu" class="dropdown" hidden></div>
-        </div>
-        <div class="menu">
-          <button id="btn-more" class="btn icon-only" aria-haspopup="true" title="More">☰</button>
-          <div id="more-menu" class="dropdown dropdown-right" hidden></div>
+          <button id="btn-more" class="btn icon-only" aria-haspopup="true" aria-label="More actions" title="More">⋯</button>
+          <div id="more-menu" class="dropdown dropdown-right" hidden>
+            <div id="more-pinned" class="more-pinned">
+              <button id="btn-share" class="btn btn-small" title="Real-time collaboration">👥 Share</button>
+              <button id="btn-export" class="btn btn-small" aria-haspopup="true">⤓ Export</button>
+              <div id="export-menu" class="dropdown more-submenu" hidden></div>
+              <button id="btn-voice" class="btn btn-small" title="Voice commands">🎙 Voice</button>
+              <div id="layer-seg" class="seg" role="radiogroup" aria-label="What the map shows"></div>
+            </div>
+            <div id="more-dynamic"></div>
+          </div>
         </div>
       </nav>
     </header>
 
     <main id="stage" class="stage">
+      <div id="drawer-backdrop" class="drawer-backdrop" hidden aria-hidden="true"></div>
       <div id="canvas" tabindex="-1"></div>
 
       <aside id="content-map" class="content-map" aria-label="Content map"></aside>
@@ -56,16 +61,25 @@
       <div id="right-rail" class="right-rail">
         <aside id="inspector" class="panel" hidden aria-label="Node inspector"></aside>
         <section id="assistant" class="assistant-dock" hidden aria-label="Ask about this node"></section>
+        <div id="inspector-empty" class="inspector-empty">
+          <div class="inspector-empty-mark">◎</div>
+          <h2>Nothing selected</h2>
+          <p>Pick a concept on the map to see its explanation, evidence and notes.</p>
+        </div>
       </div>
       <div id="polish-pill" class="polish-pill" hidden role="status">Polishing labels…</div>
 
       <div id="hud" class="hud"></div>
       <div id="presence-bar" class="presence-bar"></div>
 
-      <div class="zoom-controls" role="group" aria-label="Zoom">
+      <div id="focus-label" class="focus-label" hidden aria-live="polite"></div>
+      <div class="zoom-controls" role="group" aria-label="Map navigation">
+        <button id="section-prev" class="btn icon-only" title="Previous section ([)" hidden>◀</button>
+        <button id="section-next" class="btn icon-only" title="Next section (])" hidden>▶</button>
         <button id="zoom-in" class="btn icon-only" title="Zoom in (+)">＋</button>
         <button id="zoom-out" class="btn icon-only" title="Zoom out (−)">－</button>
-        <button id="zoom-fit" class="btn icon-only" title="Fit (f)">⤢</button>
+        <button id="zoom-focus" class="btn icon-only" title="Focus selected node">◎</button>
+        <button id="zoom-fit" class="btn icon-only" title="Fit to screen (f)">⤢</button>
       </div>
 
       <div id="voice-indicator" class="voice-indicator" hidden></div>

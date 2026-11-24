@@ -271,9 +271,11 @@
     button.type = 'button';
     button.title = 'Generate an interactive mindmap (Alt+M)';
     button.innerHTML = `
-      <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-        <circle cx="12" cy="12" r="3.2"/><path d="M9.3 10.2 5 6.5M14.7 10.2 19 6.5M9.3 13.8 5 17.5M14.7 13.8 19 17.5"/>
-        <circle cx="4" cy="5.5" r="1.6"/><circle cx="20" cy="5.5" r="1.6"/><circle cx="4" cy="18.5" r="1.6"/><circle cx="20" cy="18.5" r="1.6"/></g></svg>
+      <svg class="tm-mark" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M12 34V15l12 14 12-14v19" fill="none" stroke="currentColor" stroke-width="4.4"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="24" cy="28.5" r="2.4" fill="#f5a623"/>
+      </svg>
       <span>Mindmap</span>`;
     button.addEventListener('click', generate);
     if (anchor) {

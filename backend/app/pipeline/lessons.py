@@ -119,6 +119,58 @@ def validate_deep_teaching(lesson: dict[str, Any], topic: str,
     return (not errors), errors
 
 
+def stamp_lesson(lesson: dict[str, Any], topic: str,
+                 evidence: list[dict] | None = None,
+                 teaching_language: str = "en",
+                 expansion: str = "") -> dict[str, Any]:
+    """Stamp deterministic source attribution onto a validated lesson.
+
+    Shared by fresh generation and cache recovery so a recovered lesson carries
+    exactly the same provenance, accuracy corrections and grounding metadata as
+    a newly generated one.
+    """
+    from .terminology import apply_accuracy_corrections
+
+    out = apply_accuracy_corrections(dict(lesson), topic)
+    ev = out.get("evidence")
+    if not isinstance(ev, dict) or not (ev.get("timestamps") or ev.get("starts")):
+        stamps = sorted({round(float(e.get("start") or 0), 2)
+                         for e in (evidence or []) if e.get("start") is not None})
+        out["evidence"] = {"timestamps": stamps, "quotes": []}
+    external = ["accuracy_notes"] if out.get("accuracy_notes") else []
+    out["provenance"] = {
+        "source": "video+ai+external" if external else "video+ai",
+        "video_supported": ["explain", "lesson_evidence"],
+        "ai_explanation": ["intuition", "why_it_matters", "steps", "worked_example",
+                           "diagram", "misconception", "exercise", "knowledge_check"],
+        "external_supplement": external,
+        "example_source": "ai-generated",
+    }
+    if expansion:
+        out["acronym_expansion"] = expansion
+    out["teaching_language"] = teaching_language
+    return out
+
+
+KNOWLEDGE_CHECK_ERRORS = frozenset({
+    "knowledge check missing",
+    "knowledge check too short",
+    "knowledge check explanation missing",
+    "knowledge check answer not supported by the lesson",
+})
+
+
+def knowledge_check_only(errors: list[str] | tuple[str, ...]) -> bool:
+    """True when every validation error concerns only the knowledge_check field.
+
+    This is the precondition for a bounded, targeted repair of that one field:
+    an otherwise fully validated lesson must not be discarded over a single
+    retrieval-phrasing mistake, but a lesson with any other defect is still
+    rejected in full.
+    """
+    return bool(errors) and all(str(e) in KNOWLEDGE_CHECK_ERRORS for e in errors)
+
+
 def validate_lesson(lesson: dict[str, Any], evidence_text: str, topic: str,
                     evidence: list[dict] | None = None,
                     teaching_language: str | None = None) -> tuple[bool, list[str]]:

@@ -52,6 +52,7 @@ export class MindMapRenderer extends EventTarget {
     this.flashIds = new Set();
     this.view = { x: 0, y: 0, k: 1 };
     this.positions = new Map();
+    this.focusId = null; // section-focused view draws only one branch
     this.prevVisible = new Set();
     this.textCache = new Map();
     this.measureCtx = document.createElement('canvas').getContext('2d');
@@ -189,6 +190,24 @@ export class MindMapRenderer extends EventTarget {
     this.#animateTo({ x: width / 2 - (b.x + b.w / 2) * k, y: height / 2 - (b.y + b.h / 2) * k, k }, animate);
   }
 
+  /** Draw one section and its descendants at a readable zoom (no map data is changed). */
+  setFocus(id, { animate = true } = {}) {
+    const node = id && this.model.get(id);
+    this.focusId = node?.type === 'section' && !node.recall ? node.id : null;
+    this.svgEl?.classList.toggle('focus-mode', !!this.focusId);
+    this.render();
+    if (this.focusId) this.fit(animate);
+    return this.focusId;
+  }
+
+  clearFocus({ animate = true } = {}) {
+    if (!this.focusId) return;
+    this.focusId = null;
+    this.svgEl?.classList.remove('focus-mode');
+    this.render();
+    this.fit(animate);
+  }
+
   zoomBy(factor, cx, cy) {
     const rect = this.container.getBoundingClientRect();
     const px = cx ?? rect.width / 2;
@@ -201,8 +220,16 @@ export class MindMapRenderer extends EventTarget {
   }
 
   visibleChildren(node) {
+    const visible = (n) => (n.children || []).filter((c) => (c.layer ?? 0) <= this.options.maxLayer);
+    if (this.focusId) {
+      // Root shows only the focused section; its descendants ignore fold state
+      // so a readable lesson view needs no writes to the map.
+      return node === this.model.root
+        ? (node.children || []).filter((c) => c.id === this.focusId)
+        : visible(node);
+    }
     if (node.collapsed) return [];
-    return (node.children || []).filter((c) => (c.layer ?? 0) <= this.options.maxLayer);
+    return visible(node);
   }
 
   // ---------------------------------------------------------------------------
@@ -220,7 +247,9 @@ export class MindMapRenderer extends EventTarget {
     const visit = (node, depth, ctx) => {
       info.set(node.id, { depth, ...ctx });
       this.visibleChildren(node).forEach((child, i) => {
-        const childCtx = depth === 0 ? { index: i, color: child.color ?? i } : ctx;
+        const childCtx = depth === 0
+          ? { index: i, color: child.color ?? i, inFocus: child.id === this.focusId }
+          : ctx;
         visit(child, depth + 1, childCtx);
       });
     };
@@ -348,10 +377,23 @@ export class MindMapRenderer extends EventTarget {
     return result;
   }
 
-  /** Text shown for a node: sections carry their number ("2. Superposition"). */
+  /**
+   * Text shown for a node. Explanations and definitions live in the inspector;
+   * the canvas keeps short labels so the hierarchy stays readable. The full
+   * label is still exposed as an SVG <title> on the node and is never changed
+   * in the underlying map data.
+   */
   displayText(node) {
+    const full = node.text || ' ';
     const n = this.sectionNumber(node);
-    return n ? `${n}. ${node.text || ''}` : node.text || ' ';
+    if (n) return `${n}. ${full}`;
+    if (this.options.compactLabels === false) return full;
+    if (node.type === 'concept') {
+      const term = String(full).split(':')[0].trim();
+      return term.length >= 3 && term.length <= 64 ? term : full;
+    }
+    if (node.type === 'detail' && String(full).length > 90) return `${String(full).slice(0, 88).trimEnd()}…`;
+    return full;
   }
 
   /** Hidden children a collapsed node would show (verbatim transcript quotes never count). */
@@ -369,7 +411,7 @@ export class MindMapRenderer extends EventTarget {
     const text = this.#wrap(raw, font, size, maxW, { accent: !!style.accent, maxLines: MAX_LINES[node.type] || 4, lineFactor: LINE_HEIGHT[node.type] || 1.3 });
 
     let summary = null; // only the topic carries its one-line summary on the map
-    if (node.summary && node.type === 'root') {
+    if (node.summary && node.type === 'root' && !this.focusId) {
       const sSize = Math.max(14, size * 0.42);
       summary = { ...this.#wrap(node.summary, `400 ${sSize}px ${theme.fonts.body}`, sSize, Math.max(maxW, 280), { maxLines: 2 }), size: sSize };
     }
@@ -404,10 +446,12 @@ export class MindMapRenderer extends EventTarget {
     const { w, h, style } = m;
     const rng = seededRandom(node.id);
     const classes = ['node', `type-${node.type}`];
+    if (ctx?.inFocus) classes.push('in-focus');
     if (node.recall) classes.push('recall');
     if (!this.prevVisible.has(node.id) && this.prevVisible.size) classes.push('enter');
     if (this.flashIds.has(node.id)) classes.push('relabel');
     const g = svg('g', { class: classes.join(' '), 'data-node-id': node.id, transform: `translate(${(pos.x - w / 2).toFixed(1)},${(pos.y - h / 2).toFixed(1)})` });
+    if (String(node.text || '') !== this.displayText(node)) g.append(svg('title', {}, String(node.text || '')));
 
     // interaction affordances (not content): dashed selection ring + invisible hit area
     g.append(svg('path', { class: 'sel-ring', 'data-ui': '1', d: S.rect(-12, -9, w + 24, h + 18, rng, { r: 14, passes: 1 }), fill: 'none' }));
@@ -489,11 +533,27 @@ export class MindMapRenderer extends EventTarget {
       const radial = this.options.layout === 'radial';
       const tx = radial ? w / 2 : pos.side < 0 ? -12 : w + 12;
       const ty = radial ? h + 16 : h / 2 + 6;
-      const glyph = lazy ? '+' : node.collapsed ? `+${hidden}` : '−';
+      // A chevron with an accessible name replaces the low-value "+1" count.
+      const glyph = lazy ? '+' : node.collapsed ? '▸' : '▾';
+      const label = lazy
+        ? `Show more from ${String(node.text || '')}`
+        : node.collapsed
+          ? `Expand ${String(node.text || '')}: ${hidden} hidden ${hidden === 1 ? 'detail' : 'details'}`
+          : `Collapse ${String(node.text || '')}`;
       g.append(svg('text', {
         class: 'toggle',
         'data-action': lazy ? 'more' : 'toggle',
         'data-ui': '1',
+        role: 'button',
+        tabindex: '0',
+        'aria-label': label,
+        'aria-expanded': lazy ? 'false' : String(!node.collapsed),
+        onkeydown: (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          e.stopPropagation();
+          this.#handleClick(e.currentTarget, e);
+        },
         x: tx,
         y: ty,
         'text-anchor': radial ? 'middle' : pos.side < 0 ? 'end' : 'start',
@@ -501,7 +561,7 @@ export class MindMapRenderer extends EventTarget {
         'font-weight': 700,
         'font-family': theme.fonts.body,
         fill: theme.accent,
-      }, [glyph, svg('title', {}, lazy ? 'Show more from the video here' : node.collapsed ? 'Expand' : 'Collapse')]));
+      }, [glyph, svg('title', {}, label)]));
     }
     return g;
   }
@@ -797,6 +857,15 @@ export class MindMapRenderer extends EventTarget {
     el.addEventListener('dblclick', (e) => {
       const g = e.target.closest?.('[data-node-id]');
       if (g && !e.target.closest('[data-action]')) this.startEdit(g.dataset.nodeId);
+    });
+
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const action = e.target.closest?.('[data-action]');
+      if (!action) return;
+      e.preventDefault();
+      e.stopPropagation();
+      this.#handleClick(action, e);
     });
 
     el.addEventListener(

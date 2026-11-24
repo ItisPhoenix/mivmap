@@ -9,9 +9,11 @@ backend `os.getenv("LLM_API_KEY")` works; modules read it through `settings`.
 from __future__ import annotations
 
 import importlib.util
+import ipaddress
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
@@ -25,6 +27,37 @@ load_dotenv(BACKEND_DIR / ".env")
 
 def _env(name: str, default: str = "") -> str:
     return (os.getenv(name) or default).strip()
+
+
+_LOOPBACK_HOSTS = frozenset({
+    "localhost", "localhost.localdomain", "ip6-localhost", "ip6-loopback",
+})
+
+
+def is_loopback_url(url: str) -> bool:
+    """True when a URL points at a loopback (local) host.
+
+    Local inference servers (LM Studio, Ollama, vLLM, llama.cpp) normally listen
+    on loopback and do not implement authentication. Only these endpoints may be
+    used without an API key; every remote endpoint still requires one.
+    """
+    raw = (url or "").strip()
+    if not raw:
+        return False
+    try:
+        parsed = urlparse(raw if "://" in raw else "http://" + raw)
+        host = (parsed.hostname or "").lower().rstrip(".")
+    except ValueError:
+        return False
+    if not host:
+        return False
+    if host in _LOOPBACK_HOSTS:
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        # A DNS name other than localhost is never treated as loopback.
+        return False
 
 
 @dataclass(frozen=True)
@@ -95,8 +128,18 @@ class Settings:
         return bool(self.groq_api_key) and self.groq_api_key != "your_api_key_here"
 
     @property
+    def llm_is_local(self) -> bool:
+        """True when the configured OpenAI-compatible endpoint is on loopback."""
+        return is_loopback_url(self.llm_base_url)
+
+    @property
     def llm_enabled(self) -> bool:
-        return bool(self.llm_api_key) and self.llm_api_key not in ("", "your_api_key_here")
+        # A real (non-placeholder) key enables any endpoint, remote or local.
+        if self.llm_api_key and self.llm_api_key not in ("", "your_api_key_here"):
+            return True
+        # An explicitly configured loopback server may omit the key: local
+        # inference servers rarely implement auth. Remote endpoints never may.
+        return bool(self.llm_base_url) and self.llm_is_local
 
     @property
     def nvidia_enabled(self) -> bool:

@@ -35,13 +35,14 @@ from ..collab.ops import apply_op
 from ..config import settings
 from . import llm
 from .builder import TAGS, make_node, new_id, score_faithfulness
-from .lessons import LESSON_FIELDS, overlap, validate_deep_teaching, validate_lesson
-from .terminology import (acronym_expansion, apply_accuracy_corrections, canonical_topic,
+from .lessons import (LESSON_FIELDS, _norm, _topic_terms, knowledge_check_only,
+                      overlap, stamp_lesson, validate_deep_teaching, validate_lesson)
+from .terminology import (acronym_expansion, canonical_topic,
                           norm as term_norm,
                          TECHNICAL_CORRECTIONS)
 from .topics import ESSENTIAL_LABELS, HTTP_TOPICS
 from .embeddings import Embedder
-from .text_utils import fmt_time, truncate, unicode_norm
+from .text_utils import fmt_time, truncate, unicode_norm, unicode_tokens
 from .translate import needs_translation
 
 log = logging.getLogger("mivmap.labels")
@@ -648,6 +649,240 @@ def parse_lesson_entries(data: Any, cid: str) -> dict[str, dict]:
     return {key: value for key, value in entries.items() if _is_lesson_object(value)}
 
 
+FILLER_MARKERS = re.compile(
+    r"\b(welcome|hello everyone|hello everybody|thank you|thanks for watching|"
+    r"instructor|congratulations|interesting scenario|upon the completion|"
+    r"preparing for their|i hope you|subscribe|let'?s get started|this course|"
+    r"in this video|today we will|we will discuss|we'll discuss|"
+    r"move on to the next|next topic|quick recap|as we saw earlier|"
+    r"in the previous (video|lecture)|that'?s all for)\b", re.I)
+_GENERIC_TOPIC_WORDS = frozenset({
+    "and", "the", "for", "with", "from", "that", "this", "into", "are",
+    "was", "were", "not", "you", "your", "how", "why", "what", "when",
+    "where", "which", "their", "there", "these", "those", "then", "than",
+    "in", "of", "to", "it", "as", "at", "by", "on", "or", "an", "a", "is", "its",
+})
+
+
+def _is_user_authored(node: dict) -> bool:
+    """True for nodes the learner created; never drop or overwrite these."""
+    return bool(node.get("userAuthored")) or str(node.get("origin") or "").lower() == "user"
+
+
+def _evidence_quality(terms: set[str], evidence: list[dict]) -> float:
+    """Substantive, topic-bearing transcript characters; 0 means not teachable.
+
+    Deliberately script- and language-agnostic. A passage qualifies when it is
+    about the concept (topic-term overlap) and says something beyond repeating
+    the concept label. There is no English verb list and no character floor, so
+    concise definitions in English, Hindi, Hinglish or any other supported
+    language qualify on the same terms as long ones.
+    """
+    texts = [str(e.get("text") or "").strip() for e in evidence]
+    texts = [t for t in texts if t]
+    if not texts or not terms:
+        return 0.0
+    expanded = {unicode_norm(t).casefold() for t in terms if str(t).strip()}
+    expanded = {t for t in expanded if t}
+    substantive: list[str] = []
+    for text in texts:
+        norm = unicode_norm(text).casefold()
+        if not norm or FILLER_MARKERS.search(text):
+            continue
+        if not any(term in norm for term in expanded):
+            continue
+        residue = norm
+        for term in sorted(expanded, key=len, reverse=True):
+            residue = residue.replace(term, " ")
+        if not unicode_tokens(residue):
+            # The passage only repeats the label; it teaches nothing new.
+            continue
+        substantive.append(text)
+    if not substantive:
+        return 0.0
+    filler = sum(1 for t in texts if FILLER_MARKERS.search(t))
+    if filler / len(texts) > 0.5:
+        return 0.0
+    return sum(len(t) for t in substantive) * (1 - filler / len(texts))
+
+
+def _merge_evidence(candidates: list[tuple[float, ConceptCand]]) -> list[dict]:
+    """Union evidence from equivalent candidates, deterministically ordered."""
+    merged: list[dict] = []
+    seen: set[str] = set()
+    for _score, cand in candidates:
+        entries = cand.node.get("evidence")
+        if not entries:
+            entries = [{"start": cand.node.get("start"), "end": cand.node.get("end"),
+                        "text": cand.node.get("source", "")}]
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            text = str(entry.get("text") or "").strip()
+            if not text:
+                continue
+            identity = unicode_norm(text).casefold()
+            if identity in seen:
+                continue
+            seen.add(identity)
+            merged.append(dict(entry))  # preserves original text and timestamps
+    return merged
+
+
+def _select_deep_concepts_with_stats(concepts: dict[str, Any]) -> tuple[dict[str, Any], dict[str, int]]:
+    """Reject filler and merge duplicate evidence BEFORE any Deep Mode LLM call.
+
+    Returns (selected, counts). User-authored nodes are never grouped with other
+    concepts and never dropped by the filler heuristic.
+    """
+    groups: dict[str, dict[str, Any]] = {}
+    stats = {"extracted": len(concepts), "filler_excluded": 0, "duplicates_merged": 0, "eligible": 0}
+    for cid, cand in concepts.items():
+        node = cand.node
+        if node.get("recall") or node.get("qa") or node.get("oneline"):
+            stats["filler_excluded"] += 1
+            continue
+        user_authored = _is_user_authored(node)
+        topic = canonical_topic(str(node.get("topic") or node.get("text") or ""))
+        terms = {w for w in _topic_terms(topic)
+                 if len(w) >= 2 and w not in _GENERIC_TOPIC_WORDS}
+        if not terms:
+            stats["filler_excluded"] += 1
+            continue
+        evidence = node.get("evidence") or [{"text": node.get("source", "")}]
+        score = _evidence_quality(terms, evidence)
+        if score <= 0 and not user_authored:
+            stats["filler_excluded"] += 1
+            continue
+        # User-authored concepts keep their own slot: no silent merging.
+        key = f"user:{cid}" if user_authored else unicode_norm(topic).casefold()
+        group = groups.setdefault(key, {"members": [], "winner": None, "rank": None})
+        group["members"].append((score, cand))
+        rank = (1 if user_authored else 0, score)
+        if group["rank"] is None or rank > group["rank"]:
+            group["rank"] = rank
+            group["winner"] = (cid, cand)
+
+    selected: dict[str, Any] = {}
+    for key, group in groups.items():
+        cid, cand = group["winner"]
+        if len(group["members"]) > 1:
+            stats["duplicates_merged"] += len(group["members"]) - 1
+            node = dict(cand.node)
+            node["evidence"] = _merge_evidence(group["members"])
+            cand = ConceptCand(cid=cand.cid, sid=cand.sid, node=node)
+        selected[cid] = cand
+    stats["eligible"] = len(selected)
+    return selected, stats
+
+
+def _select_deep_concepts(concepts: dict[str, Any]) -> dict[str, Any]:
+    """Backwards-compatible selector used by focused tests and callers."""
+    return _select_deep_concepts_with_stats(concepts)[0]
+
+
+KC_REPAIR_SYSTEM = (
+    "You repair ONLY the knowledge_check field of an existing lesson. "
+    "Return JSON with one key, knowledge_check, holding question, answer and explanation strings. "
+    "The answer must be answerable from the supplied lesson text alone and must reuse the exact wording "
+    "and key phrases from explain, steps and worked_example. Do not introduce new terms, synonyms or facts "
+    "that are absent from the lesson text and evidence. The question must ask exactly what the answer "
+    "answers. The explanation must quote or point to the exact lesson sentence supporting the answer. "
+    "If the lesson text cannot support an answer, return an empty object."
+)
+
+
+def _repair_knowledge_check(lesson: dict, item: dict, errors: list[str]) -> dict | None:
+    """One bounded model call that replaces only knowledge_check.
+
+    Returns a copy of the lesson with the repaired field, or None. The caller
+    MUST re-run every validator on the result; nothing is accepted here.
+    """
+    payload = {
+        "topic": item["topic"],
+        "explain": lesson.get("explain", ""),
+        "intuition": lesson.get("intuition", ""),
+        "why_it_matters": lesson.get("why_it_matters", ""),
+        "steps": lesson.get("steps", []),
+        "worked_example": lesson.get("worked_example", ""),
+        "evidence": item["evidence"],
+        "currentKnowledgeCheck": lesson.get("knowledge_check", {}),
+        "validationErrors": [str(e) for e in errors[:8]],
+    }
+    try:
+        data = llm.chat_json(KC_REPAIR_SYSTEM, json.dumps(payload, ensure_ascii=False),
+                             max_tokens=600, temperature=0.0)
+    except Exception as exc:  # noqa: BLE001 - a failed repair keeps the original rejection
+        log.warning("knowledge_check repair call failed: %s", exc)
+        return None
+    if not isinstance(data, dict):
+        return None
+    check = data.get("knowledge_check")
+    if not isinstance(check, dict):
+        check = data if any(k in data for k in ("question", "answer", "explanation")) else None
+    if not isinstance(check, dict):
+        return None
+    keys = ("question", "answer", "explanation")
+    if not all(isinstance(check.get(k), str) and check.get(k, "").strip() for k in keys):
+        return None
+    repaired = dict(lesson)
+    repaired["knowledge_check"] = {k: check[k].strip() for k in keys}
+    return repaired
+
+
+def _reinforce_evidence(mindmap: dict, item: dict, window: float = 25.0,
+                        max_extra: int = 2) -> list[dict]:
+    """Add nearby transcript lines that genuinely mention the topic.
+
+    Only spans already present in the map's own transcript are considered. No
+    timestamp is invented and no unrelated line is attached; a concept with no
+    relevant nearby passage keeps its original evidence and may still be refused.
+    """
+    evidence = item["evidence"]
+    # Connector words from a topic ("and", "the", ...) are not evidence signals.
+    generic = frozenset({
+        "and", "the", "for", "with", "from", "that", "this", "into", "are",
+        "was", "were", "not", "you", "your", "how", "why", "what", "when",
+        "where", "which", "their", "there", "these", "those", "then", "than",
+    })
+    terms = {w for w in _topic_terms(item["topic"]) if w not in generic}
+    if not terms:
+        return evidence
+    spans = []
+    for e in evidence:
+        try:
+            spans.append((float(e.get("start") or 0), float(e.get("end") or 0)))
+        except (TypeError, ValueError):
+            continue
+    if not spans:
+        return evidence
+    lo = min(s for s, _ in spans) - window
+    hi = max(e for _, e in spans) + window
+    seen = {str(e.get("text") or "").strip() for e in evidence}
+    extra: list[dict] = []
+    for line in mindmap.get("transcript") or []:
+        if not isinstance(line, dict):
+            continue
+        try:
+            start = float(line.get("start") or 0)
+            end = float(line.get("end") or 0)
+        except (TypeError, ValueError):
+            continue
+        if not (lo <= start <= hi):
+            continue
+        text = str(line.get("text") or "").strip()
+        if not text or text in seen:
+            continue
+        norm = unicode_norm(text).lower()
+        if not any(w in norm for w in terms):
+            continue
+        seen.add(text)
+        extra.append({"start": start, "end": end, "text": text[:320]})
+        if len(extra) >= max_extra:
+            break
+    return (evidence + extra)[:4]
+
+
 def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], list[dict]]:
     """Generate, validate and checkpoint one study-ready lesson per concept.
 
@@ -658,7 +893,8 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
     bounded backoff. Rejection reasons are returned for honest diagnostics
     rather than silently marking a concept unavailable.
     """
-    from .lesson_cache import lesson_key, load as load_lesson, save as save_lesson
+    from .lesson_cache import (find_cached_lesson, lesson_key,
+                               load as load_lesson, save as save_lesson)
 
     meta = mindmap.get("meta") or {}
     teaching_language = meta.get("teachingLanguage") or "en"
@@ -670,6 +906,10 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
         ev = [{"start": e.get("start") or 0, "end": e.get("end"), "text": (e.get("text") or "")[:320]} for e in evidence[:4]]
         raw_topic = node.get("topic") or node.get("text", "")
         topic = canonical_topic(raw_topic)
+        # Before refusing a concept as insufficiently grounded, look for a
+        # nearby transcript line that actually mentions the topic. Only real
+        # spans from this map are added; unrelated or invented evidence never is.
+        ev = _reinforce_evidence(mindmap, {"topic": topic, "evidence": ev})
         model = settings.llm_model or settings.groq_model
         base = settings.llm_base_url or "configured"
         key = lesson_key(topic, ev, model, base, teaching_language)
@@ -678,6 +918,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
                     for n in cfg.get("notes", [])]
         items.append({
             "id": c.cid, "topic": topic, "evidence": ev, "key": key,
+            "node": node,
             "label": node.get("text", topic),
             "teachingLanguage": teaching_language, "sourceLanguage": source_language,
             "acronymExpansion": acronym_expansion(topic),
@@ -705,6 +946,8 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
             "knowledge_check {question, answer, explanation}, "
             "evidence {timestamps:[numbers from evidence], quotes:[short exact phrases]}. "
             + language_rule + " "
+            "knowledge_check must test the lesson text: reuse the exact wording from explain and steps in "
+            "the answer; question and answer must match; the explanation must point to the supporting lesson sentence. "
             "Ground video claims in the supplied evidence. Examples, diagrams and exercises are your own "
             "teaching aids. If evidence is insufficient, return an empty object for that id."
         )
@@ -716,6 +959,10 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
             "knowledge_check {question, answer, explanation}, "
             "evidence {timestamps:[numbers from the supplied evidence], quotes:[short exact phrases from it]}. "
             + language_rule + " "
+            "The knowledge_check is a retrieval test of the lesson you just wrote, not a new question: the answer "
+            "MUST reuse the exact wording and key phrases from explain, steps and worked_example; do not introduce "
+            "new terms, synonyms or facts absent from those fields. The question must ask exactly what the answer "
+            "answers, and the explanation must point to the lesson sentence that supports the answer. "
             "Use only the supplied evidence for video claims; examples, diagrams and exercises are your own teaching "
             "aids - never say 'the speaker says'. If knownPitfalls is given, correct that video claim, do not repeat it. "
             "Each field teaches something new. Insufficient evidence: return an empty object for that id."
@@ -723,29 +970,9 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
 
     def finish(lesson: dict, item: dict) -> dict:
         """Stamp honest, deterministic source attribution onto a validated lesson."""
-        out = apply_accuracy_corrections(lesson, item["topic"])
-        # The model sometimes omits the evidence object. Fall back to the
-        # verified transcript positions already attached to this concept;
-        # never invent a timestamp or a quote.
-        ev = out.get("evidence")
-        if not isinstance(ev, dict) or not (ev.get("timestamps") or ev.get("starts")):
-            stamps = sorted({round(float(e.get("start") or 0), 2)
-                             for e in item["evidence"] if e.get("start") is not None})
-            out["evidence"] = {"timestamps": stamps, "quotes": []}
-        external = ["accuracy_notes"] if out.get("accuracy_notes") else []
-        out["provenance"] = {
-            "source": "video+ai+external" if external else "video+ai",
-            "video_supported": ["explain", "lesson_evidence"],
-            "ai_explanation": ["intuition", "why_it_matters", "steps", "worked_example",
-                               "diagram", "misconception", "exercise", "knowledge_check"],
-            "external_supplement": external,
-            "example_source": "ai-generated",
-        }
         expansion = item.get("acronymExpansion") or acronym_expansion(item["topic"])
-        if expansion:
-            out["acronym_expansion"] = expansion
-        out["teaching_language"] = teaching_language
-        return out
+        return stamp_lesson(lesson, item["topic"], item["evidence"],
+                            teaching_language=teaching_language, expansion=expansion)
 
     accepted: dict[str, dict] = {}
     failed: list[str] = []
@@ -756,6 +983,13 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
 
     for item in items:
         hit = load_lesson(item["key"])
+        if not hit:
+            # Provider changes invalidate the content-addressed key. Recover a
+            # previously validated lesson by topic + grounded timestamps, then
+            # re-run every quality gate below before it is taught.
+            recovered = find_cached_lesson(item["topic"], item["evidence"], teaching_language)
+            if recovered:
+                hit = {"lesson": recovered, "topic": item["topic"]}
         if hit and isinstance(hit.get("lesson"), dict):
             stamped = finish(hit["lesson"], item)
             ev_text = " ".join(e.get("text", "") for e in item["evidence"])
@@ -774,6 +1008,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
         provider_diag: dict = {}
         attempts_made = 0
         retry_stop_reason = ""
+        repair_used = False  # at most ONE targeted knowledge_check repair per concept
 
         for attempt in range(max_attempts):
             attempts_made = attempt + 1
@@ -793,7 +1028,14 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
                     "parseNotes": parse_notes[-2:],
                 }
                 if last_candidate is not None:
-                    feedback["previousRejectedLesson"] = last_candidate
+                    # A full rejected lesson (sometimes >5k chars) made smaller
+                    # models echo a broken structure or truncate the JSON. Keep
+                    # only a short excerpt; the exact validation errors above
+                    # are enough to guide the bounded repair attempt.
+                    feedback["previousRejectedLessonExcerpt"] = {
+                        k: str(last_candidate.get(k) or "")[:180]
+                        for k in ("explain", "knowledge_check") if last_candidate.get(k)
+                    }
                 request_item["repairFeedback"] = feedback
 
             data = None
@@ -842,6 +1084,21 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
                     ok, errors = validate_lesson(
                         candidate, ev_text, item["topic"], item["evidence"], teaching_language
                     )
+                    if not ok and not repair_used and knowledge_check_only(errors):
+                        # Only the retrieval field is wrong: repair that one
+                        # field with a single bounded call instead of throwing
+                        # away an otherwise fully validated lesson.
+                        repair_used = True
+                        repaired = _repair_knowledge_check(candidate, item, errors)
+                        if repaired is None:
+                            errors = ["knowledge_check repair produced no usable field"]
+                        else:
+                            ok, errors = validate_lesson(
+                                repaired, ev_text, item["topic"], item["evidence"], teaching_language
+                            )
+                            if ok:
+                                candidate = repaired
+                                last_candidate = repaired
                     if ok:
                         stamped = finish(candidate, item)
                         ok2, errors2 = validate_deep_teaching(stamped, item["topic"], teaching_language)
@@ -856,12 +1113,11 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
             if lesson is not None or attempt >= max_attempts - 1:
                 break
 
+            # Only the CURRENT logical call's thread-local diagnostics may steer
+            # the retry. A module-global HTTP status from another call or thread
+            # must never suppress this call's bounded retry.
             status = provider_diag.get("status")
-            if status is None:
-                status = getattr(llm, "LAST_STATUS", None)
             retry_after = provider_diag.get("retry_after")
-            if retry_after is None:
-                retry_after = getattr(llm, "LAST_RETRY_AFTER", None)
 
             if provider_diag.get("error_kind") == "not_configured":
                 retry_stop_reason = "retry stopped: no LLM provider configured"
@@ -897,7 +1153,7 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
                 "teachingLanguage": teaching_language,
                 "failureKind": failure_kind,
                 "provider": provider_diag.get("provider"),
-                "providerStatus": provider_diag.get("status", getattr(llm, "LAST_STATUS", None)),
+                "providerStatus": provider_diag.get("status"),
                 "providerErrorKind": provider_diag.get("error_kind"),
                 "providerError": provider_diag.get("error") or (call_errors[-1] if call_errors else None),
                 "attempts": attempts_made,
@@ -910,6 +1166,11 @@ def _llm_deep_lessons(mindmap: dict, concepts: dict) -> tuple[dict, list[str], l
                         item["topic"], failure_kind, last_errors[:5], parse_notes[:2], call_errors[:2])
             continue
         accepted[item["id"]] = lesson
+        # Keep the node's evidence in step with the spans the lesson was taught
+        # from, so every stamped timestamp has a visible transcript quote.
+        node = item.get("node")
+        if isinstance(node, dict) and len(item["evidence"]) > len(node.get("evidence") or []):
+            node["evidence"] = [dict(e) for e in item["evidence"]]
         try:
             save_lesson(item["key"], {"lesson": lesson, "topic": item["topic"]})
         except Exception as exc:  # noqa: BLE001
@@ -1053,8 +1314,13 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
     test_provider = bool(provider and "llm.test" in provider[0])
     deep_status = "n/a"
     if is_deep and concepts and llm.fast_available() and not test_provider:
+        # Filter greeting/filler/duplicate candidates before spending any tokens.
+        deep_concepts, eligibility = _select_deep_concepts_with_stats(concepts)
+        from . import lesson_cache as _lesson_cache
+        cache_before = dict(_lesson_cache.CACHE_STATS)
+        llm_before = dict(llm.STATS)
         try:
-            deep_result = _llm_deep_lessons(mindmap, concepts)
+            deep_result = _llm_deep_lessons(mindmap, deep_concepts)
             if len(deep_result) == 3:
                 lessons, failed_lessons, lesson_rejections = deep_result
             else:  # older callers/tests returning (accepted, failed)
@@ -1076,15 +1342,50 @@ def label_map(mindmap: dict, timeout: float | None = None) -> dict:
             for cid in concepts:
                 if cid not in lessons:
                     merged.available[cid] = False  # fail closed: no fabricated teaching
-                    merged.unavailable[cid] = "Lesson generation failed; concept kept with explicit unavailable status."
+                    merged.unavailable[cid] = (
+                        "Concept has no substantive teaching evidence; no lesson generated."
+                        if cid not in deep_concepts else
+                        "Lesson generation failed; concept kept with explicit unavailable status."
+                    )
             stats["lesson_failures"] = failed_lessons
             stats["deepRejectionReasons"] = lesson_rejections
             stats["lessonsAccepted"] = len(lessons)
+            stats["lessonsValidated"] = len(lessons)
             stats["lessonsRejected"] = len(failed_lessons)
             stats["lessonsAttempted"] = len(lessons) + len(failed_lessons)
+            # Honest coverage accounting: generation success is not the same as
+            # complete educational coverage of the source concepts.
+            stats["conceptsExtracted"] = eligibility["extracted"]
+            stats["conceptsFillerExcluded"] = eligibility["filler_excluded"]
+            stats["conceptsDuplicatesMerged"] = eligibility["duplicates_merged"]
+            stats["conceptsEligible"] = eligibility["eligible"]
+            legitimate = (eligibility["extracted"] - eligibility["filler_excluded"]
+                          - eligibility["duplicates_merged"])
+            stats["legitimateConcepts"] = legitimate
+            # Source-level count, preserved for backwards compatibility: every
+            # extracted source concept without a validated lesson, including
+            # non-teachable filler excluded before any LLM call.
+            stats["conceptsUnexplained"] = max(0, eligibility["extracted"] - len(lessons))
+            # Educational coverage uses only unique legitimate (eligible) concept
+            # IDs with a successfully validated lesson. Rejected lessons, duplicate
+            # merges and excluded filler never count as taught.
+            legitimate_ids = set(deep_concepts)
+            validated_legitimate = len(legitimate_ids.intersection(lessons))
+            stats["legitimateConceptsUnexplained"] = max(0, legitimate - validated_legitimate)
+            stats["cacheHits"] = (
+                _lesson_cache.CACHE_STATS["hits"] - cache_before["hits"]
+                + _lesson_cache.CACHE_STATS["recovered"] - cache_before["recovered"]
+            )
+            stats["logicalLlmCalls"] = max(0, llm.STATS["logical_calls"] - llm_before["logical_calls"])
+            stats["httpRequests"] = max(0, llm.STATS["http_requests"] - llm_before["http_requests"])
             stats["provider"] = llm.provider_name()
             stats["teachingLanguage"] = (mindmap.get("meta") or {}).get("teachingLanguage") or "en"
-            deep_status = "ok" if not failed_lessons else f"incomplete: {len(failed_lessons)} concepts rejected"
+            if failed_lessons:
+                deep_status = f"incomplete: {len(failed_lessons)} concepts rejected"
+            elif stats["legitimateConceptsUnexplained"]:
+                deep_status = f"partial: {validated_legitimate} of {legitimate} eligible concepts taught"
+            else:
+                deep_status = f"ok: {validated_legitimate} of {legitimate} eligible concepts taught"
             if failed_lessons:
                 log.warning("Deep lessons failed for: %s", ", ".join(failed_lessons))
                 log.warning("Deep lesson rejection reasons: %s", json.dumps(lesson_rejections, ensure_ascii=False)[:4000])
@@ -1441,6 +1742,11 @@ def apply_outcome(mindmap: dict, outcome: dict) -> dict:
             "calls", "prompt_tokens", "completion_tokens", "llm_ms", "applied", "candidates",
             "lessonsAttempted", "lessonsAccepted", "lessonsRejected", "lesson_failures",
             "deepRejectionReasons", "provider", "teachingLanguage",
+            # Coverage and request accounting (additive: old maps keep their keys).
+            "lessonsValidated", "conceptsExtracted", "conceptsFillerExcluded",
+            "conceptsDuplicatesMerged", "conceptsEligible", "legitimateConcepts",
+            "conceptsUnexplained", "legitimateConceptsUnexplained",
+            "cacheHits", "logicalLlmCalls", "httpRequests",
         )
     }
     mindmap["meta"]["generationMs"] = stats.get("ms")

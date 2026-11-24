@@ -44,6 +44,8 @@ from pydantic import BaseModel, Field
 from .collab.rooms import manager
 from .config import has_module, settings
 from .features.chat import chat_stream
+from .features.explanations import generate_explanations, recover_explanations
+from .features.recall import improve_recall
 from .features.merge import link_videos, merge_maps
 from .features.notion import push_to_notion
 from .features.refine import refine
@@ -252,6 +254,10 @@ class StudyBody(MapBody):
     focusIds: list[str] | None = None
 
 
+class ExplainBody(MapBody):
+    conceptIds: list[str] | None = None
+
+
 class MapsBody(BaseModel):
     maps: list[dict[str, Any]]
     threshold: float | None = None
@@ -280,6 +286,9 @@ def health() -> dict:
         # Capability labels only: no endpoint, model identifiers or keys in public health.
         "llm": llm.provider_name().split(":", 1)[0],
         "openai_compatible": settings.llm_enabled,
+        "llm_local": bool(settings.llm_enabled and settings.llm_is_local),
+        "local": llm.local_available(),
+        "can_generate": llm.generation_available(),
         "groq": settings.groq_enabled,
         "embeddings": embedding_mode(),
         "translation": "available" if translate.status() not in ("disabled", "unavailable", "loading") else translate.status(),
@@ -325,6 +334,8 @@ def _label(job: Job, skeleton: dict, key: str) -> None:
     if outcome["ops"] or outcome["meta"].get("labelled"):
         final = labels.apply_outcome(copy.deepcopy(skeleton), outcome)
         finalize_concepts(final)
+        improve_recall(final)
+        improve_recall(job.map)
         _cache_map(key, final)
     _log_timing(job, skeleton, outcome["stats"], (time.perf_counter() - started) * 1000)
 
@@ -470,6 +481,20 @@ def search(body: SearchBody) -> dict:
 @app.post("/api/study")
 def study(body: StudyBody) -> dict:
     return generate_study_set(body.map, body.count, body.focusIds)
+
+
+@app.post("/api/explanations/recover")
+def recover_explanations_endpoint(body: ExplainBody) -> dict:
+    """Attach previously validated cached lessons to concepts that lack one."""
+    report = recover_explanations(body.map, body.conceptIds)
+    return {"map": body.map, "report": report}
+
+
+@app.post("/api/explanations/generate")
+def generate_explanations_endpoint(body: ExplainBody) -> dict:
+    """Generate a new validated lesson for a concept when an LLM is configured."""
+    report = generate_explanations(body.map, body.conceptIds)
+    return {"map": body.map, "report": report}
 
 
 @app.post("/api/merge")

@@ -16,6 +16,7 @@ import { CollabClient } from './features/collab.js';
 import { Gamify } from './features/gamify.js';
 import { Library } from './features/library.js';
 import { InspectorPanel } from './features/panel.js';
+import { layoutState } from './features/layout.js';
 import { REFINE_ACTIONS, runRefine } from './features/refine.js';
 import { SearchController } from './features/search.js';
 import { StudyMode } from './features/study.js';
@@ -80,8 +81,88 @@ async function main() {
   const study = new StudyMode({ api, model, renderer, seek, gamify });
   const assistant = new Assistant({ host: $('#assistant'), model, renderer, api, seek });
   const ask = (id) => assistant.open(id);
-  new InspectorPanel({ host: $('#inspector'), model, renderer, api, seek, gamify, ask });
-  new ContentMap({ host: $('#content-map'), stage: $('#stage'), toggle: $('#btn-content-map'), model, renderer, seek });
+  const stage = $('#stage');
+  const drawerBackdrop = $('#drawer-backdrop');
+  const btnInspector = $('#btn-inspector');
+  const inspectorEmpty = $('#inspector-empty');
+  let layoutMode = null;
+  let viewMode = 'full';
+  let focusIndex = 0;
+  let inspectorDrawerClosed = false;
+  const inspectorPanel = new InspectorPanel({ host: $('#inspector'), emptyHost: $('#inspector-empty'), model, renderer, api, seek, gamify, ask });
+  const contentMap = new ContentMap({
+    host: $('#content-map'), stage, toggle: $('#btn-content-map'), model, renderer, seek,
+    onStudy: (focusIds) => (model.map ? study.open({ focusIds, tab: 'quiz' }) : toast('Open a mindmap first.')),
+  });
+
+  /**
+   * Desktop reserves real canvas space for the open inspector; smaller screens
+   * use dismissible overlay drawers. Only a visibility/breakpoint change refits,
+   * so ordinary selection and zoom/pan are preserved.
+   */
+  function syncLayout({ refit = false } = {}) {
+    const state = layoutState(window.innerWidth, {
+      outlineOpen: !!contentMap.open,
+      inspectorOpen: !inspectorPanel.host.hidden && !inspectorDrawerClosed,
+    });
+    stage.dataset.layout = state.mode;
+    stage.classList.toggle('inspector-drawer-closed', inspectorDrawerClosed);
+    stage.classList.toggle('cm-open', state.outlineOpen);
+    stage.classList.toggle('inspector-open', state.reserveInspector);
+    stage.classList.toggle('drawer-open', state.drawersActive);
+    drawerBackdrop.hidden = !state.drawersActive;
+    // The empty state belongs to the desktop column only; in drawer modes it
+    // would otherwise be a permanently open overlay above the map.
+    inspectorEmpty.hidden = !(state.mode === 'desktop' && !state.inspectorOpen);
+    btnInspector.hidden = state.mode === 'desktop';
+    btnInspector.setAttribute('aria-pressed', String(state.inspectorOpen));
+    if (refit || state.mode !== layoutMode) {
+      layoutMode = state.mode;
+      if (model.map) requestAnimationFrame(() => renderer.fit());
+    }
+  }
+
+  // Visibility wrappers: the shell only needs to react when a panel actually opens/closes.
+  const rawShow = inspectorPanel.show.bind(inspectorPanel);
+  inspectorPanel.show = (ids) => {
+    const wasHidden = inspectorPanel.host.hidden;
+    const prevIds = [...inspectorPanel.ids];
+    rawShow(ids);
+    // A genuinely new selection reopens a collapsed drawer; refreshes do not.
+    const nextIds = [...inspectorPanel.ids];
+    if (nextIds.length && nextIds.join('|') !== prevIds.join('|')) inspectorDrawerClosed = false;
+    // Always re-apply the empty-state rule; refit only when the panel really changed.
+    syncLayout({ refit: wasHidden !== inspectorPanel.host.hidden });
+  };
+  const rawSetOpen = contentMap.setOpen.bind(contentMap);
+  contentMap.setOpen = (open, opts) => {
+    rawSetOpen(open, opts);
+    syncLayout({ refit: true });
+  };
+
+  btnInspector.addEventListener('click', () => {
+    const effectiveOpen = !inspectorPanel.host.hidden && !inspectorDrawerClosed;
+    if (effectiveOpen) {
+      inspectorDrawerClosed = true; // hide the drawer but keep the selected concept
+    } else {
+      const ids = [...renderer.selection];
+      if (!ids.length) return toast('Select a concept first.');
+      inspectorDrawerClosed = false;
+    }
+    syncLayout({ refit: true });
+  });
+  drawerBackdrop.addEventListener('click', () => {
+    if (layoutState(window.innerWidth).mode === 'narrow') contentMap.setOpen(false);
+    inspectorDrawerClosed = true;
+    syncLayout({ refit: true });
+  });
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => syncLayout(), 120);
+  });
+  syncLayout();
+
   const search = new SearchController({ input: $('#search'), results: $('#search-results'), model, renderer, api });
   const setLayer = (max) => {
     renderer.setOptions({ maxLayer: max });
@@ -95,6 +176,41 @@ async function main() {
     const ops = model.nodes().filter((n) => n.collapsed).map((n) => ({ type: 'update', id: n.id, patch: { collapsed: false } }));
     if (ops.length) model.apply(ops);
   }
+  /** Focus one section for readable learning; Full Map keeps the overview. */
+  const sectionsOf = () => (model.root?.children || []).filter((s) => s.type === 'section' && !s.recall);
+  function syncFocusUI() {
+    const sections = sectionsOf();
+    const active = viewMode === 'section' ? sections[focusIndex] : null;
+    const btn = $('#btn-focus-mode');
+    btn.textContent = active ? 'Full map' : 'Focus section';
+    btn.setAttribute('aria-pressed', String(!!active));
+    $('#section-prev').hidden = !active;
+    $('#section-next').hidden = !active;
+    const label = $('#focus-label');
+    label.hidden = !active;
+    if (active) {
+      const n = renderer.sectionNumber(active);
+      label.textContent = `Section ${n || focusIndex + 1} of ${sections.length} · ${plain(active.text)}`;
+    }
+  }
+  function enterFocus(index = focusIndex, { fit = true } = {}) {
+    const sections = sectionsOf();
+    if (!sections.length) return toast('No sections yet.');
+    focusIndex = Math.max(0, Math.min(index, sections.length - 1));
+    viewMode = 'section';
+    renderer.setFocus(sections[focusIndex].id, { animate: fit });
+    syncFocusUI();
+  }
+  function exitFocus({ fit = true } = {}) {
+    viewMode = 'full';
+    renderer.clearFocus({ animate: fit });
+    syncFocusUI();
+  }
+  function stepSection(delta) {
+    if (viewMode !== 'section') return enterFocus(0);
+    enterFocus(focusIndex + delta);
+  }
+
   const voice = new VoiceController({ model, renderer, seek, search: (q) => ((search.input.value = q), search.semantic()), setLayer, lang: settings.voiceLang, indicator: $('#voice-indicator') });
   const library = new Library({ api, openMap });
 
@@ -111,7 +227,11 @@ async function main() {
     if (!params.get('room')) history.replaceState(null, '', `?map=${map.id}`);
     if (save) saveMap(model.toJSON());
     study.loadProgress();
-    setTimeout(() => renderer.fit(), 50);
+    setTimeout(() => {
+      const dense = countNodes(map.root) > 80;
+      if (dense || window.innerWidth <= 1100) enterFocus(0);
+      else exitFocus();
+    }, 50);
   }
 
   function renderMeta() {
@@ -318,7 +438,21 @@ async function main() {
   $('#btn-share').addEventListener('click', () => openShare());
   $('#zoom-in').addEventListener('click', () => renderer.zoomBy(1.25));
   $('#zoom-out').addEventListener('click', () => renderer.zoomBy(0.8));
-  $('#zoom-fit').addEventListener('click', () => renderer.fit());
+  $('#zoom-fit').addEventListener('click', () => {
+    if (viewMode === 'section') exitFocus();
+    else renderer.fit();
+  });
+  $('#btn-focus-mode').addEventListener('click', () => {
+    if (viewMode === 'section') exitFocus();
+    else enterFocus(0);
+  });
+  $('#section-prev').addEventListener('click', () => stepSection(-1));
+  $('#section-next').addEventListener('click', () => stepSection(1));
+  $('#zoom-focus').addEventListener('click', () => {
+    const id = [...renderer.selection].at(-1);
+    if (id) renderer.centerOn(id, { zoom: Math.max(renderer.view.k, 0.9) });
+    else toast('Select a concept first.');
+  });
 
   const exportMenu = $('#export-menu');
   $('#btn-export').addEventListener('click', () => {
@@ -344,11 +478,12 @@ async function main() {
   });
 
   const moreMenu = $('#more-menu');
+  const moreDynamic = $('#more-dynamic');
   $('#btn-more').addEventListener('click', () => {
     const section = (title) => el('div', { class: 'menu-title' }, title);
     const radio = (group, current, options, apply) =>
       Object.entries(options).map(([id, label]) => el('button', { class: `menu-item ${current === id ? 'checked' : ''}`, onclick: () => (moreMenu.hidden = true, apply(id)) }, [el('span', {}, current === id ? '●' : '○'), label]));
-    moreMenu.replaceChildren(
+    moreDynamic.replaceChildren(
       el('button', { class: 'menu-item', onclick: () => ((moreMenu.hidden = true), library.open()) }, [el('span', {}, '📚'), 'Library & cross-video links']),
       el('button', { class: 'menu-item', onclick: () => ((moreMenu.hidden = true), promptNewVideo()) }, [el('span', {}, '＋'), 'New mindmap from URL']),
       settings.devMode ? el('button', { class: 'menu-item', onclick: () => ((moreMenu.hidden = true), openDemo()) }, [el('span', {}, '🧪'), 'Open demo map']) : null,
@@ -530,7 +665,7 @@ async function main() {
     const { node, x, y } = e.detail;
     const ids = [...renderer.selection];
     const item = (icon, label, run, disabled = false) => el('button', { class: 'menu-item', disabled: disabled ? true : null, onclick: () => ((ctxMenu.hidden = true), run()) }, [el('span', {}, icon), label]);
-    ctxMenu.replaceChildren(
+    const entries = [
       node.start !== null && node.start !== undefined ? item('▶', `Play from ${fmtTime(node.start)}`, () => seek(node)) : null,
       node.children?.length ? item(node.collapsed ? '⊞' : '⊟', node.collapsed ? 'Expand' : 'Collapse', () => model.toggle(node.id)) : null,
       item('💬', 'Ask about this node', () => ask(node.id)),
@@ -541,7 +676,8 @@ async function main() {
       item('🎓', 'Study this branch', () => study.open({ focusIds: collectIds(node) })),
       el('div', { class: 'menu-title' }, ''),
       node.type !== 'root' ? item('🗑', 'Delete', () => model.remove(ids)) : null,
-    );
+    ];
+    ctxMenu.replaceChildren(...entries.filter(Boolean));
     ctxMenu.hidden = false;
     ctxMenu.style.left = `${Math.min(x, innerWidth - 240)}px`;
     ctxMenu.style.top = `${Math.min(y, innerHeight - ctxMenu.offsetHeight - 10)}px`;
@@ -591,7 +727,10 @@ async function main() {
     if (key === '?') return showHelp();
     const layer = LAYERS.find((l) => l.key === key);
     if (layer) return setLayer(layer.max);
-    if (key === 'f') return renderer.fit();
+    if (key === 'f') return (viewMode === 'section' ? exitFocus() : renderer.fit());
+    if (key === '[') return stepSection(-1);
+    if (key === ']') return stepSection(1);
+    if (key === '0') return exitFocus();
     if (key === '+' || key === '=') return renderer.zoomBy(1.2);
     if (key === '-') return renderer.zoomBy(1 / 1.2);
     if (!node) {

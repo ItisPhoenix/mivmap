@@ -34,7 +34,7 @@ import numpy as np
 
 from . import llm, translate
 from .concepts import Concept, FILLER_CONCEPT_LABELS, VAGUE_LABELS, ConceptGraph, extract_concepts
-from .embeddings import Embedder, backend_name, cosine_matrix
+from .embeddings import Embedder, backend_name, cosine_matrix, encode_long_texts
 from .segmentation import Segment, segment_transcript
 from .study_notes import build_study_note
 from .topics import (ESSENTIAL_LABELS, HTTP_TOPICS, active_topics, detect_domain,
@@ -1218,7 +1218,9 @@ def score_faithfulness(nodes: list[dict], encoder: Embedder, spans: dict[str, st
     if not items:
         return
     texts = encoder.encode([n.get("_faith_text") or n["text"] for n, _ in items])
-    vecs = encoder.encode([span for _, span in items])
+    # Long section spans are chunked and pooled to one representative vector,
+    # so a single request never carries a 6k character payload.
+    vecs = encode_long_texts(encoder, [span for _, span in items])
     for (node, _), a, b in zip(items, texts, vecs):
         node["faith"] = round(max(0.0, float(a @ b)), 2)
 

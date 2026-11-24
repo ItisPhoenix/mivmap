@@ -97,12 +97,18 @@ class ShimElement extends ShimNode {
   }
 
   append(...nodes) {
-    for (const node of nodes) {
+    const flat = nodes.flatMap((node) => node instanceof ShimFragment ? node.childNodes : [node]);
+    for (const node of flat) {
       const child = node instanceof ShimNode ? node : new ShimText(node);
       child.parentNode?.removeChild(child);
       child.parentNode = this;
       this.childNodes.push(child);
     }
+  }
+
+  contains(node) {
+    for (let cur = node; cur; cur = cur.parentNode) if (cur === this) return true;
+    return false;
   }
 
   replaceChildren(...nodes) {
@@ -197,6 +203,22 @@ function matchCompound(el, selector) {
   });
 }
 
+class ShimFragment extends ShimNode {
+  append(...nodes) {
+    for (const node of nodes) {
+      const child = node instanceof ShimNode ? node : new ShimText(node);
+      child.parentNode?.removeChild(child);
+      child.parentNode = this;
+      this.childNodes.push(child);
+    }
+  }
+
+  removeChild(child) {
+    this.childNodes = this.childNodes.filter((c) => c !== child);
+    child.parentNode = null;
+  }
+}
+
 const documentElement = new ShimElement('html');
 const body = new ShimElement('body');
 documentElement.append(body);
@@ -209,6 +231,7 @@ globalThis.document = {
   createElement: (tag) => new ShimElement(tag),
   createElementNS: (ns, tag) => new ShimElement(tag, ns),
   createTextNode: (text) => new ShimText(text),
+  createDocumentFragment: () => new ShimFragment(),
 };
 globalThis.ResizeObserver = class {
   observe() {}

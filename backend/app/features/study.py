@@ -18,10 +18,41 @@ Flashcards test one fact each. Quiz questions have exactly 4 plausible options, 
 Use only facts in the provided nodes."""
 
 
+def _is_user_authored(node: dict) -> bool:
+    return bool(node.get("userAuthored")) or str(node.get("origin") or "").lower() == "user"
+
+
+def _has_usable_teaching_material(node: dict) -> bool:
+    for key in ("explain", "intuition", "why_it_matters", "worked_example", "misconception", "summary", "source"):
+        if str(node.get(key) or "").strip():
+            return True
+    if node.get("steps") or node.get("knowledge_check"):
+        return True
+    text = str(node.get("text") or "")
+    return ":" in text and bool(text.split(":", 1)[1].strip())
+
+
+def is_eligible(node: dict) -> bool:
+    """Shared study-set eligibility rule (mirrored in study-sets.js).
+
+    Explicitly unavailable concepts never enter flashcards or quizzes. Missing
+    flags stay eligible so legacy and Basic Mode maps keep working; user-authored
+    nodes are preserved in the map but only yield questions when they actually
+    carry teachable material.
+    """
+    if (node.get("conceptUnavailable") is True
+            or node.get("available") is False
+            or node.get("lesson_available") is False):
+        return False
+    if _is_user_authored(node) and not _has_usable_teaching_material(node):
+        return False
+    return True
+
+
 def _concepts(mindmap: dict) -> list[dict]:
     out = []
     for node, parent, _ in walk(mindmap["root"]):
-        if node.get("type") in ("concept", "detail") and plain(node.get("text", "")):
+        if node.get("type") in ("concept", "detail") and plain(node.get("text", "")) and is_eligible(node):
             out.append({"id": node["id"], "text": plain(node["text"]), "summary": node.get("summary", ""), "start": node.get("start"), "section": plain(parent.get("text", "")) if parent else ""})
     return out
 
@@ -29,7 +60,7 @@ def _concepts(mindmap: dict) -> list[dict]:
 def generate_study_set(mindmap: dict, count: int = 12, focus_ids: list[str] | None = None) -> dict:
     concepts = _concepts(mindmap)
     if focus_ids:
-        concepts = [c for c in concepts if c["id"] in set(focus_ids)] or concepts
+        concepts = [c for c in concepts if c["id"] in set(focus_ids)]
     concepts = concepts[:60]
     if not concepts:
         return {"flashcards": [], "quiz": [], "provider": "none"}
